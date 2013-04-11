@@ -4,6 +4,7 @@
  * @file
  * Contains \Drupal\field_collection\Plugin\Core\Entity\FieldCollectionItem.php
  */
+
 namespace Drupal\field_collection\Plugin\Core\Entity;
 
 use Drupal\Core\Entity\ContentEntityInterface;
@@ -25,12 +26,10 @@ use Drupal\Core\Annotation\Translation;
  *   form_controller_class = {
  *     "default" = "Drupal\field_collection\FieldCollectionItemFormController"
  *   },
- *   translation_controller_class = "Drupal\field_collection\FieldCollectionItemTranslationController",
  *   base_table = "field_collection_item",
  *   revision_table = "field_collection_item_revision",
- *   menu_base_path = "field-collection/%field_collection_item",
  *   fieldable = TRUE,
- *   translatable = TRUE,
+ *   translatable = FALSE,
  *   entity_keys = {
  *     "id" = "id",
  *     "revision" = "revision_id",
@@ -140,7 +139,7 @@ class FieldCollectionItem extends EntityNG implements ContentEntityInterface {
    */
   protected function init() {
     parent::init();
-    // We unset all defined properties except theme, so magic getters apply.
+    // We unset all defined properties so magic getters apply.
     unset($this->id);
     unset($this->revision_id);
     unset($this->uuid);
