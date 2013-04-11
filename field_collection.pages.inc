@@ -7,6 +7,9 @@
 
 // TODO: fix being embedded in a host with revisions.
 
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+
 /**
  * Field collection item view page.
  */
@@ -56,44 +59,37 @@ function field_collection_item_delete_confirm_submit($form, &$form_state) {
  *
  * @todo: Support optionally passing in the revision_id and langcode parameters.
  */
-function field_collection_item_add($field_name, $entity_type, $entity_id, $revision_id = NULL, $langcode = NULL) {
-  $info = entity_get_info();
-  if (!isset($info[$entity_type])) {
-    return MENU_NOT_FOUND;
-  }
-  $result = entity_load($entity_type, array($entity_id));
-  $entity = reset($result);
-  if (!$entity) {
-    return MENU_NOT_FOUND;
-  }
-  // Ensure the given entity is of a bundle that has an instance of the field.
-  list($id, $rev_id, $bundle) = entity_extract_ids($entity_type, $entity);
-  $instance = field_info_instance($entity_type, $field_name, $bundle);
-  if (!$instance) {
-    return MENU_NOT_FOUND;
-  }
+function field_collection_item_add($field_name, $entity_type, $entity_id, $revision_id = NULL) {
+  // This entity type exists.
+  if (($info = entity_get_info($entity_type)) &&
+    // The host entity exists.
+    ($entity = entity_load($entity_type, $entity_id)) &&
+    // The field exists on the given entity type and bundle.
+    ($instance = field_info_instance($entity_type, $field_name, $result->bundle())) &&
+    // Adding another value will not violate the field cardinality.
+    ($field['cardinality'] == FIELD_CARDINALITY_UNLIMITED || empty($entity->{$field_name}) || count($entity->{$field_name}) < $field['cardinality'])) {
+    // Create a new field collection item.
+    $field_collection_item = entity_create('field_collection_item', array('field_name' => $field_name));
 
-  // Check field cardinality.
-  $field = field_info_field($field_name);
-  $langcode = LANGUAGE_NONE;
-  if (!($field['cardinality'] == FIELD_CARDINALITY_UNLIMITED || !isset($entity->{$field_name}[$langcode]) || count($entity->{$field_name}[$langcode]) < $field['cardinality'])) {
-    drupal_set_message(t('Too many items.'), 'error');
-    return '';
+    // Check access.
+    if (!$field_collection_item->access('create')) {
+      return new AccessDeniedHttpException();
+    }
+
+    // @todo add this to FieldCollectionItemInterface.
+    // Do not link the field collection item with the host entity at this point,
+    // as during the form-workflow we have multiple field collection item entity
+    // instances, which we don't want link all with the host.
+    // That way the link is going to be created when the item is saved.
+    $field_collection_item->setHostEntity($entity_type, $entity, $entity->langcode, FALSE);
+
+    // @todo add this to FieldCollectionItemInterface.
+    $title = ($field['cardinality'] == 1) ? $instance['label'] : t('Add new !instance_label', array('!instance_label' => $field_collection_item->translatedInstanceLabel()));
+    drupal_set_title($title);
+
+    return entity_get_form($field_collection_item);
   }
-
-  $field_collection_item = entity_create('field_collection_item', array('field_name' => $field_name));
-  // Do not link the field collection item with the host entity at this point,
-  // as during the form-workflow we have multiple field collection item entity
-  // instances, which we don't want link all with the host.
-  // That way the link is going to be created when the item is saved.
-  $field_collection_item->setHostEntity($entity_type, $entity, LANGUAGE_NONE, FALSE);
-
-  $title = ($field['cardinality'] == 1) ? $instance['label'] : t('Add new !instance_label', array('!instance_label' => $field_collection_item->translatedInstanceLabel()));
-  drupal_set_title($title);
-
-  // Make sure the current user has access to create a field collection item.
-  if (!field_collection_item_access('create', $field_collection_item)) {
-    return MENU_ACCESS_DENIED;
-  }
-  return drupal_get_form('field_collection_item_form', $field_collection_item);
+  // Either no such entity type, no such entity, no such field instance or too
+  // many instances.
+  return new NotFoundHttpException();
 }
