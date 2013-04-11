@@ -1,0 +1,5 @@
+name: Field collection
+description: Provides a field collection field, to which any number of fields can be attached.
+package: Fields
+core: 8.x
+configure: admin/structure/field-collections
