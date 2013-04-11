@@ -45,6 +45,7 @@ use Drupal\Core\Annotation\Translation;
 /**
  * @todo uuid upgrade path
  * @todo rename item_id => id upgrade path
+ * @todo add langcode column to database
  * @todo form controller
  * @todo render controller
  * @todo storage controller
