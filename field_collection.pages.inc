@@ -13,7 +13,7 @@
 function field_collection_item_page_view($field_collection_item) {
   // @todo: Set breadcrumb including the host.
   drupal_set_title($field_collection_item->label());
-  return $field_collection_item->view('full', NULL, TRUE);
+  return entity_view($field_collection_item, 'full');
 }
 
 /**
@@ -24,46 +24,7 @@ function field_collection_item_form($form, &$form_state, $field_collection_item)
   if (!isset($field_collection_item->is_new)) {
     drupal_set_title($field_collection_item->label());
   }
-  $form_state += array('field_collection_item' => $field_collection_item);
-
-  // Hack: entity_form_field_validate() needs the bundle to be set.
-  // @todo: Fix core and remove the hack.
-  $form['field_name'] = array('#type' => 'value', '#value' => $field_collection_item->field_name);
-
-  field_attach_form('field_collection_item', $field_collection_item, $form, $form_state);
-
-  $form['actions'] = array('#type' => 'actions', '#weight' => 50);
-  $form['actions']['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Save'),
-    '#weight' => 5,
-  );
-  return $form;
-}
-
-/**
- * Validation callback.
- */
-function field_collection_item_form_validate($form, &$form_state) {
-  entity_form_field_validate('field_collection_item', $form, $form_state);
-}
-
-/**
- * Submit builder. Extracts the form values and updates the entity.
- */
-function field_collection_item_form_submit_build_field_collection($form, $form_state) {
-  entity_form_submit_build_entity('field_collection_item', $form_state['field_collection_item'], $form, $form_state);
-  return $form_state['field_collection_item'];
-}
-
-/**
- * Submit callback that permanently saves the changes to the entity.
- */
-function field_collection_item_form_submit($form, &$form_state) {
-  $field_collection_item = field_collection_item_form_submit_build_field_collection($form, $form_state);
-  $field_collection_item->save();
-  drupal_set_message(t('The changes have been saved.'));
-  $form_state['redirect'] = $field_collection_item->path();
+  return entity_get_form($field_collection_item);
 }
 
 /**
