@@ -19,53 +19,14 @@ function field_collection_help($path, $arg) {
 }
 
 /**
- * Implements hook_entity_info().
+ * Implements hook_entity_bundle_info().
  */
-function field_collection_entity_info() {
-  $return['field_collection_item'] = array(
-    'label' => t('Field collection item'),
-    'label callback' => 'entity_class_label',
-    'uri callback' => 'entity_class_uri',
-    'entity class' => 'FieldCollectionItemEntity',
-    'controller class' => 'EntityAPIController',
-    'base table' => 'field_collection_item',
-    'revision table' => 'field_collection_item_revision',
-    'fieldable' => TRUE,
-    // For integration with Redirect module.
-    // @see http://drupal.org/node/1263884
-    'redirect' => FALSE,
-    'entity keys' => array(
-      'id' => 'item_id',
-      'revision' => 'revision_id',
-      'bundle' => 'field_name',
-    ),
-    'module' => 'field_collection',
-    'view modes' => array(
-      'full' => array(
-        'label' => t('Full content'),
-        'custom settings' => FALSE,
-       ),
-    ),
-    'access callback' => 'field_collection_item_access',
-    'metadata controller class' => 'FieldCollectionItemMetadataController'
-  );
-
-  // Add info about the bundles. We do not use field_info_fields() but directly
-  // use field_read_fields() as field_info_fields() requires built entity info
-  // to work.
-  foreach (field_read_fields(array('type' => 'field_collection')) as $field_name => $field) {
-    $return['field_collection_item']['bundles'][$field_name] = array(
-      'label' => t('Field collection @field', array('@field' => $field_name)),
-      'admin' => array(
-        'path' => 'admin/structure/field-collections/%field_collection_field_name',
-        'real path' => 'admin/structure/field-collections/' . strtr($field_name, array('_' => '-')),
-        'bundle argument' => 3,
-        'access arguments' => array('administer field collections'),
-      ),
-    );
+function field_collection_entity_bundle_info() {
+  $bundles = array();
+  foreach (entity_load_multiple_by_properties('field_entity', array('type' => 'field_collection')) as $field_name => $field) {
+    $bundles['field_collection_item'][$field_name]['label'] = $field_name;
   }
-
-  return $return;
+  return $bundles;
 }
 
 /**
