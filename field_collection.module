@@ -70,6 +70,10 @@ function field_collection_item_load_multiple($ids = array(), $conditions = array
   return entity_load('field_collection_item', $ids, $conditions, $reset);
 }
 
+// Entity object replaced by lib/Drupal/field_collection/Entity
+// It remains here for reference and to accept merges
+// TODO: Delete
+if (FALSE) {
 /**
  * Class for field_collection_item entities.
  */
@@ -569,6 +573,7 @@ class FieldCollectionItemEntity extends Entity {
     $this->setUp();
   }
 }
+}
 
 /**
  * Implements hook_menu().
@@ -758,9 +763,12 @@ function field_collection_theme() {
   );
 }
 
+// hook_field_info replaced by lib/Drupal/field_collection/Plugin/Field/FieldType
+// TODO: Delete
 /**
  * Implements hook_field_info().
  */
+/*
 function field_collection_field_info() {
   return array(
     'field_collection' => array(
@@ -780,6 +788,7 @@ function field_collection_field_info() {
     ),
   );
 }
+*/
 
 /**
  * Implements hook_field_instance_settings_form().
