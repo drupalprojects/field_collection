@@ -5,6 +5,8 @@
  * Module implementing field collection field type.
  */
 
+use Drupal\field_collection\Entity\FieldCollection;
+
 /**
  * Implements hook_help().
  */
@@ -1674,14 +1676,19 @@ function field_collection_field_widget_embed_validate($element, &$form_state, $c
 }
 
 /**
- * Implements hook_field_create_field().
+ * Implements hook_field_enitity_create().
  */
-function field_collection_field_create_field($field) {
-  if ($field['type'] == 'field_collection') {
-    field_attach_create_bundle('field_collection_item', $field['field_name']);
+function field_collection_field_entity_create($field) {
+  if ($field->type == 'field_collection') {
+    $field_collection = new FieldCollection();
+    $field_collection->type = $field->name;
+    $field_collection->name = $field->name;
+    $field_collection->id = $field->name;
+    $field_collection->save();
 
     // Clear caches.
     entity_info_cache_clear();
+
     // Do not directly issue menu rebuilds here to avoid potentially multiple
     // rebuilds. Instead, let menu_get_item() issue the rebuild on the next
     // request.

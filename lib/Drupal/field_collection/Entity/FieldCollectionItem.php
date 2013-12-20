@@ -8,7 +8,7 @@
 namespace Drupal\field_collection\Plugin\Core\Entity;
 
 use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Entity\EntityNG;
+use Drupal\Core\Entity\Entity;
 use Drupal\Component\Annotation\Plugin;
 use Drupal\Core\Annotation\Translation;
 
@@ -53,7 +53,7 @@ use Drupal\Core\Annotation\Translation;
  * @todo translation controller
  */
 
-class FieldCollectionItem extends EntityNG implements ContentEntityInterface {
+class FieldCollectionItem extends ContentEntityBase implements ContentEntityInterface {
 
   /**
    * The field collection item ID.

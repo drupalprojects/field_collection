@@ -2,15 +2,16 @@
 
 /**
  * @file
- * Contains \Drupal\field_collection\Plugin\Core\Entity\FieldCollection.php
+ * Contains \Drupal\field_collection\Entity\FieldCollection.
  */
 
-namespace Drupal\field_collection\Plugin\Core\Entity;
+namespace Drupal\field_collection\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\Annotation\EntityType;
 use Drupal\Core\Annotation\Translation;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
+use Drupal\Core\Config\Entity\ConfigEntityInterface;
 
 /**
  * Defines the Field collection configuration entity.
@@ -42,5 +43,8 @@ use Drupal\Core\Entity\EntityStorageControllerInterface;
  * )
  */
 class FieldCollection extends ConfigEntityBase implements ConfigEntityInterface {
-
+  public function __construct() {
+    parent::__construct();
+    $this->entityType = "field_collection";
+  }
 }
