@@ -43,8 +43,33 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
  * )
  */
 class FieldCollection extends ConfigEntityBase implements ConfigEntityInterface {
-  public function __construct() {
-    parent::__construct();
+  /**
+   * The machine name of this field collection.
+   *
+   * @var string
+   *
+   * @todo Rename to $id.
+   */
+  public $type;
+
+  /**
+   * The UUID of the node type.
+   *
+   * @var string
+   */
+  public $uuid;
+
+  /**
+   * The human-readable name of the field collection.
+   *
+   * @var string
+   *
+   * @todo Rename to $label.
+   */
+  public $name;
+
+  public function __construct(array $values, $entity_type) {
+    parent::__construct($values, $entity_type);
     $this->entityType = "field_collection";
   }
 }

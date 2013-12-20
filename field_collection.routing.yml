@@ -1,8 +1,15 @@
 field_collection.overview:
-  path: 'admin/structure/field_collections'
+  path: 'admin/structure/field-collections'
   defaults:
     _title: 'Manage fields on field collections.'
     _content: '\Drupal\Core\Entity\Controller\EntityListController::listing'
     entity_type: 'field_collection'
+  requirements:
+    _permission: 'administer content types'
+
+field_collection.edit:
+  path: 'admin/structure/field-collections/manage/{field_collection}'
+  defaults:
+    _entity_form: 'field_collection.edit'
   requirements:
     _permission: 'administer content types'

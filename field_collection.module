@@ -1686,6 +1686,8 @@ function field_collection_field_entity_create($field) {
     $field_collection->id = $field->name;
     $field_collection->save();
 
+    // TODO: entity_invoke_bundle_hook in post save like in nodeType ?
+
     // Clear caches.
     entity_info_cache_clear();
 

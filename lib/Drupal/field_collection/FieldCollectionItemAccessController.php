@@ -5,9 +5,9 @@
  * Contains \Drupal\field_collection\FieldCollectionItemAccessController
  */
 
-use Drupal\Core\Entity\EntityAccessController;
-
 namespace Drupal\field_collection;
+
+use Drupal\Core\Entity\EntityAccessController;
 
 class FieldCollectionItemAccessController extends EntityAccessController {
 
