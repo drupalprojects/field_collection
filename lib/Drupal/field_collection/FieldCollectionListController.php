@@ -13,6 +13,7 @@ use Drupal\Core\Entity\EntityControllerInterface;
  * Provides a listing of field collections.
  */
 class FieldCollectionListController extends ConfigEntityListController implements EntityControllerInterface {
+
   /**
    * Overrides Drupal\Core\Entity\EntityListController::load().
    */
@@ -25,7 +26,6 @@ class FieldCollectionListController extends ConfigEntityListController implement
     return $entities;
   }
 
-
   /**
    * {@inheritdoc}
    */
@@ -35,5 +35,14 @@ class FieldCollectionListController extends ConfigEntityListController implement
       'class' => array('menu-label'),
     );
     return $row + parent::buildRow($entity);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildHeader() {
+    $header = array(
+      'title' => $this->t('Machine name'),);
+    return $header + parent::buildHeader();
   }
 }
