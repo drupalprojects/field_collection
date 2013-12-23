@@ -2,34 +2,37 @@
 
 /**
  * @file
- * Contains \Drupal\field_collection\Plugin\Core\Entity\FieldCollectionItem.php
+ * Definition of \Drupal\field_collection\Entity\FieldCollectionItem.
  */
 
-namespace Drupal\field_collection\Plugin\Core\Entity;
+namespace Drupal\field_collection\Entity;
 
-use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Entity\Entity;
-use Drupal\Component\Annotation\Plugin;
-use Drupal\Core\Annotation\Translation;
+use Drupal\Core\Entity\ContentEntityBase;
+use Drupal\Core\Entity\EntityStorageControllerInterface;
+use Drupal\Core\Field\FieldDefinition;
+use Drupal\Core\Language\Language;
 
 /**
  * Defines the field collection item entity class.
  *
- * @Plugin(
+ * @EntityType(
  *   id = "field_collection_item",
  *   label = @Translation("Field Collection Item"),
  *   bundle_label = @Translation("Field Name"),
- *   module = "field_collection",
- *   controller_class = "Drupal\field_collection\FieldCollectionItemStorageController",
- *   access_controller_class = "Drupal\field_collection\FieldCollectionItemAccessController",
- *   render_controller_class = "Drupal\field_collection\FieldCollectionItemRenderController",
- *   form_controller_class = {
- *     "default" = "Drupal\field_collection\FieldCollectionItemFormController"
+ *   controllers = {
+ *     "storage" = "Drupal\field_collection\FieldCollectionItemStorageController",
+ *     "access" = "Drupal\field_collection\FieldCollectionItemAccessController",
+ *     "form" = {
+ *       "default" = "Drupal\field_collection\FieldCollectionItemFormController",
+ *     }
  *   },
  *   base_table = "field_collection_item",
+ *   data_table = "field_collection_item_field_data",
  *   revision_table = "field_collection_item_revision",
+ *   revision_data_table = "field_collection_item_field_revision",
  *   fieldable = TRUE,
  *   translatable = FALSE,
+ *   render_cache = FALSE,
  *   entity_keys = {
  *     "id" = "id",
  *     "revision" = "revision_id",
@@ -38,22 +41,27 @@ use Drupal\Core\Annotation\Translation;
  *     "uuid" = "uuid"
  *   },
  *   bundle_keys = {
- *     "bundle" = "type"
+ *     "bundle" = "field_name"
+ *   },
+ *   bundle_entity_type = "field_collection",
+ *   permission_granularity = "bundle",
+ *   links = {
+ *     "canonical" = "field_collection.item.view",
+ *     "admin-form" = "field_collection.edit"
  *   }
  * )
  */
-/**
- * @todo uuid upgrade path
- * @todo rename item_id => id upgrade path
- * @todo add langcode column to database
- * @todo form controller
- * @todo render controller
- * @todo storage controller
- * @todo access controller
- * @todo translation controller
- */
-
-class FieldCollectionItem extends ContentEntityBase implements ContentEntityInterface {
+class FieldCollectionItem extends ContentEntityBase {
+ /**
+  * @todo uuid upgrade path
+  * @todo rename item_id => id upgrade path
+  * @todo add langcode column to database
+  * @todo form controller
+  * @todo render controller
+  * @todo storage controller
+  * @todo access controller
+  * @todo translation controller
+  */  
 
   /**
    * The field collection item ID.
@@ -153,11 +161,41 @@ class FieldCollectionItem extends ContentEntityBase implements ContentEntityInte
    */
   public function uri() {
     return array(
-      'path' => 'field-collection/' . $this->id(),
+      'path' => 'field-collection-items/' . $this->id(),
       'options' => array(
         'entity_type' => $this->entityType,
         'entity' => $this,
       )
     );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function baseFieldDefinitions($entity_type) {
+    $fields['item_id'] = FieldDefinition::create('integer')
+      ->setLabel(t('Field collection item ID'))
+      ->setDescription(t('The field collection item ID.'))
+      ->setReadOnly(TRUE);
+
+    /* TODO
+    $fields['uuid'] = FieldDefinition::create('uuid')
+      ->setLabel(t('UUID'))
+      ->setDescription(t('The field collection item UUID.'))
+      ->setReadOnly(TRUE);
+    */
+
+    $fields['revision_id'] = FieldDefinition::create('integer')
+      ->setLabel(t('Revision ID'))
+      ->setDescription(t('The field collection item revision ID.'))
+      ->setReadOnly(TRUE);
+
+    $fields['field_name'] = FieldDefinition::create('entity_reference')
+      ->setLabel(t('Type'))
+      ->setDescription(t('The field collection item field.'))
+      ->setSetting('target_type', 'field_collection')
+      ->setReadOnly(TRUE);
+
+    return $fields;
   }
 }

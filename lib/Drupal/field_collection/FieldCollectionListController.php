@@ -8,6 +8,7 @@ namespace Drupal\field_collection;
 
 use Drupal\Core\Config\Entity\ConfigEntityListController;
 use Drupal\Core\Entity\EntityControllerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a listing of field collections.
@@ -41,8 +42,7 @@ class FieldCollectionListController extends ConfigEntityListController implement
    * {@inheritdoc}
    */
   public function buildHeader() {
-    $header = array(
-      'title' => $this->t('Machine name'),);
+    $header = array('title' => $this->t('Machine name'),);
     return $header + parent::buildHeader();
   }
 }
