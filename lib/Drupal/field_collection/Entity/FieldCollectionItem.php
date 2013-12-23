@@ -34,7 +34,7 @@ use Drupal\Core\Language\Language;
  *   translatable = FALSE,
  *   render_cache = FALSE,
  *   entity_keys = {
- *     "id" = "id",
+ *     "id" = "item_id",
  *     "revision" = "revision_id",
  *     "bundle" = "field_name",
  *     "label" = "field_name",
@@ -68,7 +68,7 @@ class FieldCollectionItem extends ContentEntityBase {
    *
    * @var \Drupal\Core\Entity\Field\FieldInterface
    */
-  public $id;
+  public $item_id;
 
   /**
    * The field collection item revision ID.
@@ -116,14 +116,14 @@ class FieldCollectionItem extends ContentEntityBase {
    * Implements Drupal\Core\Entity\EntityInterface::id().
    */
   public function id() {
-    return $this->id->value;
+    return $this->item_id;
   }
 
   /**
    * Implements Drupal\Core\Entity\EntityInterface::bundle().
    */
   public function bundle() {
-    return $this->type->value;
+    return $this->field_name;
   }
 
   /**
