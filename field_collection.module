@@ -6,6 +6,7 @@
  */
 
 use Drupal\field_collection\Entity\FieldCollection;
+use Drupal\Core\Extension\ModuleHandler;
 
 /**
  * Implements hook_help().
@@ -580,26 +581,22 @@ class FieldCollectionItemEntity extends Entity {
 
 /**
  * Currently causes fatal error during the creation of a content type.
- * TODO: Replace with a routing .yml
- * TODO: Delete
+ * TODO: Replace paths with a routing .yml
  */
 /**
  * Implements hook_menu().
  */
-/*
 function field_collection_menu() {
   $items = array();
-  if (module_exists('field_ui')) {
+  if (\Drupal::moduleHandler()->moduleExists('field_ui')) {
     $items['admin/structure/field-collections'] = array(
       'title' => 'Field collections',
       'description' => 'Manage fields on field collections.',
-      'page callback' => 'field_collections_overview',
-      'access arguments' => array('administer field collections'),
-      'type' => MENU_NORMAL_ITEM,
-      'file' => 'field_collection.admin.inc',
+      'route_name' => 'field_collection.overview',
     );
   }
 
+  /*
   // Add menu paths for viewing/editing/deleting field collection items.
   foreach (field_info_fields() as $field) {
     if ($field['type'] == 'field_collection') {
@@ -667,10 +664,10 @@ function field_collection_menu() {
     'file path' => 'includes',
     'file' => 'form.inc',
   );
+*/
 
   return $items;
 }
-*/
 
 /**
  * Implements hook_menu_alter() to fix the field collections admin UI tabs.
