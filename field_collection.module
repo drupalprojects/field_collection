@@ -1034,8 +1034,14 @@ function field_collection_item_is_empty(FieldCollectionItemEntity $item) {
 }
 
 /**
+ * TODO: replace with plugin API
+ * TODO: delete
+ * https://drupal.org/node/1805846
+ */
+/**
  * Implements hook_field_formatter_info().
  */
+/*
 function field_collection_field_formatter_info() {
   return array(
     'field_collection_list' => array(
@@ -1068,6 +1074,7 @@ function field_collection_field_formatter_info() {
     ),
   );
 }
+*/
 
 /**
  * Implements hook_field_formatter_settings_form().

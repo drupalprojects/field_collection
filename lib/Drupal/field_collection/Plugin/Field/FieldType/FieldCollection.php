@@ -25,10 +25,11 @@ use Drupal\Core\TypedData\DataDefinition;
  *   instance_settings = {
  *   },
  *   default_widget = "field_collection_embed",
- *   default_formatter = "field_collection_view"
+ *   default_formatter = "field_collection_list"
  * )
  */
 class FieldCollection extends ConfigFieldItemBase {
+
   /**
    * {@inheritdoc}
    */

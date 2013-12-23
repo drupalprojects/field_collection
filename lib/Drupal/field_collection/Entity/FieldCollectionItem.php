@@ -46,12 +46,12 @@ use Drupal\Core\Language\Language;
  *   bundle_entity_type = "field_collection",
  *   permission_granularity = "bundle",
  *   links = {
- *     "canonical" = "field_collection.item.view",
  *     "admin-form" = "field_collection.edit"
  *   }
  * )
  */
 class FieldCollectionItem extends ContentEntityBase {
+
  /**
   * @todo uuid upgrade path
   * @todo rename item_id => id upgrade path

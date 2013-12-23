@@ -43,6 +43,7 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
  * )
  */
 class FieldCollection extends ConfigEntityBase implements ConfigEntityInterface {
+
   /**
    * The machine name of this field collection.
    *
