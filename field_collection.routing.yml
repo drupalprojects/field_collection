@@ -13,3 +13,10 @@ field_collection.edit:
     _entity_form: 'field_collection.edit'
   requirements:
     _permission: 'administer content types'
+
+field_collection_item.add:
+  path: 'field-collection/add/{field_collection}/{host_type}/{host_id}'
+  defaults:
+    _content: '\Drupal\field_collection\Controller\FieldCollectionItemController::add'
+  requirements:
+    _permission: 'administer content types' # TODO change this

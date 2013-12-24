@@ -2,19 +2,20 @@
 
 /**
  * @file
- * Contains \Drupal\field_collection\FieldCollectionItemFormController
+ * Contains \Drupal\field_collection\FieldCollectionItemFormController.
  */
-
-use Drupal\Core\Entity\EntityFormControllerNG;
-use Drupal\Core\Entity\EntityInterface;
 
 namespace Drupal\field_collection;
 
-class FieldCollectionItemFormController extends EntityFormControllerNG {
+use Drupal\Core\Entity\ContentEntityFormController;
+use Drupal\Core\Entity\EntityInterface;
+
+class FieldCollectionItemFormController extends ContentEntityFormController {
 
   /**
-   * Overrides \Drupal\Core\Entity\EntityFormControllerNG::form().
+   * Overrides \Drupal\Core\Entity\EntityFormController::form().
    */
+  /*
   public function form(array $form, array &$form_state, EntityInterface $field_collection_item) {
 
     // Basic item information.
@@ -43,9 +44,10 @@ class FieldCollectionItemFormController extends EntityFormControllerNG {
 
     return parent::form($form, $form_state, $block);
   }
+  */
 
   /**
-   * Overrides \Drupal\Core\Entity\EntityFormControllerNG::submit().
+   * Overrides \Drupal\Core\Entity\EntityFormController::submit().
    */
   public function submit(array $form, array &$form_state) {
     // Build the block object from the submitted values.
@@ -56,11 +58,11 @@ class FieldCollectionItemFormController extends EntityFormControllerNG {
   }
 
   /**
-   * Overrides \Drupal\Core\Entity\EntityFormControllerNG::save().
+   * Overrides \Drupal\Core\Entity\EntityFormController::save().
    */
   public function save(array $form, array &$form_state) {
     $field_collection_item = $this->getEntity($form_state);
-    $insert = empty($field_collection_item->id->value);
+    $insert = empty($field_collection_item->item_id);
     $field_collection_item->save();
     $watchdog_args = array('@type' => $field_collection_item->bundle(), '%info' => $field_collection_item->label());
 
@@ -71,9 +73,9 @@ class FieldCollectionItemFormController extends EntityFormControllerNG {
       watchdog('content', '@type: updated %info.', $watchdog_args, WATCHDOG_NOTICE);
     }
 
-    if ($field_collection_item->id->value) {
-      $form_state['values']['id'] = $field_collection_item->id->value;
-      $form_state['id'] = $field_collection_item->id->value;
+    if ($field_collection_item->id()) {
+      $form_state['values']['id'] = $field_collection_item->id();
+      $form_state['id'] = $field_collection_item->id();
     }
     else {
       // In the unlikely case something went wrong on save, the block will be
@@ -89,7 +91,7 @@ class FieldCollectionItemFormController extends EntityFormControllerNG {
   }
 
   /**
-   * Overrides \Drupal\Core\Entity\EntityFormControllerNG::delete().
+   * Overrides \Drupal\Core\Entity\EntityFormController::delete().
    */
   public function delete(array $form, array &$form_state) {
     $destination = array();

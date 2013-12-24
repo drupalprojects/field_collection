@@ -27,9 +27,7 @@ use Drupal\Core\Language\Language;
  *     }
  *   },
  *   base_table = "field_collection_item",
- *   data_table = "field_collection_item_field_data",
  *   revision_table = "field_collection_item_revision",
- *   revision_data_table = "field_collection_item_field_revision",
  *   fieldable = TRUE,
  *   translatable = FALSE,
  *   render_cache = FALSE,
@@ -116,14 +114,15 @@ class FieldCollectionItem extends ContentEntityBase {
    * Implements Drupal\Core\Entity\EntityInterface::id().
    */
   public function id() {
-    return $this->item_id;
-  }
+    if (gettype($this->item_id) == 'string') {
+      $this->item_id = (object) array('value' => $this->item_id);
+    }
 
-  /**
-   * Implements Drupal\Core\Entity\EntityInterface::bundle().
-   */
-  public function bundle() {
-    return $this->field_name;
+    if (isset($this->item_id->value)) {
+      return $this->item_id->value;
+    } else {
+      return NULL;
+    }
   }
 
   /**
