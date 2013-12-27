@@ -68,6 +68,12 @@ class FieldCollectionItemFormController extends ContentEntityFormController {
 
     if ($insert) {
       watchdog('content', '@type: added %info.', $watchdog_args, WATCHDOG_NOTICE);
+      $host = entity_load($this->getRequest()->get('host_type'),
+                          $this->getRequest()->get('host_id'));
+      // TODO: Handle cases (ex. saving more than one field collection item in a field)
+      $host->{$field_collection_item->bundle()}->value =
+        $field_collection_item->id();
+      $host->save();
     }
     else {
       watchdog('content', '@type: updated %info.', $watchdog_args, WATCHDOG_NOTICE);

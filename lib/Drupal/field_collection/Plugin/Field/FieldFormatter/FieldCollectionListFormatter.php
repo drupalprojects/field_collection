@@ -78,7 +78,7 @@ class FieldCollectionListFormatter extends FormatterBase {
     $element['#suffix'] .= '<ul class="action-links action-links-field-collection-add"><li>';
     $element['#suffix'] .= l(
       t('Add'), "field-collection/add/" .
-      $items->getFieldDefinition()->getName() . "/" . $e->bundle() . "/" .
+      $items->getFieldDefinition()->getName() . "/" . $e->entityType() . "/" .
       $e->id());
     $element['#suffix'] .= '</li></ul>';
 
