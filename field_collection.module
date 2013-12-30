@@ -1858,3 +1858,25 @@ function field_collection_devel_generate($object, $field, $instance, $bundle) {
 
   return array('value' => $field_collection->item_id);
 }
+
+/**
+ * Prepares variables for field collection item templates.
+ *
+ * Default template: field-collection-item.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - elements: An array of elements to display in view mode.
+ */
+function template_preprocess_field_collection_item(&$variables) {
+  $field_collection_item = $variables['elements']['#field_collection_item'];
+
+  // Helpful $content variable for templates.
+  $variables += array('content' => array());
+  foreach (element_children($variables['elements']) as $key) {
+    $variables['content'][$key] = $variables['elements'][$key];
+  }
+
+  // Make the field variables available with the appropriate language.
+  field_attach_preprocess($field_collection_item, $variables['content'], $variables);
+}

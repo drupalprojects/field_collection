@@ -20,3 +20,10 @@ field_collection_item.add:
     _content: '\Drupal\field_collection\Controller\FieldCollectionItemController::add'
   requirements:
     _permission: 'administer content types' # TODO change this
+
+field_collection_item.view:
+  path: 'field-collection/{field_collection_item}'
+  defaults:
+    _content: '\Drupal\field_collection\Controller\FieldCollectionItemController::page'
+  requirements:
+    _permission: 'administer content types' # TODO change this

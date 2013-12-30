@@ -21,6 +21,7 @@ use Drupal\Core\Language\Language;
  *   bundle_label = @Translation("Field Name"),
  *   controllers = {
  *     "storage" = "Drupal\field_collection\FieldCollectionItemStorageController",
+ *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "access" = "Drupal\field_collection\FieldCollectionItemAccessController",
  *     "form" = {
  *       "default" = "Drupal\field_collection\FieldCollectionItemFormController",
@@ -44,7 +45,8 @@ use Drupal\Core\Language\Language;
  *   bundle_entity_type = "field_collection",
  *   permission_granularity = "bundle",
  *   links = {
- *     "admin-form" = "field_collection.edit"
+ *     "admin-form" = "field_collection.edit",
+ *     "canonical" = "field_collection_item.view"
  *   }
  * )
  */

@@ -9,6 +9,7 @@ namespace Drupal\field_collection\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\field_collection\Entity\FieldCollection;
+use Drupal\field_collection\Entity\FieldCollectionItem;
 
 /**
  * Returns responses for Field collection item routes.
@@ -40,6 +41,34 @@ class FieldCollectionItemController extends ControllerBase {
 
     $form = $this->entityManager()->getForm($field_collection_item);
     return $form;
+  }
+
+  /**
+   * Displays a field collection item.
+   *
+   * @param \Drupal\field_collection\Entity\FieldCollectionItem $field_collection_item
+   *   The field collection item we are displaying.
+   *
+   * @return array
+   *   An array suitable for drupal_render().
+   */
+  public function page(FieldCollectionItem $field_collection_item) {
+    $build = $this->buildPage($field_collection_item);
+    return $build;
+  }
+
+  /**
+   * Builds a field collection item page render array.
+   *
+   * @param \Drupal\field_collection\Entity\FieldCollectionItem $field_collection_item
+   *   The field collection item we are displaying.
+   *
+   * @return array
+   *   An array suitable for drupal_render().
+   */
+  protected function buildPage(FieldCollectionItem $field_collection_item) {
+    $ret = array('field_collection_items' => $this->entityManager()->getViewBuilder('field_collection_item')->view($field_collection_item));
+    return $ret;
   }
 
 }

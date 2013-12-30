@@ -33,8 +33,9 @@ class FieldCollectionListFormatter extends FormatterBase {
     $settings = $this->getFieldSettings();
 
     foreach ($items as $delta => $item) {
-      $element[$delta] = array('#markup' => $this->fieldDefinition->getName() .
-                               " $delta");
+      $element[$delta] = array('#markup' =>
+        l($this->fieldDefinition->getName() . " $delta",
+          "field-collection/" . $item->value));
     }
 
     /* The following is the original code from
