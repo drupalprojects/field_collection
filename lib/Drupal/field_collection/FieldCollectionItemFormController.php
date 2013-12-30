@@ -71,8 +71,9 @@ class FieldCollectionItemFormController extends ContentEntityFormController {
       $host = entity_load($this->getRequest()->get('host_type'),
                           $this->getRequest()->get('host_id'));
       // TODO: Handle cases (ex. saving more than one field collection item in a field)
-      $host->{$field_collection_item->bundle()}->value =
-        $field_collection_item->id();
+      //_l($host->{$field_collection_item->bundle()}->getValue());
+      $host->{$field_collection_item->bundle()}[] =
+        array('value' => $field_collection_item->id());
       $host->save();
     }
     else {
