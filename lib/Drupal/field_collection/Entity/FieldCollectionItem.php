@@ -25,7 +25,8 @@ use Drupal\Core\Language\Language;
  *     "access" = "Drupal\field_collection\FieldCollectionItemAccessController",
  *     "form" = {
  *       "default" = "Drupal\field_collection\FieldCollectionItemFormController",
- *       "edit" = "Drupal\field_collection\FieldCollectionItemFormController"
+ *       "edit" = "Drupal\field_collection\FieldCollectionItemFormController",
+ *       "delete" = "Drupal\field_collection\Form\FieldCollectionItemDeleteForm"
  *     }
  *   },
  *   base_table = "field_collection_item",
@@ -114,6 +115,13 @@ class FieldCollectionItem extends ContentEntityBase {
   public $info;
 
   /**
+   * The entity type of the host.
+   *
+   * @var \Drupal\Core\Entity\Field\FieldInterface
+   */
+  public $host_type;
+
+  /**
    * Implements Drupal\Core\Entity\EntityInterface::id().
    */
   public function id() {
@@ -152,6 +160,7 @@ class FieldCollectionItem extends ContentEntityBase {
     parent::init();
     // We unset all defined properties so magic getters apply.
     unset($this->id);
+    unset($this->host_type);
     unset($this->revision_id);
     unset($this->uuid);
     unset($this->field_name);
@@ -172,12 +181,35 @@ class FieldCollectionItem extends ContentEntityBase {
   }
 
   /**
+   * Returns the host entity of this field collection item.
+   */
+  public function getHost() {
+    $entity_info = \Drupal::entityManager()
+                     ->getDefinition($this->host_type->value);
+    if (isset($entity_info['base_table'])) {
+      $host_id = reset(db_query(
+        "SELECT `entity_id` " .
+        "FROM {" . $entity_info['base_table'] . "__" . $this->bundle() . "} " .
+        "WHERE `" . $this->bundle() . "_value` = " . $this->id())
+          ->fetchCol());
+      return entity_load($this->host_type->value, $host_id);
+    } else {
+      return NULL;
+    }
+  }
+
+  /**
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions($entity_type) {
     $fields['item_id'] = FieldDefinition::create('integer')
       ->setLabel(t('Field collection item ID'))
       ->setDescription(t('The field collection item ID.'))
+      ->setReadOnly(TRUE);
+
+    $fields['host_type'] = FieldDefinition::create('string')
+      ->setLabel(t("Host's entity type"))
+      ->setDescription(t("Type of entity for the field collection item's host."))
       ->setReadOnly(TRUE);
 
     /* TODO

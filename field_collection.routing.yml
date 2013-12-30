@@ -1,5 +1,5 @@
 field_collection.overview:
-  path: 'admin/structure/field-collections'
+  path: '/admin/structure/field-collections'
   defaults:
     _title: 'Manage fields on field collections.'
     _content: '\Drupal\Core\Entity\Controller\EntityListController::listing'
@@ -8,29 +8,36 @@ field_collection.overview:
     _permission: 'administer content types'
 
 field_collection.edit:
-  path: 'admin/structure/field-collections/manage/{field_collection}'
+  path: '/admin/structure/field-collections/manage/{field_collection}'
   defaults:
     _entity_form: 'field_collection.edit'
   requirements:
     _permission: 'administer content types'
 
 field_collection_item.add:
-  path: 'field-collection/add/{field_collection}/{host_type}/{host_id}'
+  path: '/field-collection-item/add/{field_collection}/{host_type}/{host_id}'
   defaults:
     _content: '\Drupal\field_collection\Controller\FieldCollectionItemController::add'
   requirements:
     _permission: 'administer content types' # TODO change this
 
 field_collection_item.view:
-  path: 'field-collection/{field_collection_item}'
+  path: '/field-collection-item/{field_collection_item}'
   defaults:
     _content: '\Drupal\field_collection\Controller\FieldCollectionItemController::page'
   requirements:
     _permission: 'administer content types' # TODO change this
 
 field_collection_item.page_edit:
-  path: 'field-collection/{field_collection_item}/edit'
+  path: '/field-collection-item/{field_collection_item}/edit'
   defaults:
     _entity_form: 'field_collection_item.edit'
+  requirements:
+    _permission: 'administer content types' # TODO change this
+
+field_collection_item.delete_confirm:
+  path: 'field-collection-item/{field_collection_item}/delete'
+  defaults:
+    _entity_form: 'field_collection_item.delete'
   requirements:
     _permission: 'administer content types' # TODO change this

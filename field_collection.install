@@ -18,6 +18,11 @@ function field_collection_schema() {
         'not null' => TRUE,
         'description' => 'Primary Key: Unique field collection item ID.',
       ),
+      'host_type' => array(
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+      ),
       'revision_id' => array(
         'type' => 'int',
         'not null' => TRUE,

@@ -109,4 +109,5 @@ class FieldCollectionItemFormController extends ContentEntityFormController {
     $field_collection_item = $this->buildEntity($form, $form_state);
     $form_state['redirect'] = array('field-collection/' . $field_collection_item->id() . '/delete', array('query' => $destination));
   }
+
 }

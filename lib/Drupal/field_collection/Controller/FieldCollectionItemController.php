@@ -36,6 +36,7 @@ class FieldCollectionItemController extends ControllerBase {
   public function add(FieldCollection $field_collection, $host_type, $host_id) {
     $field_collection_item = $this->entityManager()->getStorageController('field_collection_item')->create(array(
       'field_name' => $field_collection->type,
+      'host_type' => $host_type,
       'revision_id' => 0, // TODO: set this correctly
     ));
 
