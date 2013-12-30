@@ -91,7 +91,7 @@ class FieldCollectionItemFormController extends ContentEntityFormController {
       $form_state['rebuild'] = TRUE;
     }
 
-    $form_state['redirect'] = $field_collection_item->uri();
+    $form_state['redirect'] = $field_collection_item->uri()['path'];
 
     // Clear the page and block caches.
     cache_invalidate_tags(array('content' => TRUE));

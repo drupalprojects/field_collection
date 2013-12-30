@@ -36,9 +36,11 @@ class FieldCollectionListFormatter extends FormatterBase {
       $element[$delta] = array('#markup' =>
         l($this->fieldDefinition->getName() . " $delta",
           "field-collection-item/" . $item->value)
-        . " (" . l(t('Edit'), "field-collection-item/" . $item->value . "/edit")
+        . " (" . l(t('Edit'), "field-collection-item/" . $item->value . "/edit",
+                   array('query' => array("destination" => current_path())))
         . "|" . l(t('Delete'), "field-collection-item/" . $item->value
-        . "/delete") . ")");
+        . "/delete", array('query' =>
+                           array("destination" => current_path()))) . ")");
     }
 
     /* The following is the original code from
@@ -83,7 +85,7 @@ class FieldCollectionListFormatter extends FormatterBase {
     $element['#suffix'] .= l(
       t('Add'), "field-collection-item/add/" .
       $items->getFieldDefinition()->getName() . "/" . $e->entityType() . "/" .
-      $e->id());
+      $e->id(), array('query' => array("destination" => current_path())));
     $element['#suffix'] .= '</li></ul>';
 
     return $element;

@@ -171,13 +171,15 @@ class FieldCollectionItem extends ContentEntityBase {
    * Overrides \Drupal\Core\Entity\Entity::uri().
    */
   public function uri() {
-    return array(
-      'path' => 'field-collection-items/' . $this->id(),
+    $ret = array(
+      'path' => 'field-collection-item/' . $this->id(),
       'options' => array(
         'entity_type' => $this->entityType,
         'entity' => $this,
       )
     );
+
+    return $ret;
   }
 
   /**
