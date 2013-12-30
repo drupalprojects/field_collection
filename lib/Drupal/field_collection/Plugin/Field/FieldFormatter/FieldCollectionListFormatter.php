@@ -33,6 +33,8 @@ class FieldCollectionListFormatter extends FormatterBase {
     $settings = $this->getFieldSettings();
 
     foreach ($items as $delta => $item) {
+      // TODO: There is probably a better way to generate the URLs...
+      // Entity::uri() ?
       $element[$delta] = array('#markup' =>
         l($this->fieldDefinition->getName() . " $delta",
           "field-collection-item/" . $item->value)

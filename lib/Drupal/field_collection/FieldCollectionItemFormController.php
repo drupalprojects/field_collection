@@ -62,7 +62,7 @@ class FieldCollectionItemFormController extends ContentEntityFormController {
    */
   public function save(array $form, array &$form_state) {
     $field_collection_item = $this->getEntity($form_state);
-    $insert = empty($field_collection_item->item_id);
+    $insert = $field_collection_item->isNew();
     $field_collection_item->save();
     $watchdog_args = array('@type' => $field_collection_item->bundle(), '%info' => $field_collection_item->label());
 

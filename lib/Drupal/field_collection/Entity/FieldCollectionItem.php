@@ -160,6 +160,7 @@ class FieldCollectionItem extends ContentEntityBase {
     parent::init();
     // We unset all defined properties so magic getters apply.
     unset($this->id);
+    unset($this->item_id);
     unset($this->host_type);
     unset($this->revision_id);
     unset($this->uuid);
