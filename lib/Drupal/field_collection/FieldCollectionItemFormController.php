@@ -70,8 +70,8 @@ class FieldCollectionItemFormController extends ContentEntityFormController {
       watchdog('content', '@type: added %info.', $watchdog_args, WATCHDOG_NOTICE);
       $host = entity_load($this->getRequest()->get('host_type'),
                           $this->getRequest()->get('host_id'));
-      // TODO: Handle cases (ex. saving more than one field collection item in a field)
-      //_l($host->{$field_collection_item->bundle()}->getValue());
+      // TODO: Generate a message if attempting to add a value to a full limited
+      // field
       $host->{$field_collection_item->bundle()}[] =
         array('value' => $field_collection_item->id());
       $host->save();

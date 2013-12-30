@@ -27,3 +27,10 @@ field_collection_item.view:
     _content: '\Drupal\field_collection\Controller\FieldCollectionItemController::page'
   requirements:
     _permission: 'administer content types' # TODO change this
+
+field_collection_item.page_edit:
+  path: 'field-collection/{field_collection_item}/edit'
+  defaults:
+    _entity_form: 'field_collection_item.edit'
+  requirements:
+    _permission: 'administer content types' # TODO change this

@@ -25,6 +25,7 @@ use Drupal\Core\Language\Language;
  *     "access" = "Drupal\field_collection\FieldCollectionItemAccessController",
  *     "form" = {
  *       "default" = "Drupal\field_collection\FieldCollectionItemFormController",
+ *       "edit" = "Drupal\field_collection\FieldCollectionItemFormController"
  *     }
  *   },
  *   base_table = "field_collection_item",

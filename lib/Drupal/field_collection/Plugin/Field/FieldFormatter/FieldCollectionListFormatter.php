@@ -35,7 +35,9 @@ class FieldCollectionListFormatter extends FormatterBase {
     foreach ($items as $delta => $item) {
       $element[$delta] = array('#markup' =>
         l($this->fieldDefinition->getName() . " $delta",
-          "field-collection/" . $item->value));
+          "field-collection/" . $item->value)
+        . " (" . l(t('Edit'), "field-collection/" . $item->value . "/edit")
+        . ")");
     }
 
     /* The following is the original code from
