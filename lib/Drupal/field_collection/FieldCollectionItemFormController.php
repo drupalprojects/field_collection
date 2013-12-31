@@ -64,10 +64,13 @@ class FieldCollectionItemFormController extends ContentEntityFormController {
     $field_collection_item = $this->getEntity($form_state);
     $insert = $field_collection_item->isNew();
     $field_collection_item->save();
-    $watchdog_args = array('@type' => $field_collection_item->bundle(), '%info' => $field_collection_item->label());
+    $watchdog_args = array(
+      '@type' => $field_collection_item->bundle(),
+      '%label' => $field_collection_item->label());
 
     if ($insert) {
-      watchdog('content', '@type: added %info.', $watchdog_args, WATCHDOG_NOTICE);
+      watchdog('content', '@type: added %label.',
+               $watchdog_args, WATCHDOG_NOTICE);
       $host = entity_load($this->getRequest()->get('host_type'),
                           $this->getRequest()->get('host_id'));
       // TODO: Generate a message if attempting to add a value to a full limited
@@ -75,9 +78,19 @@ class FieldCollectionItemFormController extends ContentEntityFormController {
       $host->{$field_collection_item->bundle()}[] =
         array('value' => $field_collection_item->id());
       $host->save();
+
+      $messages = drupal_get_messages(NULL, false);
+      if (!isset($messages['warning']) && !isset($messages['error'])) {
+        drupal_set_message(t("Successfully added a @type", $watchdog_args));
+      }
     }
     else {
-      watchdog('content', '@type: updated %info.', $watchdog_args, WATCHDOG_NOTICE);
+      watchdog('content', '@type: updated %label.',
+               $watchdog_args, WATCHDOG_NOTICE);
+      $messages = drupal_get_messages(NULL, false);
+      if (!isset($messages['warning']) && !isset($messages['error'])) {
+        drupal_set_message(t("Successfully edited %label.", $watchdog_args));
+      }
     }
 
     if ($field_collection_item->id()) {
