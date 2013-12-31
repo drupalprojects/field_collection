@@ -32,9 +32,7 @@ class FieldCollectionItemDeleteForm extends ContentEntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function submit(array $form, array &$form_state) {
-    $this->entity->delete();
     $host_entity = $this->entity->getHost();
-
     foreach ($this->entity->getHost()->{$this->entity->bundle()} as $key => $value) {
       if ($value->value == $this->entity->id()) {
         unset($this->entity->getHost()->{$this->entity->bundle()}[$key]);
@@ -42,6 +40,7 @@ class FieldCollectionItemDeleteForm extends ContentEntityConfirmFormBase {
     }
     $this->entity->getHost()->save();
 
+    $this->entity->delete();
     watchdog('content', '@type: deleted %id.', array('@type' => $this->entity->bundle(), '%id' => $this->entity->id()));
     $node_type_storage = $this->entityManager->getStorageController('field_collection');
     $node_type = $node_type_storage->load($this->entity->bundle())->label();

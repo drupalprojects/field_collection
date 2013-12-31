@@ -122,6 +122,13 @@ class FieldCollectionItem extends ContentEntityBase {
   public $host_type;
 
   /**
+   * The id of the host entity.
+   *
+   * TODO: Possibly convert it to a FieldInterface.
+   */
+  protected $host_id;
+
+  /**
    * Implements Drupal\Core\Entity\EntityInterface::id().
    */
   public function id() {
@@ -188,17 +195,30 @@ class FieldCollectionItem extends ContentEntityBase {
    */
   public function getHost() {
     $entity_info = \Drupal::entityManager()
-                     ->getDefinition($this->host_type->value);
+                   ->getDefinition($this->host_type->value);
     if (isset($entity_info['base_table'])) {
-      $host_id = reset(db_query(
-        "SELECT `entity_id` " .
-        "FROM {" . $entity_info['base_table'] . "__" . $this->bundle() . "} " .
-        "WHERE `" . $this->bundle() . "_value` = " . $this->id())
-          ->fetchCol());
-      return entity_load($this->host_type->value, $host_id);
+      return entity_load($this->host_type->value, $this->getHostId());
     } else {
       return NULL;
     }
+  }
+
+  /**
+   * Returns the id of the host entity for this field collection item.
+   */
+  public function getHostId() {
+    if (!isset($this->host_id)) {
+      $entity_info = \Drupal::entityManager()
+                     ->getDefinition($this->host_type->value);
+      $host_id_results = db_query(
+        "SELECT `entity_id` " .
+        "FROM {" . $entity_info['base_table'] . "__" . $this->bundle() . "} " .
+        "WHERE `" . $this->bundle() . "_value` = " . $this->id())
+          ->fetchCol();
+      $this->host_id = reset($host_id_results);
+    }
+
+    return $this->host_id;
   }
 
   /**
