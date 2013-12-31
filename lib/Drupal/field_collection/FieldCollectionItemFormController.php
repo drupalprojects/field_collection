@@ -9,15 +9,21 @@ namespace Drupal\field_collection;
 
 use Drupal\Core\Entity\ContentEntityFormController;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\field_collection\Entity\FieldCollectionItem;
 
 class FieldCollectionItemFormController extends ContentEntityFormController {
 
   /**
    * Overrides \Drupal\Core\Entity\EntityFormController::form().
    */
-  /*
-  public function form(array $form, array &$form_state, EntityInterface $field_collection_item) {
+  public function form(array $form, array &$form_state) {
+    $field_collection_item = $this->entity;
 
+    if ($this->operation == 'edit') {
+      $form['#title'] = $this->t('<em>Edit @type</em> @title', array('@type' => $field_collection_item->bundle(), '@title' => $field_collection_item->label()));
+    }
+
+    /*
     // Basic item information.
     foreach (array('revision_id', 'id', 'field_name') as $key) {
       $form[$key] = array(
@@ -41,10 +47,10 @@ class FieldCollectionItemFormController extends ContentEntityFormController {
       '#languages' => LANGUAGE_ALL,
       '#access' => isset($language_configuration['language_show']) && $language_configuration['language_show'],
     );
+    */
 
-    return parent::form($form, $form_state, $block);
+    return parent::form($form, $form_state);
   }
-  */
 
   /**
    * Overrides \Drupal\Core\Entity\EntityFormController::submit().

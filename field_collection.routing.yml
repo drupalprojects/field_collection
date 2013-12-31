@@ -1,7 +1,7 @@
 field_collection.overview:
   path: '/admin/structure/field-collections'
   defaults:
-    _title: 'Manage fields on field collections.'
+    _title: 'Manage field collections.'
     _content: '\Drupal\Core\Entity\Controller\EntityListController::listing'
     entity_type: 'field_collection'
   requirements:
@@ -18,6 +18,7 @@ field_collection_item.add:
   path: '/field-collection-item/add/{field_collection}/{host_type}/{host_id}'
   defaults:
     _content: '\Drupal\field_collection\Controller\FieldCollectionItemController::add'
+    _title_callback: '\Drupal\field_collection\Controller\FieldCollectionItemController::addPageTitle'
   requirements:
     _permission: 'administer content types' # TODO change this
 
@@ -25,6 +26,7 @@ field_collection_item.view:
   path: '/field-collection-item/{field_collection_item}'
   defaults:
     _content: '\Drupal\field_collection\Controller\FieldCollectionItemController::page'
+    _title_callback: '\Drupal\field_collection\Controller\FieldCollectionItemController::pageTitle'
   requirements:
     _permission: 'administer content types' # TODO change this
 
