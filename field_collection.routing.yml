@@ -38,7 +38,7 @@ field_collection_item.page_edit:
     _permission: 'administer content types' # TODO change this
 
 field_collection_item.delete_confirm:
-  path: 'field-collection-item/{field_collection_item}/delete'
+  path: '/field-collection-item/{field_collection_item}/delete'
   defaults:
     _entity_form: 'field_collection_item.delete'
   requirements:
