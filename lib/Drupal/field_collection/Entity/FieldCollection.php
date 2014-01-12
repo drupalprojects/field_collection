@@ -33,8 +33,8 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
  *   config_prefix = "field_collection",
  *   bundle_of = "field_collection_item",
  *   entity_keys = {
- *     "id" = "type",
- *     "label" = "name",
+ *     "id" = "id",
+ *     "label" = "label",
  *     "uuid" = "uuid"
  *   },
  *   links = {
@@ -48,10 +48,8 @@ class FieldCollection extends ConfigEntityBase implements ConfigEntityInterface 
    * The machine name of this field collection.
    *
    * @var string
-   *
-   * @todo Rename to $id.
    */
-  public $type;
+  public $id;
 
   /**
    * The UUID of the node type.
@@ -64,10 +62,8 @@ class FieldCollection extends ConfigEntityBase implements ConfigEntityInterface 
    * The human-readable name of the field collection.
    *
    * @var string
-   *
-   * @todo Rename to $label.
    */
-  public $name;
+  public $label;
 
   public function __construct(array $values, $entity_type) {
     parent::__construct($values, $entity_type);
@@ -75,13 +71,6 @@ class FieldCollection extends ConfigEntityBase implements ConfigEntityInterface 
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public function id() {
-    return $this->type;
-  }
-
-    /**
    * {@inheritdoc}
    */
   public function postSave(EntityStorageControllerInterface $storage_controller, $update = TRUE) {

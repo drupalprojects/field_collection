@@ -1690,8 +1690,7 @@ function field_collection_field_widget_embed_validate($element, &$form_state, $c
 function field_collection_field_entity_create($field) {
   if ($field->type == 'field_collection') {
     $field_collection = new FieldCollection();
-    $field_collection->type = $field->name;
-    $field_collection->name = $field->name;
+    $field_collection->label = $field->name;
     $field_collection->id = $field->name;
     $field_collection->save();
 
