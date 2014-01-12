@@ -23,7 +23,7 @@ class FieldCollectionListController extends ConfigEntityListController implement
 
     // Sort the entities using the entity class's sort() method.
     // See \Drupal\Core\Config\Entity\ConfigEntityBase::sort().
-    uasort($entities, array($this->entityInfo['class'], 'sort'));
+    uasort($entities, array($this->entityInfo->get('class'), 'sort'));
     return $entities;
   }
 

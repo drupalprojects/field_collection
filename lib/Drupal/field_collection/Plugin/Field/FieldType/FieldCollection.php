@@ -8,8 +8,8 @@
 namespace Drupal\field_collection\Plugin\Field\FieldType;
 
 use Drupal\Core\Field\ConfigFieldItemBase;
-use Drupal\field\FieldInterface;
 use Drupal\Core\TypedData\DataDefinition;
+use Drupal\Core\Field\FieldDefinitionInterface;
 
 /**
  * Plugin implementation of the 'field_collection' field type.
@@ -33,7 +33,7 @@ class FieldCollection extends ConfigFieldItemBase {
   /**
    * {@inheritdoc}
    */
-  public static function schema(FieldInterface $field) {
+  public static function schema(FieldDefinitionInterface $field) {
     return array(
       'columns' => array(
         'value' => array(
