@@ -132,15 +132,7 @@ class FieldCollectionItem extends ContentEntityBase {
    * Implements Drupal\Core\Entity\EntityInterface::id().
    */
   public function id() {
-    if (gettype($this->item_id) == 'string') {
-      $this->item_id = (object) array('value' => $this->item_id);
-    }
-
-    if (isset($this->item_id->value)) {
-      return $this->item_id->value;
-    } else {
-      return NULL;
-    }
+    return $this->get('item_id')->value;
   }
 
   /**
