@@ -66,62 +66,6 @@ class FieldCollectionItem extends ContentEntityBase {
   */  
 
   /**
-   * The field collection item ID.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
-   */
-  public $item_id;
-
-  /**
-   * The field collection item revision ID.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
-   */
-  public $revision_id;
-
-  /**
-   * Indicates whether this is the default revision.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
-   */
-  public $isDefaultRevision = TRUE;
-
-  /**
-   * The item UUID.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
-   */
-  public $uuid;
-
-  /**
-   * The field name (bundle).
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
-   */
-  public $field_name;
-
-  /**
-   * The block language code.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
-   */
-  public $langcode;
-
-  /**
-   * The block description.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
-   */
-  public $info;
-
-  /**
-   * The entity type of the host.
-   *
-   * @var \Drupal\Core\Entity\Field\FieldInterface
-   */
-  public $host_type;
-
-  /**
    * The id of the host entity.
    *
    * TODO: Possibly convert it to a FieldInterface.
@@ -150,21 +94,6 @@ class FieldCollectionItem extends ContentEntityBase {
    */
   public function getRevisionId() {
     return $this->revision_id->value;
-  }
-
-  /**
-   * Initialize the object. Invoked upon construction and wake up.
-   */
-  protected function init() {
-    parent::init();
-    // We unset all defined properties so magic getters apply.
-    unset($this->id);
-    unset($this->item_id);
-    unset($this->host_type);
-    unset($this->revision_id);
-    unset($this->uuid);
-    unset($this->field_name);
-    unset($this->new);
   }
 
   /**
