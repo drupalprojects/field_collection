@@ -33,12 +33,12 @@ class FieldCollectionItemDeleteForm extends ContentEntityConfirmFormBase {
    */
   public function submit(array $form, array &$form_state) {
     $host_entity = $this->entity->getHost();
-    foreach ($this->entity->getHost()->{$this->entity->bundle()} as $key => $value) {
+    foreach ($host_entity->{$this->entity->bundle()} as $key => $value) {
       if ($value->value == $this->entity->id()) {
-        unset($this->entity->getHost()->{$this->entity->bundle()}[$key]);
+        unset($host_entity->{$this->entity->bundle()}[$key]);
       }
     }
-    $this->entity->getHost()->save();
+    $host_entity->save();
 
     $this->entity->delete();
     watchdog('content', '@type: deleted %id.', array('@type' => $this->entity->bundle(), '%id' => $this->entity->id()));

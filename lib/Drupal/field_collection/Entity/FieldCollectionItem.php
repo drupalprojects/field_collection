@@ -76,7 +76,7 @@ class FieldCollectionItem extends ContentEntityBase {
    * Implements Drupal\Core\Entity\EntityInterface::id().
    */
   public function id() {
-    return $this->get('item_id')->value;
+    return $this->item_id->value;
   }
 
   /**
@@ -117,7 +117,7 @@ class FieldCollectionItem extends ContentEntityBase {
   public function getHost() {
     $entity_info = \Drupal::entityManager()
                    ->getDefinition($this->host_type->value);
-    if (isset($entity_info['base_table'])) {
+    if (null !== $entity_info->get('base_table')) {
       return entity_load($this->host_type->value, $this->getHostId());
     } else {
       return NULL;
@@ -133,7 +133,8 @@ class FieldCollectionItem extends ContentEntityBase {
                      ->getDefinition($this->host_type->value);
       $host_id_results = db_query(
         "SELECT `entity_id` " .
-        "FROM {" . $entity_info['base_table'] . "__" . $this->bundle() . "} " .
+        "FROM {" . $entity_info->get('base_table') .
+               "__" . $this->bundle() . "} " .
         "WHERE `" . $this->bundle() . "_value` = " . $this->id())
           ->fetchCol();
       $this->host_id = reset($host_id_results);
