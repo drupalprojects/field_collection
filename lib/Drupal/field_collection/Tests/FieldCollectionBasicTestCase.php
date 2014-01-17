@@ -5,9 +5,9 @@
  * Contains \Drupal\field_collection\Tests\FieldCollectionBasicTestCase.
  */
 
-use Drupal\simpletest\WebTestBase;
-
 namespace Drupal\field_collection\Tests;
+
+use Drupal\simpletest\WebTestBase;
 
 /**
  * Test basics.
@@ -48,15 +48,14 @@ class FieldCollectionBasicTestCase extends WebTestBase {
 
     // Create a field_collection field to use for the tests.
     $this->field_name = 'field_test_collection';
-    $this->field = array(
-      'field_name' => $this->field_name,
+    $this->field = entity_create('field_entity', array(
+      'name' => $this->field_name,
       'type' => 'field_collection',
-      'cardinality' => 4
-    );
-    $this->field = field_create_field($this->field);
-    $this->field_id = $this->field['id'];
+      'entity_type' => 'node',
+    ));
+    $this->field->save();
 
-    $this->instance = array(
+    $this->instance = entity_create('field_instance', array(
       'field_name' => $this->field_name,
       'entity_type' => 'node',
       'bundle' => 'article',
@@ -69,8 +68,11 @@ class FieldCollectionBasicTestCase extends WebTestBase {
         'label' => 'Test',
         'settings' => array(),
       ),
-    );
-    $this->instance = field_create_instance($this->instance);
+    ));
+    $this->instance->save();
+
+    $this->field->cardinality = 4;
+    $this->field->save();
   }
 
   /**

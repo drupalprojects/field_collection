@@ -68,36 +68,31 @@ class FieldCollectionItemFormController extends ContentEntityFormController {
    */
   public function save(array $form, array &$form_state) {
     $field_collection_item = $this->getEntity($form_state);
-    $insert = $field_collection_item->isNew();
-    $field_collection_item->save();
-    $watchdog_args = array(
-      '@type' => $field_collection_item->bundle(),
-      '%label' => $field_collection_item->label());
 
-    if ($insert) {
-      watchdog('content', '@type: added %label.',
-               $watchdog_args, WATCHDOG_NOTICE);
+    if ($field_collection_item->isNew()) {
       $host = entity_load($this->getRequest()->get('host_type'),
                           $this->getRequest()->get('host_id'));
-      // TODO: Generate a message if attempting to add a value to a full limited
-      // field
-      $host->{$field_collection_item->bundle()}[] =
-        array('value' => $field_collection_item->id());
+      $field_collection_item->setHostEntity($field_collection_item->bundle(),
+                                            $host);
+      $field_collection_item->save();
       $host->save();
 
       $messages = drupal_get_messages(NULL, false);
       if (!isset($messages['warning']) && !isset($messages['error'])) {
-        drupal_set_message(t("Successfully added a @type", $watchdog_args));
+        drupal_set_message(
+          t("Successfully added a @type",
+            array('@type' => $field_collection_item->bundle())));
       }
     }
     else {
-      watchdog('content', '@type: updated %label.',
-               $watchdog_args, WATCHDOG_NOTICE);
       $messages = drupal_get_messages(NULL, false);
       if (!isset($messages['warning']) && !isset($messages['error'])) {
-        drupal_set_message(t("Successfully edited %label.", $watchdog_args));
+        $field_collection_item->save();
+        drupal_set_message(t("Successfully edited %label.",
+                             array('%label', $field_collection_item->label())));
       }
     }
+
 
     if ($field_collection_item->id()) {
       $form_state['values']['id'] = $field_collection_item->id();

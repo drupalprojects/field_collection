@@ -5,11 +5,11 @@
  * Contains \Drupal\field_collection\Tests\FieldCollectionRulesIntegrationTest.
  */
 
-use Drupal\simpletest\WebTestBase;
-
 namespace Drupal\field_collection\Tests;
 
-class FieldCollectionRulesIntegrationTestCase extends DrupalWebTestCase {
+use Drupal\simpletest\WebTestBase;
+
+class FieldCollectionRulesIntegrationTestCase extends WebTestBase {
 
   /**
    * Field collection field.

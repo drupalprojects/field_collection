@@ -144,6 +144,46 @@ class FieldCollectionItem extends ContentEntityBase {
   }
 
   /**
+   * Sets the host entity. Only possible during creation of a item.
+   *
+   * @param $create_link
+   *   (optional) Whether a field-item linking the host entity to the field
+   *   collection item should be created.
+   */
+  public function setHostEntity($entity_type, $entity, $create_link = TRUE) {
+    if ($this->isNew()) {
+      $this->host_type = $entity_type;
+      $this->host_id = $entity->id();
+      //$this->save();
+
+      /*
+      // If the host entity is not saved yet, set the id to FALSE. So
+      // fetchHostDetails() does not try to load the host entity details.
+      if (!isset($this->hostEntityId)) {
+        $this->hostEntityId = FALSE;
+      }
+      // We are create a new field collection for a non-default entity, thus
+      // set archived to TRUE.
+      if (!entity_revision_is_default($entity_type, $entity)) {
+        $this->hostEntityId = FALSE;
+        $this->archived = TRUE;
+      }
+      */
+
+      // TODO: Generate a message if attempting to add a value to a full limited
+      // field
+      if ($create_link) {
+        $entity->{$this->bundle()}[] = array('entity' => $this);
+        //$entity->save();
+      }
+    }
+    else {
+      throw new \Exception('The host entity may be set only during creation ' .
+                           'of a field collection item.');
+    }
+  }
+
+  /**
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions($entity_type) {
