@@ -65,7 +65,9 @@ class FieldCollection extends ConfigEntityBase implements ConfigEntityInterface 
    */
   public $label;
 
-  public function __construct(array $values, $entity_type) {
+  public function __construct(array $values = array(),
+                              $entity_type = 'field_collection')
+  {
     parent::__construct($values, $entity_type);
     $this->entityType = "field_collection";
   }
