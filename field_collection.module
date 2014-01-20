@@ -9,6 +9,64 @@ use Drupal\field_collection\Entity\FieldCollection;
 use Drupal\Core\Extension\ModuleHandler;
 
 /**
+ * Loads a field collection item.
+ *
+ * @return field_collection_item
+ *   The field collection item entity or FALSE.
+ */
+function field_collection_item_load($item_id, $reset = FALSE) {
+  $result = field_collection_item_load_multiple(array($item_id), $reset);
+  return $result ? reset($result) : FALSE;
+}
+
+/**
+ * Loads field collection items.
+ *
+ * @return
+ *   An array of field collection item entities.
+ */
+function field_collection_item_load_multiple($ids = array(), $reset = FALSE) {
+  return entity_load('field_collection_item', $ids, $reset);
+}
+
+/**
+ * Loads a field collection revision.
+ *
+ * @param $revision_id
+ *   The field collection revision ID.
+ */
+function field_collection_item_revision_load($revision_id) {
+  return entity_revision_load('field_collection_item', $revision_id);
+}
+
+/**
+ * Implements hook_field_enitity_create().
+ */
+function field_collection_field_entity_create($field) {
+  if ($field->type == 'field_collection') {
+    $field_collection = new FieldCollection();
+    $field_collection->label = $field->name;
+    $field_collection->id = $field->name;
+    $field_collection->save();
+
+    // TODO: entity_invoke_bundle_hook in post save like in nodeType ?
+
+    // Clear caches.
+    entity_info_cache_clear();
+
+    // Do not directly issue menu rebuilds here to avoid potentially multiple
+    // rebuilds. Instead, let menu_get_item() issue the rebuild on the next
+    // request.
+    variable_set('menu_rebuild_needed', TRUE);
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Everything above this is in use by the Drupal 8 version.
+// Things below may be as well.
+////////////////////////////////////////////////////////////////////////////////
+
+/**
  * Implements hook_help().
  */
 function field_collection_help($path, $arg) {
@@ -40,37 +98,6 @@ function field_collection_field_name_load($arg) {
   if (($field = field_info_field($field_name)) && $field['type'] == 'field_collection') {
     return $field_name;
   }
-}
-
-/**
- * Loads a field collection item.
- *
- * @return field_collection_item
- *   The field collection item entity or FALSE.
- */
-function field_collection_item_load($item_id, $reset = FALSE) {
-  $result = field_collection_item_load_multiple(array($item_id), array(), $reset);
-  return $result ? reset($result) : FALSE;
-}
-
-/**
- * Loads a field collection revision.
- *
- * @param $revision_id
- *   The field collection revision ID.
- */
-function field_collection_item_revision_load($revision_id) {
-  return entity_revision_load('field_collection_item', $revision_id);
-}
-
-/**
- * Loads field collection items.
- *
- * @return
- *   An array of field collection item entities.
- */
-function field_collection_item_load_multiple($ids = array(), $conditions = array(), $reset = FALSE) {
-  return entity_load('field_collection_item', $ids, $conditions, $reset);
 }
 
 // Entity object replaced by lib/Drupal/field_collection/Entity
@@ -868,6 +895,7 @@ function field_collection_field_presave($host_entity_type, $host_entity, $field,
     // In case the entity has been changed / created, save it and set the id.
     // If the host entity creates a new revision, save new item-revisions as
     // well.
+    /*
     if (isset($item['entity']) || !empty($host_entity->revision)) {
 
       if ($entity = field_collection_field_get_entity($item)) {
@@ -895,6 +923,7 @@ function field_collection_field_presave($host_entity_type, $host_entity, $field,
         );
       }
     }
+  */
   }
 }
 
@@ -1681,28 +1710,6 @@ function field_collection_field_widget_embed_validate($element, &$form_state, $c
     // @see field_collection_field_presave()
     $item['entity'] = $field_collection_item;
     form_set_value($element, $item, $form_state);
-  }
-}
-
-/**
- * Implements hook_field_enitity_create().
- */
-function field_collection_field_entity_create($field) {
-  if ($field->type == 'field_collection') {
-    $field_collection = new FieldCollection();
-    $field_collection->label = $field->name;
-    $field_collection->id = $field->name;
-    $field_collection->save();
-
-    // TODO: entity_invoke_bundle_hook in post save like in nodeType ?
-
-    // Clear caches.
-    entity_info_cache_clear();
-
-    // Do not directly issue menu rebuilds here to avoid potentially multiple
-    // rebuilds. Instead, let menu_get_item() issue the rebuild on the next
-    // request.
-    variable_set('menu_rebuild_needed', TRUE);
   }
 }
 

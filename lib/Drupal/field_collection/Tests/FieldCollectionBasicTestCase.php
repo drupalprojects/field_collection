@@ -100,11 +100,13 @@ class FieldCollectionBasicTestCase extends WebTestBase {
 
     $this->assertEqual(
       $entity->id(), $node->{$this->field_name}->value,
-      'A field_collection has been successfully created and referenced.');
+      'A field_collection_item has been successfully created and referenced.');
+
+    $this->assertEqual(
+      $entity->revision_id->value, $node->{$this->field_name}->revision,
+      'The new field_collection_item has the correct revision.');
 
     /*
-    $this->assertEqual($entity->revision_id, $node->{$this->field_name}[LANGUAGE_NONE][0]['revision_id'], 'A field_collection has been successfully created and referenced.');
-
     // Test adding an additional field_collection during node edit.
     $entity2 = entity_create('field_collection_item', array('field_name' => $this->field_name));
     $node->{$this->field_name}[LANGUAGE_NONE][] = array('entity' => $entity2);

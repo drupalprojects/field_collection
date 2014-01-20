@@ -48,6 +48,27 @@ class FieldCollection extends ConfigFieldItemBase {
     );
   }
 
+  public function getFieldCollectionItem($create = FALSE) {
+    if ($this->entity) {
+      return $this->entity;
+    }
+    elseif (isset($this->value)) {
+      // By default always load the default revision, so caches get used.
+      $entity = field_collection_item_load($this->value);
+      if ($entity->getRevisionId() != $this->revision_id) {
+        // A non-default revision is a referenced, so load this one.
+        $entity = field_collection_item_revision_load($this->revision_id);
+      }
+      return $entity;
+    }
+    elseif ($create) {
+      $item->entity = entity_create('field_collection_item',
+                                    array('field_name' => $field_name));
+      return $item->entity;
+    }
+    return FALSE;
+  }
+
   /**
    * Support saving field collection items in @code $item['entity'] @endcode.
    * This may be used to seamlessly create field collection items during
@@ -55,20 +76,24 @@ class FieldCollection extends ConfigFieldItemBase {
    * collections at once.
    */
   public function preSave() {
+    // TODO: Clarify ( $this->entity is NOT the same as $this->getEntity() )
+ 
+    /*
     if (isset($this->entity)) {
       $this->value = $this->entity->id();
     }
+    */
+
+    // _l($this->getEntity()->revision);
 
     // TODO: Restore this functionality from the original field_presave hook
 
     // In case the entity has been changed / created, save it and set the id.
     // If the host entity creates a new revision, save new item-revisions as
     // well.
-    /*
-    if (isset($item['entity']) || !empty($host_entity->revision)) {
-
-      if ($entity = field_collection_field_get_entity($item)) {
-
+    if (isset($this->entity) || $this->getEntity()->isNewRevision()) {
+      if ($fc_item = $this->getFieldCollectionItem()) {
+        /*
         if (!empty($entity->is_new)) {
           $entity->setHostEntity($host_entity_type, $host_entity, LANGUAGE_NONE, FALSE);
         }
@@ -85,13 +110,11 @@ class FieldCollection extends ConfigFieldItemBase {
           }
         }
         $entity->save(TRUE);
+        */
 
-        $item = array(
-          'value' => $entity->item_id,
-          'revision_id' => $entity->revision_id,
-        );
+        $this->value = $fc_item->id();
+        $this->revision_id = $fc_item->getRevisionId();
       }
     }
-    */
   }
 }
