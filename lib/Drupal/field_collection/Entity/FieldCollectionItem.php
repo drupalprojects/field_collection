@@ -80,6 +80,17 @@ class FieldCollectionItem extends ContentEntityBase {
   }
 
   /**
+   * 
+   */
+  public function save() {
+    if (!isset($this->revision_id->value)) {
+      $this->revision_id->value = 0;
+    }
+
+    return parent::save();
+  }
+
+  /**
    * Overrides \Drupal\Core\Entity\Entity::createDuplicate().
    */
   public function createDuplicate() {

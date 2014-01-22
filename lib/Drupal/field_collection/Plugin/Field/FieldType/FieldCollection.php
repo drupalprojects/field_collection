@@ -84,8 +84,6 @@ class FieldCollection extends ConfigFieldItemBase {
     }
     */
 
-    // _l($this->getEntity()->revision);
-
     // TODO: Restore this functionality from the original field_presave hook
 
     // In case the entity has been changed / created, save it and set the id.

@@ -82,8 +82,7 @@ class FieldCollectionBasicTestCase extends WebTestBase {
     $node = $this->drupalCreateNode(array('type' => 'article'));
     // Manually create a field_collection.
     $entity = entity_create('field_collection_item',
-                            array('field_name' => $this->field_name,
-                                  'revision_id' => 0));
+                            array('field_name' => $this->field_name));
     $entity->setHostEntity('node', $node);
     $entity->save();
     $node->save();
@@ -103,12 +102,13 @@ class FieldCollectionBasicTestCase extends WebTestBase {
       'A field_collection_item has been successfully created and referenced.');
 
     $this->assertEqual(
-      $entity->revision_id->value, $node->{$this->field_name}->revision,
+      $entity->revision_id->value, $node->{$this->field_name}->revision_id,
       'The new field_collection_item has the correct revision.');
 
     /*
     // Test adding an additional field_collection during node edit.
-    $entity2 = entity_create('field_collection_item', array('field_name' => $this->field_name));
+    $entity2 = entity_create('field_collection_item',
+                             array('field_name' => $this->field_name));
     $node->{$this->field_name}[LANGUAGE_NONE][] = array('entity' => $entity2);
     node_save($node);
 
