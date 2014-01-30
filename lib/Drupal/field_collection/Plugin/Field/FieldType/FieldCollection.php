@@ -71,6 +71,11 @@ class FieldCollection extends ConfigFieldItemBase {
     return FALSE;
   }
 
+  public function delete() {
+    $this->getFieldCollectionItem()->delete();
+    parent::delete();
+  }
+
   /**
    * Support saving field collection items in @code
    * $field->field_collection_item @endcode.  This may be used to seamlessly
@@ -95,7 +100,7 @@ class FieldCollection extends ConfigFieldItemBase {
       if ($fc_item = $this->getFieldCollectionItem()) {
         if ($fc_item->isNew()) {
           $fc_item->setHostEntity(
-            $this->getEntity()->bundle(), $this->getEntity(), FALSE);
+            $this->getEntity()->getEntityTypeId(), $this->getEntity(), FALSE);
           $fc_item->save();
         }
 

@@ -26,7 +26,7 @@ function field_collection_item_load($item_id, $reset = FALSE) {
  *   An array of field collection item entities.
  */
 function field_collection_item_load_multiple($ids = array(), $reset = FALSE) {
-  return entity_load('field_collection_item', $ids, $reset);
+  return entity_load_multiple('field_collection_item', $ids, $reset);
 }
 
 /**

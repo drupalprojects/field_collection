@@ -115,7 +115,7 @@ class FieldCollectionBasicTestCase extends WebTestBase {
 
     $this->assertTrue(
       !empty($entity2->id()) && !empty($entity2->getRevisionId()),
-      'Field_collection has been saved.');
+      'field_collection has been saved.');
 
     $this->assertEqual($entity->id(), $node->{$this->field_name}->value,
                        'Existing reference has been kept during update.');
@@ -123,26 +123,28 @@ class FieldCollectionBasicTestCase extends WebTestBase {
     $this->assertEqual(
       $entity->getRevisionId(),
       $node->{$this->field_name}[0]->revision_id,
-      'Existing reference has been kept during update (revision).');
+      'Revision: Existing reference has been kept during update.');
 
     $this->assertEqual($entity2->id(), $node->{$this->field_name}[1]->value,
-                       'New field_collection has been properly referenced');
+                       'New field_collection has been properly referenced.');
 
     $this->assertEqual(
       $entity2->getRevisionId(),
       $node->{$this->field_name}[1]->revision_id,
-      'New field_collection has been properly referenced (revision)');
+      'Revision: New field_collection has been properly referenced.');
 
     // Make sure deleting the field_collection removes the reference.
-    /*
     $entity2->delete();
     $node = node_load($node->nid->value, TRUE);
     $this->assertTrue(!isset($node->{$this->field_name}[1]),
                       'Reference correctly deleted.');
 
     // Make sure field_collections are removed during deletion of the host.
-    node_delete($node->nid);
-    $this->assertTrue(entity_load('field_collection_item', FALSE) === array(), 'Field collections are deleted when the host is deleted.');
+    /*
+    $node->delete();
+    $this->assertTrue(
+      entity_load_multiple('field_collection_item', NULL, TRUE) === array(),
+      'Field collections are deleted when the host is deleted.');
 
     // Try deleting nodes with collections without any values.
     $node = $this->drupalCreateNode(array('type' => 'article'));

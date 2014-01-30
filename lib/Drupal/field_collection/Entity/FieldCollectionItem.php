@@ -80,7 +80,7 @@ class FieldCollectionItem extends ContentEntityBase {
   }
 
   /**
-   * 
+   * {@inheritdoc}
    */
   public function save() {
     if (!isset($this->revision_id->value)) {
@@ -88,6 +88,29 @@ class FieldCollectionItem extends ContentEntityBase {
     }
 
     return parent::save();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function delete() {
+    if ($this->getHost()) {
+      $this->deleteHostEntityReference();
+    }
+    parent::delete();
+  }
+  
+  /**
+   * Deletes the host entity's reference of the field collection item.
+   */
+  protected function deleteHostEntityReference() {
+    $delta = $this->getDelta();
+    if ($this->id() && isset($delta) &&
+        isset($this->getHost()->{$this->field_name->value}[$delta]))
+    {
+      unset($this->getHost()->{$this->field_name->value}[$delta]);
+      $this->getHost()->save();
+    }
   }
 
   /**
@@ -105,6 +128,26 @@ class FieldCollectionItem extends ContentEntityBase {
    */
   public function getRevisionId() {
     return $this->revision_id->value;
+  }
+  
+  /**
+   * Determines the $delta of the reference pointing to this field collection
+   * item.
+   */
+  public function getDelta() {
+    $host = $this->getHost();
+    if (($host = $this->getHost()) && isset($host->{$this->field_name->value})) {
+      foreach ($host->{$this->field_name->value} as $delta => $item) {
+        if (isset($item->value) && $item->value == $this->id()) {
+          return $delta;
+        }
+        elseif (isset($item->field_collection_item) &&
+                $item->field_collection_item === $this)
+        {
+          return $delta;
+        }
+      }
+    }
   }
 
   /**
@@ -127,7 +170,7 @@ class FieldCollectionItem extends ContentEntityBase {
    */
   public function getHost() {
     $entity_info = \Drupal::entityManager()
-                   ->getDefinition($this->host_type->value);
+                   ->getDefinition($this->host_type->value, true);
     if (null !== $entity_info->get('base_table')) {
       return entity_load($this->host_type->value, $this->getHostId());
     } else {
@@ -141,7 +184,7 @@ class FieldCollectionItem extends ContentEntityBase {
   public function getHostId() {
     if (!isset($this->host_id)) {
       $entity_info = \Drupal::entityManager()
-                     ->getDefinition($this->host_type->value);
+                     ->getDefinition($this->host_type->value, true);
       $host_id_results = db_query(
         "SELECT `entity_id` " .
         "FROM {" . $entity_info->get('base_table') .
