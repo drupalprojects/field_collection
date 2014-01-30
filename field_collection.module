@@ -57,7 +57,12 @@ function field_collection_field_entity_create($field) {
     // Do not directly issue menu rebuilds here to avoid potentially multiple
     // rebuilds. Instead, let menu_get_item() issue the rebuild on the next
     // request.
-    variable_set('menu_rebuild_needed', TRUE);
+    //
+    // TODO: Figure out whether this is still needed and replace it with the
+    // new API if it is.
+    // https://drupal.org/node/2183531
+    //
+    // variable_set('menu_rebuild_needed', TRUE);
   }
 }
 
