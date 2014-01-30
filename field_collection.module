@@ -733,13 +733,19 @@ function field_collection_admin_page_title($field_name) {
  * Implements hook_admin_paths().
  */
 function field_collection_admin_paths() {
-  if (variable_get('node_admin_theme')) {
-    return array(
-      'field-collection/*/*/edit' => TRUE,
-      'field-collection/*/*/delete' => TRUE,
-      'field-collection/*/add/*/*' => TRUE,
-    );
-  }
+  // TODO: Figure out whether this is still needed and replace it with the
+  // new API if it is.
+  //
+  // https://drupal.org/node/2183531 for the variable
+  // Routes for the rest
+  //
+  //if (variable_get('node_admin_theme')) {
+  //  return array(
+  //    'field-collection/*/*/edit' => TRUE,
+  //    'field-collection/*/*/delete' => TRUE,
+  //    'field-collection/*/add/*/*' => TRUE,
+  //  );
+  //}
 }
 
 /**
