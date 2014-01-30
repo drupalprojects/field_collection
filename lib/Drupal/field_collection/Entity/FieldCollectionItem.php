@@ -184,7 +184,7 @@ class FieldCollectionItem extends ContentEntityBase {
       // TODO: Generate a message if attempting to add a value to a full limited
       // field
       if ($create_link) {
-        $entity->{$this->bundle()}[] = array('entity' => $this);
+        $entity->{$this->bundle()}[] = array('field_collection_item' => $this);
         //$entity->save();
       }
     }

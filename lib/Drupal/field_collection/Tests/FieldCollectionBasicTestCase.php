@@ -105,24 +105,40 @@ class FieldCollectionBasicTestCase extends WebTestBase {
       $entity->revision_id->value, $node->{$this->field_name}->revision_id,
       'The new field_collection_item has the correct revision.');
 
-    /*
     // Test adding an additional field_collection during node edit.
     $entity2 = entity_create('field_collection_item',
                              array('field_name' => $this->field_name));
-    $node->{$this->field_name}[LANGUAGE_NONE][] = array('entity' => $entity2);
-    node_save($node);
 
-    $node = node_load($node->nid, NULL, TRUE);
-    $this->assertTrue(!empty($entity2->item_id) && !empty($entity2->revision_id), 'Field_collection has been saved.');
-    $this->assertEqual($entity->item_id, $node->{$this->field_name}[LANGUAGE_NONE][0]['value'], 'Existing reference has been kept during update.');
-    $this->assertEqual($entity->revision_id, $node->{$this->field_name}[LANGUAGE_NONE][0]['revision_id'], 'Existing reference has been kept during update (revision).');
-    $this->assertEqual($entity2->item_id, $node->{$this->field_name}[LANGUAGE_NONE][1]['value'], 'New field_collection has been properly referenced');
-    $this->assertEqual($entity2->revision_id, $node->{$this->field_name}[LANGUAGE_NONE][1]['revision_id'], 'New field_collection has been properly referenced (revision)');
+    $node->{$this->field_name}[1]->field_collection_item = $entity2;
+    $node->save();
+    $node = node_load($node->nid->value, TRUE);
+
+    $this->assertTrue(
+      !empty($entity2->id()) && !empty($entity2->getRevisionId()),
+      'Field_collection has been saved.');
+
+    $this->assertEqual($entity->id(), $node->{$this->field_name}->value,
+                       'Existing reference has been kept during update.');
+
+    $this->assertEqual(
+      $entity->getRevisionId(),
+      $node->{$this->field_name}[0]->revision_id,
+      'Existing reference has been kept during update (revision).');
+
+    $this->assertEqual($entity2->id(), $node->{$this->field_name}[1]->value,
+                       'New field_collection has been properly referenced');
+
+    $this->assertEqual(
+      $entity2->getRevisionId(),
+      $node->{$this->field_name}[1]->revision_id,
+      'New field_collection has been properly referenced (revision)');
 
     // Make sure deleting the field_collection removes the reference.
+    /*
     $entity2->delete();
-    $node = node_load($node->nid, NULL, TRUE);
-    $this->assertTrue(!isset($node->{$this->field_name}[LANGUAGE_NONE][1]), 'Reference correctly deleted.');
+    $node = node_load($node->nid->value, TRUE);
+    $this->assertTrue(!isset($node->{$this->field_name}[1]),
+                      'Reference correctly deleted.');
 
     // Make sure field_collections are removed during deletion of the host.
     node_delete($node->nid);

@@ -49,38 +49,38 @@ class FieldCollection extends ConfigFieldItemBase {
   }
 
   public function getFieldCollectionItem($create = FALSE) {
-    if ($this->entity) {
-      return $this->entity;
+    if (isset($this->field_collection_item)) {
+      return $this->field_collection_item;
     }
     elseif (isset($this->value)) {
       // By default always load the default revision, so caches get used.
-      $entity = field_collection_item_load($this->value);
-      if ($entity->getRevisionId() != $this->revision_id) {
+      $field_collection_item = field_collection_item_load($this->value);
+      if ($field_collection_item->getRevisionId() != $this->revision_id) {
         // A non-default revision is a referenced, so load this one.
-        $entity = field_collection_item_revision_load($this->revision_id);
+        $field_collection_item =
+          field_collection_item_revision_load($this->revision_id);
       }
-      return $entity;
+      return $field_collection_item;
     }
     elseif ($create) {
-      $item->entity = entity_create('field_collection_item',
-                                    array('field_name' => $field_name));
-      return $item->entity;
+      $field_collection_item =
+        entity_create('field_collection_item',
+                      array('field_name' => $field_name));
+      return $field_collection_item;
     }
     return FALSE;
   }
 
   /**
-   * Support saving field collection items in @code $item['entity'] @endcode.
-   * This may be used to seamlessly create field collection items during
-   * host-entity creation or to save changes to the host entity and its
-   * collections at once.
+   * Support saving field collection items in @code
+   * $field->field_collection_item @endcode.  This may be used to seamlessly
+   * create field collection items during host-entity creation or to save
+   * changes to the host entity and its collections at once.
    */
   public function preSave() {
-    // TODO: Clarify ( $this->entity is NOT the same as $this->getEntity() )
- 
     /*
-    if (isset($this->entity)) {
-      $this->value = $this->entity->id();
+    if (isset($this->field_collection_item)) {
+      $this->value = $this->field_collection_item->id();
     }
     */
 
@@ -89,25 +89,28 @@ class FieldCollection extends ConfigFieldItemBase {
     // In case the entity has been changed / created, save it and set the id.
     // If the host entity creates a new revision, save new item-revisions as
     // well.
-    if (isset($this->entity) || $this->getEntity()->isNewRevision()) {
+    if (isset($this->field_collection_item) ||
+        $this->getEntity()->isNewRevision())
+    {
       if ($fc_item = $this->getFieldCollectionItem()) {
-        /*
-        if (!empty($entity->is_new)) {
-          $entity->setHostEntity($host_entity_type, $host_entity, LANGUAGE_NONE, FALSE);
+        if ($fc_item->isNew()) {
+          $fc_item->setHostEntity(
+            $this->getEntity()->bundle(), $this->getEntity(), FALSE);
+          $fc_item->save();
         }
 
+        /*
         // If the host entity is saved as new revision, do the same for the item.
         if (!empty($host_entity->revision)) {
-          $entity->revision = TRUE;
+          $fc_item->revision = TRUE;
           $is_default = entity_revision_is_default($host_entity_type, $host_entity);
           // If an entity type does not support saving non-default entities,
           // assume it will be saved as default.
           if (!isset($is_default) || $is_default) {
-            $entity->default_revision = TRUE;
-            $entity->archived = FALSE;
+            $fc_item->default_revision = TRUE;
+            $fc_item->archived = FALSE;
           }
         }
-        $entity->save(TRUE);
         */
 
         $this->value = $fc_item->id();
