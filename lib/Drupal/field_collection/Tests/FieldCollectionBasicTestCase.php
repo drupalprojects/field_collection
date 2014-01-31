@@ -140,7 +140,6 @@ class FieldCollectionBasicTestCase extends WebTestBase {
                       'Reference correctly deleted.');
 
     // Make sure field_collections are removed during deletion of the host.
-    /*
     $node->delete();
     $this->assertTrue(
       entity_load_multiple('field_collection_item', NULL, TRUE) === array(),
@@ -148,28 +147,46 @@ class FieldCollectionBasicTestCase extends WebTestBase {
 
     // Try deleting nodes with collections without any values.
     $node = $this->drupalCreateNode(array('type' => 'article'));
-    node_delete($node->nid);
-    $this->assertTrue(node_load($node->nid, NULL, TRUE) == FALSE, 'Node without collection values deleted.');
+    $node->delete();
+    $this->assertTrue(node_load($node->nid->value, NULL, TRUE) == FALSE,
+                      'Node without collection values deleted.');
 
     // Test creating a field collection entity with a not-yet saved host entity.
     $node = entity_create('node', array('type' => 'article'));
-    $entity = entity_create('field_collection_item', array('field_name' => $this->field_name));
+    $entity = entity_create('field_collection_item',
+                            array('field_name' => $this->field_name));
     $entity->setHostEntity('node', $node);
     $entity->save();
+
     // Now the node should have been saved with the collection and the link
     // should have been established.
-    $this->assertTrue(!empty($node->nid), 'Node has been saved with the collection.');
-    $this->assertTrue(count($node->{$this->field_name}[LANGUAGE_NONE]) == 1 && !empty($node->{$this->field_name}[LANGUAGE_NONE][0]['value']) && !empty($node->{$this->field_name}[LANGUAGE_NONE][0]['revision_id']), 'Link has been established.');
+    $this->assertTrue(!empty($node->nid->value),
+                      'Node has been saved with the collection.');
+
+    $this->assertTrue(
+      count($node->{$this->field_name}) == 1 &&
+      !empty($node->{$this->field_name}[0]->value) &&
+      !empty($node->{$this->field_name}[0]->revision_id),
+      'Link has been established.');
 
     // Again, test creating a field collection with a not-yet saved host entity,
     // but this time save both entities via the host.
     $node = entity_create('node', array('type' => 'article'));
-    $entity = entity_create('field_collection_item', array('field_name' => $this->field_name));
+    $entity = entity_create('field_collection_item',
+                            array('field_name' => $this->field_name));
     $entity->setHostEntity('node', $node);
-    node_save($node);
-    $this->assertTrue(!empty($entity->item_id) && !empty($entity->revision_id), 'Collection has been saved with the host.');
-    $this->assertTrue(count($node->{$this->field_name}[LANGUAGE_NONE]) == 1 && !empty($node->{$this->field_name}[LANGUAGE_NONE][0]['value']) && !empty($node->{$this->field_name}[LANGUAGE_NONE][0]['revision_id']), 'Link has been established.');
+    $node->save();
 
+    $this->assertTrue(!empty($entity->id()) && !empty($entity->getRevisionId()),
+                      'Collection has been saved with the host.');
+
+    $this->assertTrue(
+      count($node->{$this->field_name}) == 1 &&
+      !empty($node->{$this->field_name}[0]->value) &&
+      !empty($node->{$this->field_name}[0]->revision_id),
+      'Link has been established.');
+
+    /*
     // Test Revisions.
     list ($node, $item) = $this->createNodeWithFieldCollection();
 
@@ -275,31 +292,31 @@ class FieldCollectionBasicTestCase extends WebTestBase {
   /**
    * Make sure the basic UI and access checks are working.
    */
-  /*
   public function testBasicUI() {
     // Add a field to the collection.
-    $field = array(
-      'field_name' => 'field_text',
-      'type' => 'text',
-      'cardinality' => 1,
-      'translatable' => FALSE,
-    );
-    field_create_field($field);
-    $instance = array(
+    $field = entity_create('field_entity', array(
+      'name' => 'field_text',
       'entity_type' => 'field_collection_item',
-      'field_name' => 'field_text',
+      'type' => 'text',
+    ));
+    $field->save();
+
+    entity_create('field_instance', array(
+      'field_name' => $field->name,
+      'entity_type' => 'field_collection_item',
       'bundle' => $this->field_name,
-      'label' => 'Test text field',
+      /*'label' => 'Test text field',
       'widget' => array(
         'type' => 'text_textfield',
-      ),
-    );
-    field_create_instance($instance);
+      ),*/
+    ))->save();
+
 
     $user = $this->drupalCreateUser();
     $node = $this->drupalCreateNode(array('type' => 'article'));
 
     $this->drupalLogin($user);
+    /*
     // Make sure access is denied.
     $path = 'field-collection/field-test-collection/add/node/' . $node->nid;
     $this->drupalGet($path);
@@ -359,6 +376,6 @@ class FieldCollectionBasicTestCase extends WebTestBase {
     $this->assertNoLinkByHref('field-collection/field-test-collection/2/delete', 'No links on revision view.');
 
     $this->drupalGet("node/$node->nid/revisions");
-  }
   */
+  }
 }

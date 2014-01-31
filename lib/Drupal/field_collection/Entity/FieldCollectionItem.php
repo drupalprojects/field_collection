@@ -106,6 +106,7 @@ class FieldCollectionItem extends ContentEntityBase {
   protected function deleteHostEntityReference() {
     $delta = $this->getDelta();
     if ($this->id() && isset($delta) &&
+        NULL !== $this->getHost(TRUE) &&
         isset($this->getHost()->{$this->field_name->value}[$delta]))
     {
       unset($this->getHost()->{$this->field_name->value}[$delta]);
@@ -168,11 +169,11 @@ class FieldCollectionItem extends ContentEntityBase {
   /**
    * Returns the host entity of this field collection item.
    */
-  public function getHost() {
+  public function getHost($reset = FALSE) {
     $entity_info = \Drupal::entityManager()
-                   ->getDefinition($this->host_type->value, true);
-    if (null !== $entity_info->get('base_table')) {
-      return entity_load($this->host_type->value, $this->getHostId());
+                   ->getDefinition($this->host_type->value, TRUE);
+    if (NULL !== $entity_info->get('base_table')) {
+      return entity_load($this->host_type->value, $this->getHostId(), $reset);
     } else {
       return NULL;
     }
@@ -206,6 +207,10 @@ class FieldCollectionItem extends ContentEntityBase {
    */
   public function setHostEntity($entity_type, $entity, $create_link = TRUE) {
     if ($this->isNew()) {
+      if ($entity->isNew()) {
+        $entity->save();
+      }
+
       $this->host_type = $entity_type;
       $this->host_id = $entity->id();
       //$this->save();
@@ -228,7 +233,7 @@ class FieldCollectionItem extends ContentEntityBase {
       // field
       if ($create_link) {
         $entity->{$this->bundle()}[] = array('field_collection_item' => $this);
-        //$entity->save();
+        $entity->save();
       }
     }
     else {
