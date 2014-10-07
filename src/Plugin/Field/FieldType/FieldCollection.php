@@ -7,9 +7,9 @@
 
 namespace Drupal\field_collection\Plugin\Field\FieldType;
 
-use Drupal\Core\Field\ConfigFieldItemBase;
+use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\TypedData\DataDefinition;
-use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
 
 /**
  * Plugin implementation of the 'field_collection' field type.
@@ -28,12 +28,12 @@ use Drupal\Core\Field\FieldDefinitionInterface;
  *   default_formatter = "field_collection_list"
  * )
  */
-class FieldCollection extends ConfigFieldItemBase {
+class FieldCollection extends FieldItemBase {
 
   /**
    * {@inheritdoc}
    */
-  public static function schema(FieldDefinitionInterface $field) {
+  public static function schema(FieldStorageDefinitionInterface $field) {
     return array(
       'columns' => array(
         'value' => array(
@@ -46,6 +46,18 @@ class FieldCollection extends ConfigFieldItemBase {
         ),
       ),
     );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
+    $properties['value'] = DataDefinition::create('integer')
+      ->setLabel(t('Field collection item ID'))
+      ->setSetting('unsigned', TRUE)
+      ->setReadOnly(TRUE);
+
+    return $properties;
   }
 
   public function getFieldCollectionItem($create = FALSE) {
