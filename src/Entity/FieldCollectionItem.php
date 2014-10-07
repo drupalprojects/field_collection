@@ -8,8 +8,9 @@
 namespace Drupal\field_collection\Entity;
 
 use Drupal\Core\Entity\ContentEntityBase;
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
-use Drupal\Core\Field\FieldDefinition;
 use Drupal\Core\Language\Language;
 
 /**
@@ -19,7 +20,7 @@ use Drupal\Core\Language\Language;
  *   id = "field_collection_item",
  *   label = @Translation("Field Collection Item"),
  *   bundle_label = @Translation("Field Name"),
- *   controllers = {
+ *   handlers = {
  *     "storage" = "Drupal\field_collection\FieldCollectionItemStorageController",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "access" = "Drupal\field_collection\FieldCollectionItemAccessController",
@@ -245,13 +246,13 @@ class FieldCollectionItem extends ContentEntityBase {
   /**
    * {@inheritdoc}
    */
-  public static function baseFieldDefinitions($entity_type) {
-    $fields['item_id'] = FieldDefinition::create('integer')
+  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
+    $fields['item_id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Field collection item ID'))
       ->setDescription(t('The field collection item ID.'))
       ->setReadOnly(TRUE);
 
-    $fields['host_type'] = FieldDefinition::create('string')
+    $fields['host_type'] = BaseFieldDefinition::create('string')
       ->setLabel(t("Host's entity type"))
       ->setDescription(t("Type of entity for the field collection item's host."))
       ->setReadOnly(TRUE);
@@ -263,12 +264,12 @@ class FieldCollectionItem extends ContentEntityBase {
       ->setReadOnly(TRUE);
     */
 
-    $fields['revision_id'] = FieldDefinition::create('integer')
+    $fields['revision_id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Revision ID'))
       ->setDescription(t('The field collection item revision ID.'))
       ->setReadOnly(TRUE);
 
-    $fields['field_name'] = FieldDefinition::create('entity_reference')
+    $fields['field_name'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Type'))
       ->setDescription(t('The field collection item field.'))
       ->setSetting('target_type', 'field_collection')

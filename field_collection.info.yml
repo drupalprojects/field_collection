@@ -1,9 +1,9 @@
 name: Field collection
-description: Provides a field collection field, to which any number of fields can be attached.
+description: 'Provides a field collection field, to which any number of fields can be attached.'
 package: Field types
+version: VERSION
 core: 8.x
 configure: admin/structure/field-collections
 type: module
 dependencies:
-  - entity
   - field

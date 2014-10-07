@@ -7,20 +7,20 @@
 
 namespace Drupal\field_collection\Entity;
 
-use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
 use Drupal\Core\Entity\Annotation\EntityType;
 use Drupal\Core\Annotation\Translation;
-use Drupal\Core\Entity\EntityStorageControllerInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 
 /**
  * Defines the Field collection configuration entity.
  *
- * @EntityType(
+ * @ConfigEntityType(
  *   id = "field_collection",
  *   label = @Translation("Field collection"),
- *   controllers = {
- *     "storage" = "Drupal\Core\Config\Entity\ConfigStorageController",
+ *   handlers = {
+ *     "storage" = "Drupal\Core\Config\Entity\ConfigEntityStorage",
  *     "access" = "Drupal\field_collection\FieldCollectionAccessController",
  *     "form" = {
  *       "add" = "Drupal\field_collection\FieldCollectionFormController",
@@ -42,7 +42,7 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
  *   }
  * )
  */
-class FieldCollection extends ConfigEntityBase implements ConfigEntityInterface {
+class FieldCollection extends ConfigEntityBundleBase implements ConfigEntityInterface {
 
   /**
    * The machine name of this field collection.
@@ -75,7 +75,7 @@ class FieldCollection extends ConfigEntityBase implements ConfigEntityInterface 
   /**
    * {@inheritdoc}
    */
-  public function postSave(EntityStorageControllerInterface $storage_controller, $update = TRUE) {
+  public function postSave(EntityStorageInterface $storage_controller, $update = TRUE) {
     parent::postSave($storage_controller, $update);
 
     if (!$update) {
