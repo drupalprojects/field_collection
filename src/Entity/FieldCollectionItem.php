@@ -16,7 +16,7 @@ use Drupal\Core\Language\Language;
 /**
  * Defines the field collection item entity class.
  *
- * @EntityType(
+ * @ContentEntityType(
  *   id = "field_collection_item",
  *   label = @Translation("Field Collection Item"),
  *   bundle_label = @Translation("Field Name"),
