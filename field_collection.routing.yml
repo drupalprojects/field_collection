@@ -1,4 +1,4 @@
-field_collection.overview:
+field_collection.overview_field_collections:
   path: '/admin/structure/field-collections'
   defaults:
     _title: 'Manage field collections.'
@@ -7,7 +7,7 @@ field_collection.overview:
   requirements:
     _permission: 'administer content types'
 
-field_collection.edit:
+entity.field_collection.edit_form:
   path: '/admin/structure/field-collections/manage/{field_collection}'
   defaults:
     _entity_form: 'field_collection.edit'

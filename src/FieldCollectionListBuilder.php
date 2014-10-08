@@ -32,4 +32,11 @@ class FieldCollectionListBuilder extends ConfigEntityListBuilder {
     $header = array('title' => $this->t('Machine name'),);
     return $header + parent::buildHeader();
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDefaultOperations(EntityInterface $entity) {
+    return array();
+  }
 }

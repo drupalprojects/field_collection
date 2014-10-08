@@ -7,11 +7,11 @@
 
 namespace Drupal\field_collection;
 
-use Drupal\Core\Entity\EntityFormController;
+use Drupal\Core\Entity\EntityForm;
 
 /**
  * Form controller for field collection forms.
  */
-class FieldCollectionFormController extends EntityFormController {
+class FieldCollectionForm extends EntityForm {
 
 }

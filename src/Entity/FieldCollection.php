@@ -24,8 +24,8 @@ use Drupal\Core\Entity\EntityInterface;
  *     "storage" = "Drupal\Core\Config\Entity\ConfigEntityStorage",
  *     "access" = "Drupal\field_collection\FieldCollectionAccessControlHandler",
  *     "form" = {
- *       "add" = "Drupal\field_collection\FieldCollectionFormController",
- *       "edit" = "Drupal\field_collection\FieldCollectionFormController",
+ *       "add" = "Drupal\field_collection\FieldCollectionForm",
+ *       "edit" = "Drupal\field_collection\FieldCollectionForm",
  *       "delete" = "Drupal\field_collection\Form\FieldCollectionDeleteConfirm"
  *     },
  *     "list_builder" = "Drupal\field_collection\FieldCollectionListBuilder",
@@ -39,7 +39,7 @@ use Drupal\Core\Entity\EntityInterface;
  *     "uuid" = "uuid"
  *   },
  *   links = {
- *     "edit-form" = "field_collection.edit"
+ *     "edit-form" = "entity.field_collection.edit_form"
  *   }
  * )
  */

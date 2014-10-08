@@ -46,6 +46,7 @@ use Drupal\Core\Language\Language;
  *     "bundle" = "field_name"
  *   },
  *   bundle_entity_type = "field_collection",
+ *   field_ui_base_route = "entity.field_collection.edit_form",
  *   permission_granularity = "bundle",
  *   links = {
  *     "admin-form" = "field_collection.edit",
