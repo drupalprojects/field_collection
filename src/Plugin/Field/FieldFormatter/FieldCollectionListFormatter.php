@@ -36,11 +36,11 @@ class FieldCollectionListFormatter extends FormatterBase {
       // TODO: There is probably a better way to generate the URLs...
       // Entity::uri() ?
       $element[$delta] = array('#markup' =>
-        l($this->fieldDefinition->getName() . " $delta",
+        _l($this->fieldDefinition->getName() . " $delta",
           "field-collection-item/" . $item->value)
-        . " (" . l(t('Edit'), "field-collection-item/" . $item->value . "/edit",
+        . " (" . _l(t('Edit'), "field-collection-item/" . $item->value . "/edit",
                    array('query' => array("destination" => current_path())))
-        . "|" . l(t('Delete'), "field-collection-item/" . $item->value
+        . "|" . _l(t('Delete'), "field-collection-item/" . $item->value
         . "/delete", array('query' =>
                            array("destination" => current_path()))) . ")");
     }
@@ -64,7 +64,7 @@ class FieldCollectionListFormatter extends FormatterBase {
         $title = entity_i18n_string("field:{$field['field_name']}:{$instance['bundle']}:setting_add", $settings['add']);
         $add_path = $path . '/add/' . $entity_type . '/' . $id;
         $element['#suffix'] .= '<ul class="action-links action-links-field-collection-add"><li>';
-        $element['#suffix'] .= l($title, $add_path, array('query' => drupal_get_destination()));
+        $element['#suffix'] .= _l($title, $add_path, array('query' => drupal_get_destination()));
         $element['#suffix'] .= '</li></ul>';
       }
     }
@@ -84,9 +84,9 @@ class FieldCollectionListFormatter extends FormatterBase {
     $e = $items->getEntity();
     $element['#suffix'] = '';
     $element['#suffix'] .= '<ul class="action-links action-links-field-collection-add"><li>';
-    $element['#suffix'] .= l(
+    $element['#suffix'] .= _l(
       t('Add'), "field-collection-item/add/" .
-      $items->getFieldDefinition()->getName() . "/" . $e->entityType() . "/" .
+      $items->getFieldDefinition()->getName() . "/" . $e->getEntityTypeId() . "/" .
       $e->id(), array('query' => array("destination" => current_path())));
     $element['#suffix'] .= '</li></ul>';
 
