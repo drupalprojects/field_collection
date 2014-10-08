@@ -27,7 +27,7 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
  *       "edit" = "Drupal\field_collection\FieldCollectionFormController",
  *       "delete" = "Drupal\field_collection\Form\FieldCollectionDeleteConfirm"
  *     },
- *     "list" = "Drupal\field_collection\FieldCollectionListController",
+ *     "list_bundler" = "Drupal\field_collection\FieldCollectionListBuilder",
  *   },
  *   admin_permission = "administer content types",
  *   config_prefix = "field_collection",

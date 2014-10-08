@@ -28,7 +28,7 @@ use Drupal\Core\Language\Language;
  *       "default" = "Drupal\field_collection\FieldCollectionItemFormController",
  *       "edit" = "Drupal\field_collection\FieldCollectionItemFormController",
  *       "delete" = "Drupal\field_collection\Form\FieldCollectionItemDeleteForm"
- *     }
+ *     },
  *   },
  *   base_table = "field_collection_item",
  *   revision_table = "field_collection_item_revision",
