@@ -64,7 +64,7 @@ class FieldCollectionItem extends ContentEntityBase {
   * @todo storage controller
   * @todo access controller
   * @todo translation controller
-  */  
+  */
 
   /**
    * The id of the host entity.
@@ -100,7 +100,7 @@ class FieldCollectionItem extends ContentEntityBase {
     }
     parent::delete();
   }
-  
+
   /**
    * Deletes the host entity's reference of the field collection item.
    */
@@ -131,7 +131,7 @@ class FieldCollectionItem extends ContentEntityBase {
   public function getRevisionId() {
     return $this->revision_id->value;
   }
-  
+
   /**
    * Determines the $delta of the reference pointing to this field collection
    * item.

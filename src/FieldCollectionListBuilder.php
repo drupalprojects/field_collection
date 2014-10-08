@@ -6,27 +6,14 @@
 
 namespace Drupal\field_collection;
 
-use Drupal\Core\Config\Entity\ConfigEntityListController;
-use Drupal\Core\Entity\EntityControllerInterface;
+use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Provides a listing of field collections.
  */
-class FieldCollectionListController extends ConfigEntityListController implements EntityControllerInterface {
-
-  /**
-   * Overrides Drupal\Core\Entity\EntityListController::load().
-   */
-  public function load() {
-    $entities = parent::load();
-
-    // Sort the entities using the entity class's sort() method.
-    // See \Drupal\Core\Config\Entity\ConfigEntityBase::sort().
-    uasort($entities, array($this->entityInfo->get('class'), 'sort'));
-    return $entities;
-  }
-
+class FieldCollectionListBuilder extends ConfigEntityListBuilder {
   /**
    * {@inheritdoc}
    */

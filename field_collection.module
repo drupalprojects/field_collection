@@ -7,6 +7,7 @@
 
 use Drupal\field_collection\Entity\FieldCollection;
 use Drupal\Core\Extension\ModuleHandler;
+use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Loads a field collection item.
@@ -40,19 +41,21 @@ function field_collection_item_revision_load($revision_id) {
 }
 
 /**
- * Implements hook_field_enitity_create().
+ * Implements hook_ENTITY_TYPE_insert().
+ *
+ * Create a field collection bundle when a new field collection field is made.
  */
-function field_collection_field_entity_create($field) {
+function field_collection_field_storage_config_insert(EntityInterface $field) {
   if ($field->type == 'field_collection') {
     $field_collection = new FieldCollection();
-    $field_collection->label = $field->name;
-    $field_collection->id = $field->name;
+    $field_collection->label = $field->field_name;
+    $field_collection->id = $field->field_name;
     $field_collection->save();
 
     // TODO: entity_invoke_bundle_hook in post save like in nodeType ?
 
     // Clear caches.
-    entity_info_cache_clear();
+    //entity_info_cache_clear();
 
     // Do not directly issue menu rebuilds here to avoid potentially multiple
     // rebuilds. Instead, let menu_get_item() issue the rebuild on the next

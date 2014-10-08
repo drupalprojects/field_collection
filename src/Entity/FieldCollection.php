@@ -12,6 +12,7 @@ use Drupal\Core\Entity\Annotation\EntityType;
 use Drupal\Core\Annotation\Translation;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Defines the Field collection configuration entity.
@@ -21,13 +22,13 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
  *   label = @Translation("Field collection"),
  *   handlers = {
  *     "storage" = "Drupal\Core\Config\Entity\ConfigEntityStorage",
- *     "access" = "Drupal\field_collection\FieldCollectionAccessController",
+ *     "access" = "Drupal\field_collection\FieldCollectionAccessControlHandler",
  *     "form" = {
  *       "add" = "Drupal\field_collection\FieldCollectionFormController",
  *       "edit" = "Drupal\field_collection\FieldCollectionFormController",
  *       "delete" = "Drupal\field_collection\Form\FieldCollectionDeleteConfirm"
  *     },
- *     "list_bundler" = "Drupal\field_collection\FieldCollectionListBuilder",
+ *     "list_builder" = "Drupal\field_collection\FieldCollectionListBuilder",
  *   },
  *   admin_permission = "administer content types",
  *   config_prefix = "field_collection",
@@ -42,7 +43,7 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
  *   }
  * )
  */
-class FieldCollection extends ConfigEntityBundleBase implements ConfigEntityInterface {
+class FieldCollection extends ConfigEntityBundleBase implements ConfigEntityInterface, EntityInterface {
 
   /**
    * The machine name of this field collection.

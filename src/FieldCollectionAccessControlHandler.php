@@ -7,8 +7,8 @@
 
 namespace Drupal\field_collection;
 
-use Drupal\Core\Entity\EntityAccessController;
+use Drupal\Core\Entity\EntityAccessControlHandler;
 
-class FieldCollectionAccessController extends EntityAccessController {
+class FieldCollectionAccessControlHandler extends EntityAccessControlHandler {
 
 }
