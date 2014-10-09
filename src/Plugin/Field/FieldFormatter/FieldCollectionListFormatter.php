@@ -31,18 +31,23 @@ class FieldCollectionListFormatter extends FormatterBase {
   public function viewElements(FieldItemListInterface $items) {
     $element = array();
     $settings = $this->getFieldSettings();
+    $count = 0; // TODO: Is there a better way to get an accurate count of the
+                // items from the FileItemList that doesn't count blank items?
 
     foreach ($items as $delta => $item) {
-      // TODO: There is probably a better way to generate the URLs...
-      // Entity::uri() ?
-      $element[$delta] = array('#markup' =>
-        _l($this->fieldDefinition->getName() . " $delta",
-          "field-collection-item/" . $item->value)
-        . " (" . _l(t('Edit'), "field-collection-item/" . $item->value . "/edit",
-                   array('query' => array("destination" => current_path())))
-        . "|" . _l(t('Delete'), "field-collection-item/" . $item->value
-        . "/delete", array('query' =>
-                           array("destination" => current_path()))) . ")");
+      if ($item->value !== NULL) {
+        // TODO: There is probably a better way to generate the URLs...
+        // Entity::uri() ?
+        $count++;
+        $element[$delta] = array('#markup' =>
+          _l($this->fieldDefinition->getName() . " $delta",
+            "field-collection-item/" . $item->value)
+          . " (" . _l(t('Edit'), "field-collection-item/" . $item->value . "/edit",
+                     array('query' => array("destination" => current_path())))
+          . "|" . _l(t('Delete'), "field-collection-item/" . $item->value
+          . "/delete", array('query' =>
+                             array("destination" => current_path()))) . ")");
+      }
     }
 
     /* The following is the original code from
@@ -81,14 +86,16 @@ class FieldCollectionListFormatter extends FormatterBase {
     */
 
     // TODO: This will be replaced by the above
-    $e = $items->getEntity();
-    $element['#suffix'] = '';
-    $element['#suffix'] .= '<ul class="action-links action-links-field-collection-add"><li>';
-    $element['#suffix'] .= _l(
-      t('Add'), "field-collection-item/add/" .
-      $items->getFieldDefinition()->getName() . "/" . $e->getEntityTypeId() . "/" .
-      $e->id(), array('query' => array("destination" => current_path())));
-    $element['#suffix'] .= '</li></ul>';
+    if ($cardinality == -1 || $count < $cardinality) {
+      $e = $items->getEntity();
+      $element['#suffix'] = '';
+      $element['#suffix'] .= '<ul class="action-links action-links-field-collection-add"><li>';
+      $element['#suffix'] .= _l(
+        t('Add'), "field-collection-item/add/" .
+        $this->fieldDefinition->getName() . "/" . $e->getEntityTypeId() . "/" .
+        $e->id(), array('query' => array("destination" => current_path())));
+      $element['#suffix'] .= '</li></ul>';
+    }
 
     return $element;
   }

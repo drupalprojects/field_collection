@@ -77,7 +77,7 @@ class FieldCollection extends FieldItemBase {
     elseif ($create) {
       $field_collection_item =
         entity_create('field_collection_item',
-                      array('field_name' => $field_name));
+                      array('field_name' => $this->getFieldDefinition()->field_name));
       return $field_collection_item;
     }
     return FALSE;

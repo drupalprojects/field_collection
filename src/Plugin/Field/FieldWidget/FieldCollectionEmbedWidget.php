@@ -31,10 +31,9 @@ class FieldCollectionEmbedWidget extends WidgetBase {
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
-    $item = entity_create('field_collection_item',
-                          array('field_name' => $this->fieldDefinition->field_name));
+    $field_collection_item = $items[$delta]->getFieldCollectionItem(TRUE);
 
-    $element = \Drupal::service('entity.form_builder')->getForm($item);
+    $element = \Drupal::service('entity.form_builder')->getForm($field_collection_item);
     unset($element['actions']);
 
     if ($this->fieldDefinition->getFieldStorageDefinition()->cardinality == 1) {
