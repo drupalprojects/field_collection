@@ -34,7 +34,11 @@ class FieldCollectionEmbedWidget extends WidgetBase {
     $field_collection_item = $items[$delta]->getFieldCollectionItem(TRUE);
 
     $field_collection_item_form = \Drupal::service('entity.form_builder')->getForm($field_collection_item);
-    $element['field_daa'] = $field_collection_item_form['field_daa'];
+    foreach ($field_collection_item_form as $key => $value) {
+      if (substr($key, 0, 6) == 'field_') {
+        $element[$key] = $value;
+      }
+    }
 
     if ($this->fieldDefinition->getFieldStorageDefinition()->cardinality == 1) {
       $element['#prefix'] = '<fieldset><legend>' . $this->fieldDefinition->label . '</legend>';
