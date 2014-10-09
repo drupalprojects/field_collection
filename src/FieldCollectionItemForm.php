@@ -69,8 +69,6 @@ class FieldCollectionItemForm extends ContentEntityForm {
    */
   public function save(array $form, FormStateInterface $form_state) {
     $field_collection_item = $this->getEntity($form_state);
-    _c($form['#form_id']);
-    _c(array_keys($form));
 
     if ($field_collection_item->isNew()) {
       $host = entity_load($this->getRequest()->get('host_type'),
