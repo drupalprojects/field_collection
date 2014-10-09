@@ -109,10 +109,6 @@ class FieldCollectionItemForm extends ContentEntityForm {
       'field_collection_item.view',
       array('field_collection_item' => $field_collection_item->id()
     ));
-
-    // Clear the page and block caches
-    //\Drupal::cache()->invalidateTags(array('content' => TRUE));
-    //cache_invalidate_tags(array('content' => TRUE));
   }
 
   /**
