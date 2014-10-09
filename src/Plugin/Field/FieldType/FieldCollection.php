@@ -78,6 +78,12 @@ class FieldCollection extends FieldItemBase {
       $field_collection_item =
         entity_create('field_collection_item',
                       array('field_name' => $this->getFieldDefinition()->field_name));
+
+      /*
+      $field_collection_item->setHostEntity(
+        $this->getEntity()->getEntityTypeId(), $this->getEntity(), FALSE);
+      */
+
       return $field_collection_item;
     }
     return FALSE;
@@ -109,11 +115,11 @@ class FieldCollection extends FieldItemBase {
     if (isset($this->field_collection_item) ||
         $this->getEntity()->isNewRevision())
     {
-      if ($fc_item = $this->getFieldCollectionItem()) {
-        if ($fc_item->isNew()) {
-          $fc_item->setHostEntity(
+      if ($field_collection_item = $this->getFieldCollectionItem()) {
+        if ($field_collection_item->isNew()) {
+          $field_collection_item->setHostEntity(
             $this->getEntity()->getEntityTypeId(), $this->getEntity(), FALSE);
-          $fc_item->save();
+          $field_collection_item->save();
         }
 
         /*
@@ -130,8 +136,8 @@ class FieldCollection extends FieldItemBase {
         }
         */
 
-        $this->value = $fc_item->id();
-        $this->revision_id = $fc_item->getRevisionId();
+        $this->value = $field_collection_item->id();
+        $this->revision_id = $field_collection_item->getRevisionId();
       }
     }
   }

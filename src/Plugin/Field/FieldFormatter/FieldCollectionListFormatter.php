@@ -86,6 +86,7 @@ class FieldCollectionListFormatter extends FormatterBase {
     */
 
     // TODO: This will be replaced by the above
+    $cardinality = $this->fieldDefinition->getFieldStorageDefinition()->cardinality;
     if ($cardinality == -1 || $count < $cardinality) {
       $e = $items->getEntity();
       $element['#suffix'] = '';
