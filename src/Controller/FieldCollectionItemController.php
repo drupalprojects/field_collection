@@ -35,13 +35,13 @@ class FieldCollectionItemController extends ControllerBase {
    * TODO: additional fields
    */
   public function add(FieldCollection $field_collection, $host_type, $host_id) {
-    $field_collection_item = $this->entityManager()->getStorageController('field_collection_item')->create(array(
+    $field_collection_item = $this->entityManager()->getStorage('field_collection_item')->create(array(
       'field_name' => $field_collection->id,
       'host_type' => $host_type,
       'revision_id' => 0, // TODO: set this correctly
     ));
 
-    $form = $this->entityManager()->getForm($field_collection_item);
+    $form = $this->entityFormBuilder()->getForm($field_collection_item);
     return $form;
   }
 

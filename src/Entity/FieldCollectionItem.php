@@ -21,12 +21,12 @@ use Drupal\Core\Language\Language;
  *   label = @Translation("Field Collection Item"),
  *   bundle_label = @Translation("Field Name"),
  *   handlers = {
- *     "storage" = "Drupal\field_collection\FieldCollectionItemStorageController",
+ *     "storage" = "Drupal\field_collection\FieldCollectionItemStorage",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
- *     "access" = "Drupal\field_collection\FieldCollectionItemAccessController",
+ *     "access" = "Drupal\field_collection\FieldCollectionItemAccessControlHandler",
  *     "form" = {
- *       "default" = "Drupal\field_collection\FieldCollectionItemFormController",
- *       "edit" = "Drupal\field_collection\FieldCollectionItemFormController",
+ *       "default" = "Drupal\field_collection\FieldCollectionItemForm",
+ *       "edit" = "Drupal\field_collection\FieldCollectionItemForm",
  *       "delete" = "Drupal\field_collection\Form\FieldCollectionItemDeleteForm"
  *     },
  *   },
@@ -251,19 +251,18 @@ class FieldCollectionItem extends ContentEntityBase {
     $fields['item_id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Field collection item ID'))
       ->setDescription(t('The field collection item ID.'))
-      ->setReadOnly(TRUE);
+      ->setReadOnly(TRUE)
+      ->setSetting('unsigned', TRUE);
 
-    $fields['host_type'] = BaseFieldDefinition::create('string')
+    $fields['host_type'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t("Host's entity type"))
       ->setDescription(t("Type of entity for the field collection item's host."))
       ->setReadOnly(TRUE);
 
-    /* TODO
-    $fields['uuid'] = FieldDefinition::create('uuid')
+    $fields['uuid'] = BaseFieldDefinition::create('uuid')
       ->setLabel(t('UUID'))
       ->setDescription(t('The field collection item UUID.'))
       ->setReadOnly(TRUE);
-    */
 
     $fields['revision_id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Revision ID'))

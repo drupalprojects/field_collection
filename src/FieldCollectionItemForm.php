@@ -7,16 +7,17 @@
 
 namespace Drupal\field_collection;
 
-use Drupal\Core\Entity\ContentEntityFormController;
+use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\field_collection\Entity\FieldCollectionItem;
+use Drupal\Core\Form\FormStateInterface;
 
-class FieldCollectionItemFormController extends ContentEntityFormController {
+class FieldCollectionItemForm extends ContentEntityForm {
 
   /**
-   * Overrides \Drupal\Core\Entity\EntityFormController::form().
+   * Overrides \Drupal\Core\Entity\EntityForm::form().
    */
-  public function form(array $form, array &$form_state) {
+  public function form(array $form, FormStateInterface $form_state) {
     $field_collection_item = $this->entity;
 
     if ($this->operation == 'edit') {
@@ -55,7 +56,7 @@ class FieldCollectionItemFormController extends ContentEntityFormController {
   /**
    * Overrides \Drupal\Core\Entity\EntityFormController::submit().
    */
-  public function submit(array $form, array &$form_state) {
+  public function submit(array $form, FormStateInterface $form_state) {
     // Build the block object from the submitted values.
     $field_collection_item = parent::submit($form, $form_state);
     $field_collection_item->setNewRevision();
@@ -66,7 +67,7 @@ class FieldCollectionItemFormController extends ContentEntityFormController {
   /**
    * Overrides \Drupal\Core\Entity\EntityFormController::save().
    */
-  public function save(array $form, array &$form_state) {
+  public function save(array $form, FormStateInterface $form_state) {
     $field_collection_item = $this->getEntity($form_state);
 
     if ($field_collection_item->isNew()) {
@@ -93,10 +94,9 @@ class FieldCollectionItemFormController extends ContentEntityFormController {
       }
     }
 
-
     if ($field_collection_item->id()) {
-      $form_state['values']['id'] = $field_collection_item->id();
-      $form_state['id'] = $field_collection_item->id();
+      $form_state->setValue('id', $field_collection_item->id());
+      $form_state->set('id', $field_collection_item->id());
     }
     else {
       // In the unlikely case something went wrong on save, the block will be
@@ -105,16 +105,20 @@ class FieldCollectionItemFormController extends ContentEntityFormController {
       $form_state['rebuild'] = TRUE;
     }
 
-    $form_state['redirect'] = $field_collection_item->uri()['path'];
+    $form_state->setRedirect(
+      'field_collection_item.view',
+      array('field_collection_item' => $field_collection_item->id()
+    ));
 
-    // Clear the page and block caches.
-    cache_invalidate_tags(array('content' => TRUE));
+    // Clear the page and block caches
+    //\Drupal::cache()->invalidateTags(array('content' => TRUE));
+    //cache_invalidate_tags(array('content' => TRUE));
   }
 
   /**
    * Overrides \Drupal\Core\Entity\EntityFormController::delete().
    */
-  public function delete(array $form, array &$form_state) {
+  public function delete(array $form, FormStateInterface $form_state) {
     $destination = array();
     if (isset($_GET['destination'])) {
       $destination = drupal_get_destination();
