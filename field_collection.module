@@ -8,6 +8,7 @@
 use Drupal\field_collection\Entity\FieldCollection;
 use Drupal\Core\Extension\ModuleHandler;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Field\WidgetBase;
 
 /**
  * Loads a field collection item.
@@ -69,3 +70,67 @@ function field_collection_field_storage_config_insert(EntityInterface $field) {
   }
 }
 
+function field_collection_field_widget_embed_validate($element, \Drupal\Core\Form\FormStateInterface $form_state, $form) {
+  // TODO: Actual validation
+  /*
+  $instance = field_widget_instance($element, $form_state);
+  $field = field_widget_field($element, $form_state);
+  */
+
+  $field_parents = $element['#field_parents'];
+  $field_name = $element['#field_name'];
+
+  $field_state = WidgetBase::getWidgetState($field_parents, $field_name, $form_state);
+  $field_collection_item = $field_state['entity'][$element['#delta']];
+
+  /*
+  // Attach field API validation of the embedded form.
+  field_attach_form_validate('field_collection_item', $field_collection_item, $element, $form_state);
+
+  // Now validate required elements if the entity is not empty.
+  if (!field_collection_item_is_empty($field_collection_item) && !empty($element['#field_collection_required_elements'])) {
+    foreach ($element['#field_collection_required_elements'] as &$elements) {
+
+      // Copied from _form_validate().
+      // #1676206: Modified to support options widget.
+      if (isset($elements['#needs_validation'])) {
+        $is_empty_multiple = (!count($elements['#value']));
+        $is_empty_string = (is_string($elements['#value']) && drupal_strlen(trim($elements['#value'])) == 0);
+        $is_empty_value = ($elements['#value'] === 0);
+        $is_empty_option = (isset($elements['#options']['_none']) && $elements['#value'] == '_none');
+        if ($is_empty_multiple || $is_empty_string || $is_empty_value || $is_empty_option) {
+          if (isset($elements['#title'])) {
+            form_error($elements, t('@name field is required.', array('@name' => $elements['#title'])));
+          }
+          else {
+            form_error($elements);
+          }
+        }
+      }
+    }
+  }
+  */
+
+  // Only if the form is being submitted, finish the collection entity and
+  // prepare it for saving.
+  if ($form_state->isSubmitted() && !$form_state->hasAnyErrors()) {
+  /*
+    field_attach_submit('field_collection_item', $field_collection_item, $element, $form_state);
+
+    // Load initial form values into $item, so any other form values below the
+    // same parents are kept.
+    $item = drupal_array_get_nested_value($form_state['values'], $element['#parents']);
+
+    // Set the _weight if it is a multiple field.
+    if (isset($element['_weight']) && ($field['cardinality'] > 1 || $field['cardinality'] == FIELD_CARDINALITY_UNLIMITED)) {
+      $item['_weight'] = $element['_weight']['#value'];
+    }
+
+    // Put the field collection item in $item['entity'], so it is saved with
+    // the host entity via hook_field_presave() / field API if it is not empty.
+    // @see field_collection_field_presave()
+    $item['entity'] = $field_collection_item;
+    form_set_value($element, $item, $form_state);
+  */
+  }
+}

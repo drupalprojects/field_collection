@@ -94,6 +94,12 @@ class FieldCollection extends FieldItemBase {
     parent::delete();
   }
 
+  public function insert() {
+  }
+
+  public function update() {
+  }
+
   /**
    * Support saving field collection items in @code
    * $field->field_collection_item @endcode.  This may be used to seamlessly
