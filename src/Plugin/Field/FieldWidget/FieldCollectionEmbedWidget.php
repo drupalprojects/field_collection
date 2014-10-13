@@ -40,7 +40,7 @@ class FieldCollectionEmbedWidget extends WidgetBase {
     //
     // TODO: Remove 'field_collections' from parents if possible.  Just using
     // array($field_name, $delta) seems to cause a lockup when the form is submitted.
-    $parents = array_merge($element['#field_parents'], array('field_collections', $field_name, $delta));
+    $parents = array_merge($element['#field_parents'], array($field_name, $delta));
 
     $element += array(
       '#element_validate' => array('field_collection_field_widget_embed_validate'),
@@ -73,13 +73,13 @@ class FieldCollectionEmbedWidget extends WidgetBase {
       $field_state['items_count'] = 1;
     }
 
-    if (isset($field_state['entity'][$delta])) {
-      $field_collection_item = $field_state['entity'][$delta];
+    if (isset($field_state['field_collection_item'][$delta])) {
+      $field_collection_item = $field_state['field_collection_item'][$delta];
     }
     else {
       $field_collection_item = $items[$delta]->getFieldCollectionItem(TRUE);
       // Put our entity in the form state, so FAPI callbacks can access it.
-      $field_state['entity'][$delta] = $field_collection_item;
+      $field_state['field_collection_item'][$delta] = $field_collection_item;
     }
 
     static::setWidgetState($element['#field_parents'], $field_name, $form_state, $field_state);
@@ -88,10 +88,13 @@ class FieldCollectionEmbedWidget extends WidgetBase {
     $display->buildForm($field_collection_item, $element, $form_state);
 
     /*
+      TODO: Figure out if field_collection_field_widget_embed_delay_required_validation
+      is still necessary and restore this functionality if it is.
       if (empty($element['#required'])) {
         $element['#after_build'][] = 'field_collection_field_widget_embed_delay_required_validation';
       }
 
+      TODO: Remove button on unlimited cardinality field collection fields
       if ($field['cardinality'] == FIELD_CARDINALITY_UNLIMITED) {
         $element['remove_button'] = array(
           '#delta' => $delta,

@@ -82,9 +82,64 @@ class FieldCollectionItem extends ContentEntityBase {
   }
 
   /**
-   * {@inheritdoc}
+   * Save the field collection item.
+   *
+   * By default, always save the host entity, so modules are able to react
+   * upon changes to the content of the host and any 'last updated' dates of
+   * entities get updated.
+   *
+   * For creating an item a host entity has to be specified via setHostEntity()
+   * before this function is invoked. For the link between the entities to be
+   * fully established, the host entity object has to be updated to include a
+   * reference on this field collection item during saving. So do not skip
+   * saving the host for creating items.
+   *
+   * @param $skip_host_save
+   *   (internal) If TRUE is passed, the host entity is not saved automatically
+   *   and therefore no link is created between the host and the item or
+   *   revision updates might be skipped. Use with care.
    */
-  public function save() {
+  public function save($skip_host_save = FALSE) {
+    /* TODO
+    // Make sure we have a host entity during creation.
+    if (!empty($this->is_new) && !(isset($this->hostEntityId) || isset($this->hostEntity) || isset($this->hostEntityRevisionId))) {
+      throw new Exception("Unable to create a field collection item without a given host entity.");
+    }
+    */
+
+    // Only save directly if we are told to skip saving the host entity. Else,
+    // we always save via the host as saving the host might trigger saving
+    // field collection items anyway (e.g. if a new revision is created).
+    if ($skip_host_save) {
+      return parent::save();
+    }
+    /* TODO
+    else {
+      $host_entity = $this->hostEntity();
+      if (!$host_entity) {
+        throw new Exception("Unable to save a field collection item without a valid reference to a host entity.");
+      }
+      // If this is creating a new revision, also do so for the host entity.
+      if (!empty($this->revision) || !empty($this->is_new_revision)) {
+        $host_entity->revision = TRUE;
+        if (!empty($this->default_revision)) {
+          entity_revision_set_default($this->hostEntityType, $host_entity);
+        }
+      }
+      // Set the host entity reference, so the item will be saved with the host.
+      // @see field_collection_field_presave()
+      $delta = $this->delta();
+      if (isset($delta)) {
+        $host_entity->{$this->field_name}[$this->langcode][$delta] = array('entity' => $this);
+      }
+      else {
+        $host_entity->{$this->field_name}[$this->langcode][] =  array('entity' => $this);
+      }
+      return entity_save($this->hostEntityType, $host_entity);
+    }
+    */
+
+    // TODO: Handle revisions for real.
     if (!isset($this->revision_id->value)) {
       $this->revision_id->value = 0;
     }
@@ -209,20 +264,16 @@ class FieldCollectionItem extends ContentEntityBase {
    */
   public function setHostEntity($entity_type, $entity, $create_link = TRUE) {
     if ($this->isNew()) {
-      if ($entity->isNew()) {
-        $entity->save();
-      }
-
       $this->host_type = $entity_type;
       $this->host_id = $entity->id();
-      //$this->save();
+      $this->host_entity = $entity;
 
-      /*
       // If the host entity is not saved yet, set the id to FALSE. So
       // fetchHostDetails() does not try to load the host entity details.
-      if (!isset($this->hostEntityId)) {
-        $this->hostEntityId = FALSE;
+      if (!isset($this->host_id)) {
+        $this->host_id = FALSE;
       }
+      /*
       // We are create a new field collection for a non-default entity, thus
       // set archived to TRUE.
       if (!entity_revision_is_default($entity_type, $entity)) {
@@ -233,6 +284,7 @@ class FieldCollectionItem extends ContentEntityBase {
 
       // TODO: Generate a message if attempting to add a value to a full limited
       // field
+
       if ($create_link) {
         $entity->{$this->bundle()}[] = array('field_collection_item' => $this);
         $entity->save();
