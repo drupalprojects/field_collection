@@ -124,18 +124,28 @@ function field_collection_field_widget_embed_validate($element, \Drupal\Core\For
 
     // Load initial form values into $item, so any other form values below the
     // same parents are kept.
-    $fiefield_collection_field_widget_embed_delay_required_validationld = NestedArray::getValue($form_state->getValues(), $element['#parents']);
+    $field = NestedArray::getValue($form_state->getValues(), $element['#parents']);
 
-    /*
-    // TODO: Set the _weight if it is a multiple field.
-    if (isset($element['_weight']) && ($field['cardinality'] > 1 || $field['cardinality'] == FIELD_CARDINALITY_UNLIMITED)) {
+    // Set the _weight if it is a multiple field.
+    if (isset($element['_weight']) && $form[$field_name]['widget']['#cardinality_multiple']) {
       $field['_weight'] = $element['_weight']['#value'];
     }
-    */
 
     // Put the field collection field in $field['field_collection_item'], so it is saved with
     // the host entity via FieldCollection->preSave() / field API if it is not empty.
     $field['field_collection_item'] = $field_collection_item;
     $form_state->setValue($element['#parents'], $field);
+  }
+}
+
+/**
+ * Implements hood_form_FORM_ID_alter() for field_ui_field_edit_form.
+ *
+ * Remove default value from field collection field settings.
+ */
+function field_collection_form_field_ui_field_edit_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state) {
+  if ($form['#field']->getType() == 'field_collection') {
+    unset($form['field']['default_value']['widget']);
+    $form['field']['default_value']['#description'] = t('To specify a default value, configure it via the regular default value setting of each field that is part of the field collection. To do so, go to the <a href="!url">Manage fields</a> screen of the field collection.', array('!url' => _url('admin/structure/field-collections/manage/' . $form['#field']->getName() . '/fields')));
   }
 }
