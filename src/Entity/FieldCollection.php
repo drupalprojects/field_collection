@@ -72,15 +72,4 @@ class FieldCollection extends ConfigEntityBundleBase implements ConfigEntityInte
     parent::__construct($values, $entity_type);
     $this->entityType = "field_collection";
   }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function postSave(EntityStorageInterface $storage_controller, $update = TRUE) {
-    parent::postSave($storage_controller, $update);
-
-    if (!$update) {
-      entity_invoke_bundle_hook('create', 'field_collection_item', $this->id());
-    }
-  }
 }

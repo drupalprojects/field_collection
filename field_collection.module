@@ -52,6 +52,7 @@ function field_collection_field_storage_config_insert(EntityInterface $field) {
     $field_collection = new FieldCollection();
     $field_collection->label = $field->field_name;
     $field_collection->id = $field->field_name;
+    $field_collection->enforceIsNew();
     $field_collection->save();
 
     // TODO: entity_invoke_bundle_hook in post save like in nodeType ?
