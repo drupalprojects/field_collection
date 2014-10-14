@@ -113,7 +113,7 @@ class FieldCollectionItem extends ContentEntityBase {
     if ($skip_host_save) {
       return parent::save();
     }
-    /* TODO
+    /* TODO: Need this?
     else {
       $host_entity = $this->hostEntity();
       if (!$host_entity) {
