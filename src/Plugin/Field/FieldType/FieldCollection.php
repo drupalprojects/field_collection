@@ -228,11 +228,9 @@ class FieldCollection extends FieldItemBase {
     if ($this->value) {
       return FALSE;
     }
-    /*
-    else if (isset($this->getFieldCollectionItem()) {
+    else if ($this->getFieldCollectionItem()) {
       return $this->getFieldCollectionItem()->isEmpty();
     }
-    */
     return TRUE;
   }
 }

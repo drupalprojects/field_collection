@@ -329,4 +329,25 @@ class FieldCollectionItem extends ContentEntityBase {
 
     return $fields;
   }
+
+  /**
+   * Determines whether a field collection item entity is empty based on the
+   * collection-fields.
+   */
+  function isEmpty() {
+    $is_empty = TRUE;
+
+    foreach ($this->getIterator() as $field) {
+      // Only check configured fields, skip base fields like uuid.
+      if (!$field->isEmpty() && 'Drupal\\field\\Entity\\FieldConfig' == get_class($field->getFieldDefinition())) {
+        $is_empty = FALSE;
+      }
+    }
+
+    // TODO: Allow other modules a chance to alter the value before returning?
+    //drupal_alter('field_collection_is_empty', $is_empty, $this);
+
+    return $is_empty;
+  }
+
 }

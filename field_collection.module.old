@@ -798,38 +798,6 @@ function field_collection_field_item_to_ids($items) {
 }
 
 /**
- * Determines whether a field collection item entity is empty based on the collection-fields.
- */
-function field_collection_item_is_empty(FieldCollectionItemEntity $item) {
-  $instances = field_info_instances('field_collection_item', $item->field_name);
-  $is_empty = TRUE;
-
-  foreach ($instances as $instance) {
-    $field_name = $instance['field_name'];
-    $field = field_info_field($field_name);
-
-    // Determine the list of languages to iterate on.
-    $languages = field_available_languages('field_collection_item', $field);
-
-    foreach ($languages as $langcode) {
-      if (!empty($item->{$field_name}[$langcode])) {
-        // If at least one collection-field is not empty; the
-        // field collection item is not empty.
-        foreach ($item->{$field_name}[$langcode] as $field_item) {
-          if (!module_invoke($field['module'], 'field_is_empty', $field_item, $field)) {
-            $is_empty = FALSE;
-          }
-        }
-      }
-    }
-  }
-
-  // Allow other modules a chance to alter the value before returning.
-  drupal_alter('field_collection_is_empty', $is_empty, $item);
-  return $is_empty;
-}
-
-/**
  * TODO: replace with plugin API
  * TODO: delete
  * https://drupal.org/node/1805846
