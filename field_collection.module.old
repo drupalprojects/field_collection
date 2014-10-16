@@ -506,7 +506,6 @@ function field_collection_menu() {
     );
   }
 
-  /*
   // Add menu paths for viewing/editing/deleting field collection items.
   foreach (field_info_fields() as $field) {
     if ($field['type'] == 'field_collection') {
@@ -574,7 +573,6 @@ function field_collection_menu() {
     'file path' => 'includes',
     'file' => 'form.inc',
   );
-*/
 
   return $items;
 }
@@ -692,7 +690,6 @@ function field_collection_theme() {
 /**
  * Implements hook_field_info().
  */
-/*
 function field_collection_field_info() {
   return array(
     'field_collection' => array(
@@ -712,7 +709,6 @@ function field_collection_field_info() {
     ),
   );
 }
-*/
 
 /**
  * Returns the base path to use for field collection items.
@@ -743,84 +739,6 @@ function field_collection_field_settings_form($field, $instance) {
     ),
   );
   return $form;
-}
-
-/**
- * Implements hook_field_presave().
- *
- * Support saving field collection items in @code $item['entity'] @endcode. This
- * may be used to seamlessly create field collection items during host-entity
- * creation or to save changes to the host entity and its collections at once.
- */
-function field_collection_field_presave($host_entity_type, $host_entity, $field, $instance, $langcode, &$items) {
-  foreach ($items as &$item) {
-    // In case the entity has been changed / created, save it and set the id.
-    // If the host entity creates a new revision, save new item-revisions as
-    // well.
-    /*
-    if (isset($item['entity']) || !empty($host_entity->revision)) {
-
-      if ($entity = field_collection_field_get_entity($item)) {
-
-        if (!empty($entity->is_new)) {
-          $entity->setHostEntity($host_entity_type, $host_entity, LANGUAGE_NONE, FALSE);
-        }
-
-        // If the host entity is saved as new revision, do the same for the item.
-        if (!empty($host_entity->revision)) {
-          $entity->revision = TRUE;
-          $is_default = entity_revision_is_default($host_entity_type, $host_entity);
-          // If an entity type does not support saving non-default entities,
-          // assume it will be saved as default.
-          if (!isset($is_default) || $is_default) {
-            $entity->default_revision = TRUE;
-            $entity->archived = FALSE;
-          }
-        }
-        $entity->save(TRUE);
-
-        $item = array(
-          'value' => $entity->item_id,
-          'revision_id' => $entity->revision_id,
-        );
-      }
-    }
-  */
-  }
-}
-
-/**
- * Implements hook_field_update().
- *
- * Care about removed field collection items.
- */
-function field_collection_field_update($entity_type, $entity, $field, $instance, $langcode, &$items) {
-  $items_original = !empty($entity->original->{$field['field_name']}[$langcode]) ? $entity->original->{$field['field_name']}[$langcode] : array();
-  $original_by_id = array_flip(field_collection_field_item_to_ids($items_original));
-
-  foreach ($items as $item) {
-    unset($original_by_id[$item['value']]);
-  }
-
-  // If there are removed items, care about deleting the item entities.
-  if ($original_by_id) {
-    $ids = array_flip($original_by_id);
-
-    // If we are creating a new revision, the old-items should be kept but get
-    // marked as archived now.
-    if (!empty($entity->revision)) {
-      db_update('field_collection_item')
-        ->fields(array('archived' => 1))
-        ->condition('item_id', $ids, 'IN')
-        ->execute();
-    }
-    else {
-      // Delete unused field collection items now.
-      foreach (field_collection_item_load_multiple($ids) as $item) {
-        $item->deleteRevision(TRUE);
-      }
-    }
-  }
 }
 
 /**
@@ -880,19 +798,6 @@ function field_collection_field_item_to_ids($items) {
 }
 
 /**
- * Implements hook_field_is_empty().
- */
-function field_collection_field_is_empty($item, $field) {
-  if (!empty($item['value'])) {
-    return FALSE;
-  }
-  elseif (isset($item['entity'])) {
-    return field_collection_item_is_empty($item['entity']);
-  }
-  return TRUE;
-}
-
-/**
  * Determines whether a field collection item entity is empty based on the collection-fields.
  */
 function field_collection_item_is_empty(FieldCollectionItemEntity $item) {
@@ -932,7 +837,6 @@ function field_collection_item_is_empty(FieldCollectionItemEntity $item) {
 /**
  * Implements hook_field_formatter_info().
  */
-/*
 function field_collection_field_formatter_info() {
   return array(
     'field_collection_list' => array(
@@ -965,7 +869,6 @@ function field_collection_field_formatter_info() {
     ),
   );
 }
-*/
 
 /**
  * Implements hook_field_formatter_settings_form().

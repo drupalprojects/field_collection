@@ -221,6 +221,19 @@ class FieldCollection extends FieldItemBase {
     */
   }
 
-  public function preSave() {
+  /**
+   * {@inheritdoc}
+   */
+  function isEmpty() {
+    if ($this->value) {
+      return FALSE;
+    }
+    /*
+    else if (isset($this->getFieldCollectionItem()) {
+      return $this->getFieldCollectionItem()->isEmpty();
+    }
+    */
+    return TRUE;
   }
 }
+
