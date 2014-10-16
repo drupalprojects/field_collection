@@ -12,6 +12,7 @@ use Drupal\Core\Field\WidgetBase;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\field_collection\Entity\FieldCollectionItem;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
 
 /**
  * Plugin implementation of the 'field_collection_embed' widget.
@@ -35,12 +36,9 @@ class FieldCollectionEmbedWidget extends WidgetBase {
     $field_name = $this->fieldDefinition->getName();
 
     // Nest the field collection item entity form in a dedicated parent space,
-    // by appending [field_name, delta] to the current parent space.
+    // by appending [field_name, 'widget', delta] to the current parent space.
     // That way the form values of the field collection item are separated.
-    //
-    // TODO: Remove 'field_collections' from parents if possible.  Just using
-    // array($field_name, $delta) seems to cause a lockup when the form is submitted.
-    $parents = array_merge($element['#field_parents'], array($field_name, $delta));
+    $parents = array_merge($element['#field_parents'], array($field_name, 'widget', $delta));
 
     $element += array(
       '#element_validate' => array('field_collection_field_widget_embed_validate'),
@@ -55,6 +53,7 @@ class FieldCollectionEmbedWidget extends WidgetBase {
     $field_state = static::getWidgetState($element['#field_parents'], $field_name, $form_state);
 
     /*
+      // TODO
       if (!empty($field['settings']['hide_blank_items']) && $delta == $field_state['items_count'] && $delta > 0) {
         // Do not add a blank item. Also see
         // field_collection_field_attach_form() for correcting #max_delta.
@@ -67,11 +66,6 @@ class FieldCollectionEmbedWidget extends WidgetBase {
         $field_state['items_count'] = 1;
       }
     */
-
-    // TODO: Add above functionality.
-    if ($field_state['items_count'] == 0) {
-      $field_state['items_count'] = 1;
-    }
 
     if (isset($field_state['field_collection_item'][$delta])) {
       $field_collection_item = $field_state['field_collection_item'][$delta];
@@ -93,10 +87,13 @@ class FieldCollectionEmbedWidget extends WidgetBase {
       if (empty($element['#required'])) {
         $element['#after_build'][] = 'field_collection_field_widget_embed_delay_required_validation';
       }
+    */
 
-      TODO: Remove button on unlimited cardinality field collection fields
-      if ($field['cardinality'] == FIELD_CARDINALITY_UNLIMITED) {
-        $element['remove_button'] = array(
+    // Put the remove button on unlimited cardinality field collection fields.
+    if ($this->fieldDefinition->getFieldStorageDefinition()->getCardinality() == FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED) {
+      $element['actions'] = array(
+        '#type' => 'actions',
+        'remove_button' => array(
           '#delta' => $delta,
           '#name' => implode('_', $parents) . '_remove_button',
           '#type' => 'submit',
@@ -105,13 +102,20 @@ class FieldCollectionEmbedWidget extends WidgetBase {
           '#submit' => array('field_collection_remove_submit'),
           '#limit_validation_errors' => array(),
           '#ajax' => array(
-            'path' => 'field_collection/ajax',
+            'path' => 'field_collection/ajax/remove',
             'effect' => 'fade',
+            'wrapper' => 'edit-' . str_replace('_', '-', $field_name) . '-wrapper',
+            'options' => array(
+              'query' => array(
+                //'element_parents' => implode('/', $element['#parents']),
+                'element_parents' => $field_name,
+              ),
+            ),
           ),
           '#weight' => 1000,
-        );
-      }
-    */
+        ),
+      );
+    }
 
     return $element;
   }

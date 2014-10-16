@@ -10,6 +10,7 @@ use Drupal\Core\Extension\ModuleHandler;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Loads a field collection item.
@@ -75,7 +76,7 @@ function field_collection_field_storage_config_insert(EntityInterface $field) {
 /**
  * FAPI validation of an individual field collection element.
  */
-function field_collection_field_widget_embed_validate($element, \Drupal\Core\Form\FormStateInterface $form_state, $form) {
+function field_collection_field_widget_embed_validate($element, FormStateInterface $form_state, $form) {
   // TODO: Actual validation
   /*
   $instance = field_widget_instance($element, $form_state);
@@ -143,9 +144,103 @@ function field_collection_field_widget_embed_validate($element, \Drupal\Core\For
  *
  * Remove default value from field collection field settings.
  */
-function field_collection_form_field_ui_field_edit_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state) {
+function field_collection_form_field_ui_field_edit_form_alter(&$form, FormStateInterface $form_state) {
   if ($form['#field']->getType() == 'field_collection') {
     unset($form['field']['default_value']['widget']);
     $form['field']['default_value']['#description'] = t('To specify a default value, configure it via the regular default value setting of each field that is part of the field collection. To do so, go to the <a href="!url">Manage fields</a> screen of the field collection.', array('!url' => _url('admin/structure/field-collections/manage/' . $form['#field']->getName() . '/fields')));
   }
+}
+
+/**
+ * Submit callback to remove an item from the field UI multiple wrapper.
+ *
+ * When a remove button is submitted, we need to find the item that it
+ * referenced and delete it. Since field UI has the deltas as a straight
+ * unbroken array key, we have to renumber everything down. Since we do this
+ * we *also* need to move all the deltas around in the $form_state->values
+ * and $form_state input so that user changed values follow. This is a bit
+ * of a complicated process.
+ */
+function field_collection_remove_submit($form, FormStateInterface $form_state) {
+  $button = $form_state->getTriggeringElement();
+  $delta = $button['#delta'];
+
+  // Where in the form we'll find the parent element.
+  $address = array_slice($button['#array_parents'], 0, -2);
+
+  // Go one level up in the form, to the widgets container.
+  $parent_element = NestedArray::getValue($form, $address);
+  $field_name = $parent_element['#field_name'];
+  $langcode = $parent_element['#language'];
+  $parents = $parent_element['#field_parents'];
+
+  $field_state = WidgetBase::getWidgetState($parents, $field_name, $form_state);
+
+  // Go ahead and renumber everything from our delta to the last
+  // item down one. This will overwrite the item being removed.
+  for ($i = $delta; $i <= $field_state['items_count']; $i++) {
+    $old_element_address = array_merge($address, array($i + 1));
+    $new_element_address = array_merge($address, array($i));
+
+    $moving_element = NestedArray::getValue($form, $old_element_address);
+    $moving_element_value = NestedArray::getValue($form_state->getValues(), $old_element_address);
+    $moving_element_input = NestedArray::getValue($form_state->getUserInput(), $old_element_address);
+
+    // Tell the element where it's being moved to.
+    $moving_element['#parents'] = $new_element_address;
+
+    // Move the element around.
+    $form_state->setValueForElement($moving_element, $moving_element_value);
+    $user_input = $form_state->getUserInput();
+    NestedArray::setValue($user_input, $moving_element['#parents'], $moving_element_input);
+    $form_state->setUserInput($user_input);
+
+    // Move the entity in our saved state.
+    if (isset($field_state['field_collection_item'][$i + 1])) {
+      $field_state['field_collection_item'][$i] = $field_state['field_collection_item'][$i + 1];
+    }
+    else {
+      unset($field_state['field_collection_item'][$i]);
+    }
+  }
+
+  // Replace the deleted entity with an empty one. This helps to ensure that
+  // trying to add a new entity won't ressurect a deleted entity from the
+  // trash bin.
+  $count = count($field_state['field_collection_item']);
+  $field_state['field_collection_item'][$count] = entity_create('field_collection_item', array('field_name' => $field_name));
+
+  // Then remove the last item. But we must not go negative.
+  if ($field_state['items_count'] > 0) {
+    $field_state['items_count']--;
+  }
+
+  // Fix the weights. Field UI lets the weights be in a range of
+  // (-1 * item_count) to (item_count). This means that when we remove one,
+  // the range shrinks; weights outside of that range then get set to
+  // the first item in the select by the browser, floating them to the top.
+  // We use a brute force method because we lost weights on both ends
+  // and if the user has moved things around, we have to cascade because
+  // if I have items weight weights 3 and 4, and I change 4 to 3 but leave
+  // the 3, the order of the two 3s now is undefined and may not match what
+  // the user had selected.
+  $input = NestedArray::getValue($form_state->getUserInput(), $address);
+  // Sort by weight
+  uasort($input, '_field_sort_items_helper');
+
+  // Reweight everything in the correct order.
+  $weight = -1 * $field_state['items_count'];
+  foreach ($input as $key => $item) {
+    if ($item) {
+      $input[$key]['_weight'] = $weight++;
+    }
+  }
+
+  $user_input = $form_state->getUserInput();
+  NestedArray::setValue($user_input, $address, $input);
+  $form_state->setUserInput($user_input);
+
+  WidgetBase::setWidgetState($parents, $field_name, $form_state, $field_state);
+
+  $form_state->setRebuild();
 }

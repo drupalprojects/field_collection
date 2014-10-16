@@ -43,3 +43,12 @@ field_collection_item.delete_confirm:
     _entity_form: 'field_collection_item.delete'
   requirements:
     _permission: 'administer content types' # TODO change this
+
+field_collection.ajax_remove:
+  path: '/field_collection/ajax/remove'
+  defaults:
+    _controller: '\Drupal\field_collection\Controller\FieldCollectionWidgetAjaxController::remove'
+  options:
+    _theme: ajax_base_page
+  requirements:
+    _permission: 'administer content types' # TODO change this
