@@ -54,23 +54,19 @@ class FieldCollectionWidgetAjaxController extends FormAjaxController {
       return $response->addCommand(new ReplaceCommand(NULL, drupal_render($status_messages)));
     }
 
-    // Get the current element.
-    $current_element = NestedArray::getValue($form, $form_parents);
-
     // Process user input. $form and $form_state are modified in the process.
     drupal_process_form($form['#form_id'], $form, $form_state);
 
     // Retrieve the element to be rendered.
-    $form = NestedArray::getValue($form, $form_parents);
+    $address = array_slice($form_parents, 0, -1);
+    $form = NestedArray::getValue($form, $address);
 
     $status_messages = array('#theme' => 'status_messages');
     $form['#prefix'] .= drupal_render($status_messages);
     $output = drupal_render($form);
     drupal_process_attached($form);
-    /*
     $js = _drupal_add_js();
     $settings = drupal_merge_js_settings($js['settings']['data']);
-    */
 
     $response = new AjaxResponse();
     foreach ($commands as $command) {

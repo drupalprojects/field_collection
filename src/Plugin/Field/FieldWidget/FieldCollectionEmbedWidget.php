@@ -28,6 +28,21 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
  * )
  */
 class FieldCollectionEmbedWidget extends WidgetBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function form(FieldItemListInterface $items, array &$form, FormStateInterface $form_state, $get_delta = NULL) {
+    $ret = parent::form($items, $form, $form_state, $get_delta);
+    $field_name = $this->fieldDefinition->getName();
+
+    // Add a new wrapper around all the elements for Ajax replacement.
+    $ret['#prefix'] = '<div id="' . $field_name . '-ajax-wrapper">';
+    $ret['#suffix'] = '</div>';
+
+    return $ret;
+  }
+
   /**
    * {@inheritdoc}
    */
@@ -36,9 +51,9 @@ class FieldCollectionEmbedWidget extends WidgetBase {
     $field_name = $this->fieldDefinition->getName();
 
     // Nest the field collection item entity form in a dedicated parent space,
-    // by appending [field_name, 'widget', delta] to the current parent space.
+    // by appending [field_name, delta] to the current parent space.
     // That way the form values of the field collection item are separated.
-    $parents = array_merge($element['#field_parents'], array($field_name, 'widget', $delta));
+    $parents = array_merge($element['#field_parents'], array($field_name, $delta));
 
     $element += array(
       '#element_validate' => array('field_collection_field_widget_embed_validate'),
@@ -104,11 +119,12 @@ class FieldCollectionEmbedWidget extends WidgetBase {
           '#ajax' => array(
             'path' => 'field_collection/ajax/remove',
             'effect' => 'fade',
-            'wrapper' => 'edit-' . str_replace('_', '-', $field_name) . '-wrapper',
+            //'wrapper' => 'edit-' . str_replace('_', '-', $field_name) . '-wrapper',
+            'wrapper' => $field_name . '-ajax-wrapper',
             'options' => array(
               'query' => array(
-                //'element_parents' => implode('/', $element['#parents']),
-                'element_parents' => $field_name,
+                'element_parents' => implode('/', $element['#parents']),
+                //'element_parents' => $field_name,
               ),
             ),
           ),
@@ -119,4 +135,5 @@ class FieldCollectionEmbedWidget extends WidgetBase {
 
     return $element;
   }
+
 }

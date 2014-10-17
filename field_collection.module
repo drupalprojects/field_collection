@@ -166,12 +166,11 @@ function field_collection_remove_submit($form, FormStateInterface $form_state) {
   $delta = $button['#delta'];
 
   // Where in the form we'll find the parent element.
-  $address = array_slice($button['#array_parents'], 0, -2);
+  $address = array_slice($button['#array_parents'], 0, -4);
 
   // Go one level up in the form, to the widgets container.
-  $parent_element = NestedArray::getValue($form, $address);
+  $parent_element = NestedArray::getValue($form, array_merge($address, array('widget')));
   $field_name = $parent_element['#field_name'];
-  $langcode = $parent_element['#language'];
   $parents = $parent_element['#field_parents'];
 
   $field_state = WidgetBase::getWidgetState($parents, $field_name, $form_state);
@@ -179,15 +178,16 @@ function field_collection_remove_submit($form, FormStateInterface $form_state) {
   // Go ahead and renumber everything from our delta to the last
   // item down one. This will overwrite the item being removed.
   for ($i = $delta; $i <= $field_state['items_count']; $i++) {
-    $old_element_address = array_merge($address, array($i + 1));
-    $new_element_address = array_merge($address, array($i));
+    $old_element_address = array_merge($address, array('widget', $i + 1));
+    $old_element_state_address = array_merge($address, array($i + 1));
+    $new_element_state_address = array_merge($address, array($i));
 
     $moving_element = NestedArray::getValue($form, $old_element_address);
-    $moving_element_value = NestedArray::getValue($form_state->getValues(), $old_element_address);
-    $moving_element_input = NestedArray::getValue($form_state->getUserInput(), $old_element_address);
+    $moving_element_value = NestedArray::getValue($form_state->getValues(), $old_element_state_address);
+    $moving_element_input = NestedArray::getValue($form_state->getUserInput(), $old_element_state_address);
 
     // Tell the element where it's being moved to.
-    $moving_element['#parents'] = $new_element_address;
+    $moving_element['#parents'] = $new_element_state_address;
 
     // Move the element around.
     $form_state->setValueForElement($moving_element, $moving_element_value);
