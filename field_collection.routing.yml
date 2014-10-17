@@ -14,15 +14,7 @@ entity.field_collection.edit_form:
   requirements:
     _permission: 'administer content types'
 
-field_collection_item.add:
-  path: '/field-collection-item/add/{field_collection}/{host_type}/{host_id}'
-  defaults:
-    _content: '\Drupal\field_collection\Controller\FieldCollectionItemController::add'
-    _title_callback: '\Drupal\field_collection\Controller\FieldCollectionItemController::addPageTitle'
-  requirements:
-    _permission: 'administer content types' # TODO change this
-
-field_collection_item.view:
+entity.field_collection_item.canonical:
   path: '/field-collection-item/{field_collection_item}'
   defaults:
     _content: '\Drupal\field_collection\Controller\FieldCollectionItemController::page'
@@ -30,14 +22,22 @@ field_collection_item.view:
   requirements:
     _permission: 'administer content types' # TODO change this
 
-field_collection_item.page_edit:
+field_collection_item.add_page:
+  path: '/field-collection-item/add/{field_collection}/{host_type}/{host_id}'
+  defaults:
+    _content: '\Drupal\field_collection\Controller\FieldCollectionItemController::add'
+    _title_callback: '\Drupal\field_collection\Controller\FieldCollectionItemController::addPageTitle'
+  requirements:
+    _permission: 'administer content types' # TODO change this
+
+entity.field_collection_item.edit_form:
   path: '/field-collection-item/{field_collection_item}/edit'
   defaults:
     _entity_form: 'field_collection_item.edit'
   requirements:
     _permission: 'administer content types' # TODO change this
 
-field_collection_item.delete_confirm:
+entity.field_collection_item.delete_form:
   path: '/field-collection-item/{field_collection_item}/delete'
   defaults:
     _entity_form: 'field_collection_item.delete'
