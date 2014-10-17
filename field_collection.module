@@ -244,3 +244,9 @@ function field_collection_remove_submit($form, FormStateInterface $form_state) {
 
   $form_state->setRebuild();
 }
+
+function field_collection_preprocess_input(&$variables) {
+  // TODO: Turn off HTML5 required fields on field collection items so the form
+  // can be submitted when it has non-required blank field collection items.
+  // ie. unset($variables['attributes']['required']) if a field collection item field
+}

@@ -119,12 +119,10 @@ class FieldCollectionEmbedWidget extends WidgetBase {
           '#ajax' => array(
             'path' => 'field_collection/ajax/remove',
             'effect' => 'fade',
-            //'wrapper' => 'edit-' . str_replace('_', '-', $field_name) . '-wrapper',
             'wrapper' => $field_name . '-ajax-wrapper',
             'options' => array(
               'query' => array(
                 'element_parents' => implode('/', $element['#parents']),
-                //'element_parents' => $field_name,
               ),
             ),
           ),
