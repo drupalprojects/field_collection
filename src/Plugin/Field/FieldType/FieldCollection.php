@@ -145,8 +145,9 @@ class FieldCollection extends FieldItemBase {
         if ($field_collection_item->isNew()) {
           $field_collection_item->setHostEntity(
             $this->getEntity()->getEntityTypeId(), $this->getEntity(), FALSE);
-          $field_collection_item->save();
         }
+
+        $field_collection_item->save();
 
         $this->value = $field_collection_item->id();
         $this->revision_id = $field_collection_item->getRevisionId();

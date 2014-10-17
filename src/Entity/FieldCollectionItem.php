@@ -21,7 +21,7 @@ use Drupal\Core\Language\Language;
  *   label = @Translation("Field Collection Item"),
  *   bundle_label = @Translation("Field Name"),
  *   handlers = {
- *     "storage" = "Drupal\field_collection\FieldCollectionItemStorage",
+ *     "storage" = "Drupal\Core\Entity\Sql\SqlContentEntityStorage",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "access" = "Drupal\field_collection\FieldCollectionItemAccessControlHandler",
  *     "form" = {

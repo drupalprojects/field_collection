@@ -14,6 +14,9 @@ use Drupal\Core\Entity\EntityInterface;
  * Provides a listing of field collections.
  */
 class FieldCollectionListBuilder extends ConfigEntityListBuilder {
+  // TODO: Add "Used in" column
+  // $rows[$field_name]['data'][2] = l(t('manage fields'), 'admin/structure/field-collections/' . $field_name_url_str . '/fields');
+
   /**
    * {@inheritdoc}
    */
@@ -39,4 +42,14 @@ class FieldCollectionListBuilder extends ConfigEntityListBuilder {
   public function getDefaultOperations(EntityInterface $entity) {
     return array();
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function render() {
+    $build = parent::render();
+    $build['#empty'] = t('No field collections have been defined yet. To do so attach a field collection field to any entity.');
+    return $build;
+  }
+
 }
