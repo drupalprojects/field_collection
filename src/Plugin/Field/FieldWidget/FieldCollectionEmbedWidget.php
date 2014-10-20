@@ -13,6 +13,7 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\field_collection\Entity\FieldCollectionItem;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Component\Utility\NestedArray;
 
 /**
  * Plugin implementation of the 'field_collection_embed' widget.
@@ -56,7 +57,9 @@ class FieldCollectionEmbedWidget extends WidgetBase {
     $parents = array_merge($element['#field_parents'], array($field_name, $delta));
 
     $element += array(
-      '#element_validate' => array('field_collection_field_widget_embed_validate'),
+      '#element_validate' => array(array(
+        'Drupal\\field_collection\\Plugin\\Field\\FieldWidget\\FieldCollectionEmbedWidget',
+        'validate',)),
       '#parents' => $parents,
       '#field_name' => $field_name,
     );
@@ -96,28 +99,14 @@ class FieldCollectionEmbedWidget extends WidgetBase {
     $display = entity_get_form_display('field_collection_item', $this->fieldDefinition->getName(), 'default');
     $display->buildForm($field_collection_item, $element, $form_state);
 
-    // Checked for in field_collection_preprocess_input
-    foreach ($element as $form_key => &$field) {
-      if (strpos($form_key, 'field_') === 0) {
-        foreach($field['widget'] as $widget_key => &$widget_value) {
-          if (is_numeric($widget_key)) {
-            foreach($widget_value as $inner_key => &$inner_value) {
-              if (!(strpos($inner_key, '#') === 0)) {
-                $inner_value['#field_collection'] = TRUE;
-              }
-            }
-          }
-        }
-      }
-    }
+    if (empty($element['#required'])) {
+      $element['#after_build'][] = array(
+        'Drupal\\field_collection\\Plugin\\Field\\FieldWidget\\FieldCollectionEmbedWidget',
+        'delayRequiredValidation',);
 
-    /*
-      TODO: Figure out if field_collection_field_widget_embed_delay_required_validation
-      is still necessary and restore this functionality if it is.
-      if (empty($element['#required'])) {
-        $element['#after_build'][] = 'field_collection_field_widget_embed_delay_required_validation';
-      }
-    */
+      // Stop HTML5 form validation so our validation code can run instead.
+      $form['#attributes']['novalidate'] = 'novalidate';
+    }
 
     // Put the remove button on unlimited cardinality field collection fields.
     if ($this->fieldDefinition->getFieldStorageDefinition()->getCardinality() == FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED) {
@@ -129,7 +118,9 @@ class FieldCollectionEmbedWidget extends WidgetBase {
           '#type' => 'submit',
           '#value' => t('Remove'),
           '#validate' => array(),
-          '#submit' => array('field_collection_remove_submit'),
+          '#submit' => array(array(
+            'Drupal\\field_collection\\Plugin\\Field\\FieldWidget\\FieldCollectionEmbedWidget',
+            'removeSubmit')),
           '#limit_validation_errors' => array(),
           '#ajax' => array(
             'path' => 'field_collection/ajax/remove',
@@ -147,6 +138,204 @@ class FieldCollectionEmbedWidget extends WidgetBase {
     }
 
     return $element;
+  }
+
+  /**
+   * FAPI #after_build of an individual field collection element to delay the validation of #required.
+   */
+  public static function delayRequiredValidation(&$element, FormStateInterface $form_state) {
+    // If the process_input flag is set, the form and its input is going to be
+    // validated. Prevent #required (sub)fields from throwing errors while
+    // their non-#required field collection item is empty.
+    if ($form_state->isProcessingInput()) {
+      static::collectRequiredElements($element, $element['#field_collection_required_elements']);
+    }
+    return $element;
+  }
+
+  /**
+   * Prevent the default 'required' validation from running on subfields.
+   */
+  private static function collectRequiredElements(&$element, &$required_elements) {
+    // Recurse through all children.
+    foreach (element_children($element) as $key) {
+      if (isset($element[$key]) && $element[$key]) {
+        static::collectRequiredElements($element[$key], $required_elements);
+      }
+    }
+
+    if (!empty($element['#required'])) {
+      $element['#required'] = FALSE;
+      $required_elements[] = &$element;
+      $element += array('#pre_render' => array());
+      array_unshift($element['#pre_render'], array(
+        'Drupal\\field_collection\\Plugin\\Field\\FieldWidget\\FieldCollectionEmbedWidget',
+        'renderRequired',));
+    }
+  }
+
+  /**
+   * #pre_render callback that ensures the element is rendered as being required.
+   */
+  public static function renderRequired($element) {
+    $element['#required'] = TRUE;
+    return $element;
+  }
+
+  /**
+   * FAPI validation of an individual field collection element.
+   */
+  public static function validate($element, FormStateInterface $form_state, $form) {
+    $field_parents = $element['#field_parents'];
+    $field_name = $element['#field_name'];
+
+    $field_state = static::getWidgetState($field_parents, $field_name, $form_state);
+    $field_collection_item = $field_state['field_collection_item'][$element['#delta']];
+
+    // Attach field API validation of the embedded form.
+    //$form_state->setValidateHandlers($form_state->getValidateHandlers() + $field_collection_item->validate);
+    //field_attach_form_validate('field_collection_item', $field_collection_item, $element, $form_state);
+
+    /*
+    TODO: Validation
+    // Now validate required elements if the entity is not empty.
+    if (!field_collection_item_is_empty($field_collection_item) && !empty($element['#field_collection_required_elements'])) {
+      foreach ($element['#field_collection_required_elements'] as &$elements) {
+
+        // Copied from _form_validate().
+        // #1676206: Modified to support options widget.
+        if (isset($elements['#needs_validation'])) {
+          $is_empty_multiple = (!count($elements['#value']));
+          $is_empty_string = (is_string($elements['#value']) && drupal_strlen(trim($elements['#value'])) == 0);
+          $is_empty_value = ($elements['#value'] === 0);
+          $is_empty_option = (isset($elements['#options']['_none']) && $elements['#value'] == '_none');
+          if ($is_empty_multiple || $is_empty_string || $is_empty_value || $is_empty_option) {
+            if (isset($elements['#title'])) {
+              form_error($elements, t('@name field is required.', array('@name' => $elements['#title'])));
+            }
+            else {
+              form_error($elements);
+            }
+          }
+        }
+      }
+    }
+    */
+
+    // Only if the form is being submitted, finish the collection entity and
+    // prepare it for saving.
+    if ($form_state->isSubmitted() && !$form_state->hasAnyErrors()) {
+      $display = entity_get_form_display('field_collection_item', $field_name, 'default');
+      $display->extractFormValues($field_collection_item, $element, $form_state);
+
+      // Load initial form values into $item, so any other form values below the
+      // same parents are kept.
+      $field = NestedArray::getValue($form_state->getValues(), $element['#parents']);
+
+      // Set the _weight if it is a multiple field.
+      if (isset($element['_weight']) && $form[$field_name]['widget']['#cardinality_multiple']) {
+        $field['_weight'] = $element['_weight']['#value'];
+      }
+
+      // Put the field collection field in $field['field_collection_item'], so it is saved with
+      // the host entity via FieldCollection->preSave() / field API if it is not empty.
+      $field['field_collection_item'] = $field_collection_item;
+      $form_state->setValue($element['#parents'], $field);
+    }
+  }
+
+  /**
+   * Submit callback to remove an item from the field UI multiple wrapper.
+   *
+   * When a remove button is submitted, we need to find the item that it
+   * referenced and delete it. Since field UI has the deltas as a straight
+   * unbroken array key, we have to renumber everything down. Since we do this
+   * we *also* need to move all the deltas around in the $form_state->values
+   * and $form_state input so that user changed values follow. This is a bit
+   * of a complicated process.
+   */
+  public static function removeSubmit($form, FormStateInterface $form_state) {
+    $button = $form_state->getTriggeringElement();
+    $delta = $button['#delta'];
+
+    // Where in the form we'll find the parent element.
+    $address = array_slice($button['#array_parents'], 0, -4);
+
+    // Go one level up in the form, to the widgets container.
+    $parent_element = NestedArray::getValue($form, array_merge($address, array('widget')));
+    $field_name = $parent_element['#field_name'];
+    $parents = $parent_element['#field_parents'];
+
+    $field_state = static::getWidgetState($parents, $field_name, $form_state);
+
+    // Go ahead and renumber everything from our delta to the last
+    // item down one. This will overwrite the item being removed.
+    for ($i = $delta; $i <= $field_state['items_count']; $i++) {
+      $old_element_address = array_merge($address, array('widget', $i + 1));
+      $old_element_state_address = array_merge($address, array($i + 1));
+      $new_element_state_address = array_merge($address, array($i));
+
+      $moving_element = NestedArray::getValue($form, $old_element_address);
+      $moving_element_value = NestedArray::getValue($form_state->getValues(), $old_element_state_address);
+      $moving_element_input = NestedArray::getValue($form_state->getUserInput(), $old_element_state_address);
+
+      // Tell the element where it's being moved to.
+      $moving_element['#parents'] = $new_element_state_address;
+
+      // Move the element around.
+      $form_state->setValueForElement($moving_element, $moving_element_value);
+      $user_input = $form_state->getUserInput();
+      NestedArray::setValue($user_input, $moving_element['#parents'], $moving_element_input);
+      $form_state->setUserInput($user_input);
+
+      // Move the entity in our saved state.
+      if (isset($field_state['field_collection_item'][$i + 1])) {
+        $field_state['field_collection_item'][$i] = $field_state['field_collection_item'][$i + 1];
+      }
+      else {
+        unset($field_state['field_collection_item'][$i]);
+      }
+    }
+
+    // Replace the deleted entity with an empty one. This helps to ensure that
+    // trying to add a new entity won't ressurect a deleted entity from the
+    // trash bin.
+    $count = count($field_state['field_collection_item']);
+    $field_state['field_collection_item'][$count] = entity_create('field_collection_item', array('field_name' => $field_name));
+
+    // Then remove the last item. But we must not go negative.
+    if ($field_state['items_count'] > 0) {
+      $field_state['items_count']--;
+    }
+
+    // Fix the weights. Field UI lets the weights be in a range of
+    // (-1 * item_count) to (item_count). This means that when we remove one,
+    // the range shrinks; weights outside of that range then get set to
+    // the first item in the select by the browser, floating them to the top.
+    // We use a brute force method because we lost weights on both ends
+    // and if the user has moved things around, we have to cascade because
+    // if I have items weight weights 3 and 4, and I change 4 to 3 but leave
+    // the 3, the order of the two 3s now is undefined and may not match what
+    // the user had selected.
+    $input = NestedArray::getValue($form_state->getUserInput(), $address);
+    // Sort by weight
+    uasort($input, '_field_sort_items_helper');
+
+    // Reweight everything in the correct order.
+    $weight = -1 * $field_state['items_count'];
+    foreach ($input as $key => $item) {
+      if ($item) {
+        $input[$key]['_weight'] = $weight++;
+      }
+    }
+
+    $user_input = $form_state->getUserInput();
+    NestedArray::setValue($user_input, $address, $input);
+    $form_state->setUserInput($user_input);
+
+    static::setWidgetState($parents, $field_name, $form_state, $field_state);
+
+    $form_state->setRebuild();
   }
 
 }
