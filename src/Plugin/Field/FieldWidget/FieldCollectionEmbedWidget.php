@@ -96,6 +96,21 @@ class FieldCollectionEmbedWidget extends WidgetBase {
     $display = entity_get_form_display('field_collection_item', $this->fieldDefinition->getName(), 'default');
     $display->buildForm($field_collection_item, $element, $form_state);
 
+    // Checked for in field_collection_preprocess_input
+    foreach ($element as $form_key => &$field) {
+      if (strpos($form_key, 'field_') === 0) {
+        foreach($field['widget'] as $widget_key => &$widget_value) {
+          if (is_numeric($widget_key)) {
+            foreach($widget_value as $inner_key => &$inner_value) {
+              if (!(strpos($inner_key, '#') === 0)) {
+                $inner_value['#field_collection'] = TRUE;
+              }
+            }
+          }
+        }
+      }
+    }
+
     /*
       TODO: Figure out if field_collection_field_widget_embed_delay_required_validation
       is still necessary and restore this functionality if it is.

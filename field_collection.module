@@ -245,8 +245,16 @@ function field_collection_remove_submit($form, FormStateInterface $form_state) {
   $form_state->setRebuild();
 }
 
+/**
+ * Theme preprocess function for fields inside field collection items.
+ *
+ * Checks for a value set in the widget indicating that the field is a part of a
+ * field collection item and turns off the HTML5 required attributes for it so
+ * the form can be submitted and our validation code used.
+ */
 function field_collection_preprocess_input(&$variables) {
-  // TODO: Turn off HTML5 required fields on field collection items so the form
-  // can be submitted when it has non-required blank field collection items.
-  // ie. unset($variables['attributes']['required']) if a field collection item field
+  if (!empty($variables['element']['#field_collection'])) {
+    unset($variables['attributes']['required']);
+    unset($variables['attributes']['aria-required']);
+  }
 }
