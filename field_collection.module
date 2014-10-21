@@ -84,3 +84,7 @@ function field_collection_form_field_ui_field_edit_form_alter(&$form, FormStateI
     $form['field']['default_value']['#description'] = t('To specify a default value, configure it via the regular default value setting of each field that is part of the field collection. To do so, go to the <a href="!url">Manage fields</a> screen of the field collection.', array('!url' => _url('admin/structure/field-collections/manage/' . $form['#field']->getName() . '/fields')));
   }
 }
+
+function field_collection_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  //_d($form_id);
+}

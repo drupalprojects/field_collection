@@ -96,7 +96,7 @@ class FieldCollectionEmbedWidget extends WidgetBase {
 
     static::setWidgetState($element['#field_parents'], $field_name, $form_state, $field_state);
 
-    $display = entity_get_form_display('field_collection_item', $this->fieldDefinition->getName(), 'default');
+    $display = entity_get_form_display('field_collection_item', $field_name, 'default');
     $display->buildForm($field_collection_item, $element, $form_state);
 
     if (empty($element['#required'])) {
@@ -191,43 +191,38 @@ class FieldCollectionEmbedWidget extends WidgetBase {
 
     $field_state = static::getWidgetState($field_parents, $field_name, $form_state);
     $field_collection_item = $field_state['field_collection_item'][$element['#delta']];
+    $display = entity_get_form_display('field_collection_item', $field_name, 'default');
+    $display->extractFormValues($field_collection_item, $element, $form_state);
 
-    // Attach field API validation of the embedded form.
-    //$form_state->setValidateHandlers($form_state->getValidateHandlers() + $field_collection_item->validate);
-    //field_attach_form_validate('field_collection_item', $field_collection_item, $element, $form_state);
-
-    /*
-    TODO: Validation
     // Now validate required elements if the entity is not empty.
-    if (!field_collection_item_is_empty($field_collection_item) && !empty($element['#field_collection_required_elements'])) {
+    if (!$field_collection_item->isEmpty() && !empty($element['#field_collection_required_elements'])) {
       foreach ($element['#field_collection_required_elements'] as &$elements) {
-
-        // Copied from _form_validate().
+        // Copied from \Drupal\Core\Form\FormValidator::doValidateForm().
         // #1676206: Modified to support options widget.
         if (isset($elements['#needs_validation'])) {
           $is_empty_multiple = (!count($elements['#value']));
           $is_empty_string = (is_string($elements['#value']) && drupal_strlen(trim($elements['#value'])) == 0);
           $is_empty_value = ($elements['#value'] === 0);
           $is_empty_option = (isset($elements['#options']['_none']) && $elements['#value'] == '_none');
+
           if ($is_empty_multiple || $is_empty_string || $is_empty_value || $is_empty_option) {
-            if (isset($elements['#title'])) {
-              form_error($elements, t('@name field is required.', array('@name' => $elements['#title'])));
+            if (isset($elements['#required_error'])) {
+              $form_state->setError($elements, $elements['#required_error']);
+            }
+            else if (isset($elements['#title'])) {
+              $form_state->setError($elements, t('!name field is required.', array('!name' => $elements['#title'])));
             }
             else {
-              form_error($elements);
+              $form_state->setError($elements);
             }
           }
         }
       }
     }
-    */
 
     // Only if the form is being submitted, finish the collection entity and
     // prepare it for saving.
     if ($form_state->isSubmitted() && !$form_state->hasAnyErrors()) {
-      $display = entity_get_form_display('field_collection_item', $field_name, 'default');
-      $display->extractFormValues($field_collection_item, $element, $form_state);
-
       // Load initial form values into $item, so any other form values below the
       // same parents are kept.
       $field = NestedArray::getValue($form_state->getValues(), $element['#parents']);
