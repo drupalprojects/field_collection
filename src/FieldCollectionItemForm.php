@@ -74,8 +74,7 @@ class FieldCollectionItemForm extends ContentEntityForm {
       $host = entity_load($this->getRequest()->get('host_type'),
                           $this->getRequest()->get('host_id'));
 
-      $field_collection_item->setHostEntity($field_collection_item->bundle(),
-                                            $host);
+      $field_collection_item->setHostEntity($host);
       $field_collection_item->save();
       $host->save();
 

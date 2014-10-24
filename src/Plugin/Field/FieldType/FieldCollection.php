@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\field_collection\Plugin\Field\FieldType\FieldCollectionItem.
+ * Contains \Drupal\field_collection\Plugin\Field\FieldType\FieldCollection.
  */
 
 namespace Drupal\field_collection\Plugin\Field\FieldType;
@@ -17,7 +17,10 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
  * @FieldType(
  *   id = "field_collection",
  *   label = @Translation("Field collection"),
- *   description = @Translation("This field stores references to embedded entities, which itself may contain any number of fields."),
+ *   description = @Translation(
+ *     "This field stores references to embedded entities, which itself may
+ *     contain any number of fields."
+ *   ),
  *   settings = {
  *     "path" = "",
  *     "hide_blank_items" = TRUE,
@@ -61,7 +64,9 @@ class FieldCollection extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
-  public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
+  public static function propertyDefinitions(
+    FieldStorageDefinitionInterface $field_definition)
+  {
     $properties['value'] = DataDefinition::create('integer')
       ->setLabel(t('Field collection item ID'))
       ->setSetting('unsigned', TRUE)
@@ -87,12 +92,12 @@ class FieldCollection extends FieldItemBase {
     elseif ($create) {
       $field_collection_item =
         entity_create('field_collection_item',
-                      array('field_name' => $this->getFieldDefinition()->field_name));
+                      array('field_name' => $this->getFieldDefinition()
+                        ->field_name));
 
       // TODO: Uncomment or delete
       /*
-      $field_collection_item->setHostEntity(
-        $this->getEntity()->getEntityTypeId(), $this->getEntity(), FALSE);
+      $field_collection_item->setHostEntity($this->getEntity(), FALSE);
       */
 
       return $field_collection_item;
@@ -123,8 +128,7 @@ class FieldCollection extends FieldItemBase {
       */
 
       if ($field_collection_item->isNew()) {
-        $field_collection_item->setHostEntity(
-          $this->getEntity()->getEntityTypeId(), $this->getEntity(), FALSE);
+        $field_collection_item->setHostEntity($this->getEntity(), FALSE);
       }
 
       $field_collection_item->save(TRUE);

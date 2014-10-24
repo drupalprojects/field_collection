@@ -40,7 +40,7 @@ abstract class FieldCollectionLinksFormatter extends FormatterBase {
     if ($settings['add'] && ($field['cardinality'] == FIELD_CARDINALITY_UNLIMITED || count($items) < $field['cardinality'])) {
       // Check whether the current is allowed to create a new item.
       $field_collection_item = entity_create('field_collection_item', array('field_name' => $field['field_name']));
-      $field_collection_item->setHostEntity($entity_type, $entity, LANGUAGE_NONE, FALSE);
+      $field_collection_item->setHostEntity($entity, FALSE);
 
       if (field_collection_item_access('create', $field_collection_item)) {
         $path = field_collection_field_get_path($field);

@@ -64,6 +64,8 @@ class FieldCollectionItem extends ContentEntityBase {
   protected $host_id;
 
   /**
+
+  /**
    * Implements Drupal\Core\Entity\EntityInterface::id().
    */
   public function id() {
@@ -212,7 +214,8 @@ class FieldCollectionItem extends ContentEntityBase {
    */
   public function getHost($reset = FALSE) {
     $entity_info = \Drupal::entityManager()
-                   ->getDefinition($this->host_type->value, TRUE);
+      ->getDefinition($this->host_type->value, TRUE);
+
     if (NULL !== $entity_info->get('base_table')) {
       return entity_load($this->host_type->value, $this->getHostId(), $reset);
     } else {
@@ -246,9 +249,9 @@ class FieldCollectionItem extends ContentEntityBase {
    *   (optional) Whether a field-item linking the host entity to the field
    *   collection item should be created.
    */
-  public function setHostEntity($entity_type, $entity, $create_link = TRUE) {
+  public function setHostEntity($entity, $create_link = TRUE) {
     if ($this->isNew()) {
-      $this->host_type = $entity_type;
+      $this->host_type = $entity->getEntityTypeId();
       $this->host_id = $entity->id();
       $this->host_entity = $entity;
 
@@ -290,7 +293,7 @@ class FieldCollectionItem extends ContentEntityBase {
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE);
 
-    $fields['host_type'] = BaseFieldDefinition::create('entity_reference')
+    $fields['host_type'] = BaseFieldDefinition::create('string')
       ->setLabel(t("Host's entity type"))
       ->setDescription(t("Type of entity for the field collection item's host."))
       ->setReadOnly(TRUE);
