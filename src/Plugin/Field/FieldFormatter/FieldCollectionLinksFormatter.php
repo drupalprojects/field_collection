@@ -19,15 +19,13 @@ abstract class FieldCollectionLinksFormatter extends FormatterBase {
    * Helper function to get Edit and Delete links for an item.
    */
   protected function getEditLinks(FieldItemInterface $item) {
-    $links = '(' . _l(t('Edit'),
+    $links = '(' . \Drupal::l(t('Edit'),
       Url::FromRoute('entity.field_collection_item.edit_form',
-                     array('field_collection_item' => $item->value))
-        ->toString());
+                     array('field_collection_item' => $item->value)));
 
-    $links .= '|' . _l(t('Delete'),
+    $links .= '|' . \Drupal::l(t('Delete'),
       Url::FromRoute('entity.field_collection_item.delete_form',
-                     array('field_collection_item' => $item->value))
-        ->toString());
+                     array('field_collection_item' => $item->value)));
 
     $links .= ')';
 

@@ -22,6 +22,14 @@ entity.field_collection_item.canonical:
   requirements:
     _permission: 'administer content types' # TODO change this
 
+field_collection_item.revision_show:
+  path: '/field-collection-item/{field_collection_item}/revisions/{field_collection_item_revision}/view'
+  defaults:
+    _content: '\Drupal\field_collection\Controller\FieldCollectionItemController::revisionShow'
+    _title_callback: '\Drupal\field_collection\Controller\FieldCollectionItemController::revisionPageTitle'
+  requirements:
+    _permission: 'administer content types' # TODO change this
+
 field_collection_item.add_page:
   path: '/field-collection-item/add/{field_collection}/{host_type}/{host_id}'
   defaults:

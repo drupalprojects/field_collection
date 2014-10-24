@@ -11,6 +11,7 @@ use Drupal\Component\Utility\String;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\field_collection\Entity\FieldCollection;
 use Drupal\field_collection\Entity\FieldCollectionItem;
+use Drupal\Core\Entity\Controller\EntityViewController;
 
 /**
  * Returns responses for Field collection item routes.
@@ -83,7 +84,9 @@ class FieldCollectionItemController extends ControllerBase {
    *   The page title.
    */
   public function pageTitle(FieldCollectionItem $field_collection_item) {
-    return String::checkPlain($this->entityManager()->getTranslationFromContext($field_collection_item)->label());
+    return String::checkPlain($this->entityManager()
+      ->getTranslationFromContext($field_collection_item)
+      ->label());
   }
 
   /**
@@ -98,6 +101,49 @@ class FieldCollectionItemController extends ControllerBase {
   public function addPageTitle(FieldCollection $field_collection) {
     return $this->t('Create @label',
                     array('@label' => $field_collection->label));
+  }
+
+  /**
+   * Displays a field collection item revision.
+   *
+   * @param int $field_collection_item_revision
+   *   The field collection item revision ID.
+   *
+   * @return array
+   *   An array suitable for drupal_render().
+   */
+  public function revisionShow($field_collection_item_revision) {
+    $field_collection_item = $this->entityManager()
+      ->getStorage('field_collection_item')
+      ->loadRevision($field_collection_item_revision);
+
+    $field_collection_item_view_controller =
+      new EntityViewController($this->entityManager);
+
+    $page = $field_collection_item_view_controller
+      ->view($field_collection_item);
+
+    unset($page['field_collection_item'][$field_collection_item->id()]['#cache']);
+    return $page;
+  }
+
+  /**
+   * Page title callback for a field collection item revision.
+   *
+   * @param int $field_collection_item_revision
+   *   The field collection item revision ID.
+   *
+   * @return string
+   *   The page title.
+   */
+  public function revisionPageTitle($field_collection_item_revision) {
+    $field_collection_item = $this->entityManager()
+      ->getStorage('field_collection_item')
+      ->loadRevision($field_collection_item_revision);
+
+    return $this->t('Revision %revision of %title',
+                    array('%revision' => $field_collection_item_revision,
+                          '%title' => $field_collection_item->label()));
   }
 
 }

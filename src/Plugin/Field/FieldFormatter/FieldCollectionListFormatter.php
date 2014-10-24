@@ -39,12 +39,23 @@ class FieldCollectionListFormatter extends FieldCollectionLinksFormatter {
       if ($item->value !== NULL) {
         $count++;
 
-        $links = _l($this->fieldDefinition->getName() . ' ' . $delta,
-          Url::FromRoute('entity.field_collection_item.canonical',
-                         array('field_collection_item' => $item->value))
-            ->toString());
+        $field_collection_item =
+          field_collection_item_revision_load($item->revision_id);
 
-        $links .= ' ' . $this->getEditLinks($item);
+        if ($field_collection_item->isDefaultRevision()) {
+          $links = \Drupal::l($this->fieldDefinition->getName() . ' ' . $delta,
+            Url::FromRoute('entity.field_collection_item.canonical',
+                           array('field_collection_item' => $item->value)));
+
+          $links .= ' ' . $this->getEditLinks($item);
+        }
+        else {
+          $links = \Drupal::l($this->fieldDefinition->getName() . ' ' . $delta,
+            Url::FromRoute('field_collection_item.revision_show', array(
+              'field_collection_item' => $item->value,
+              'field_collection_item_revision' => $item->revision_id)));
+        }
+
 
         $element[$delta] = array('#markup' => $links);
       }

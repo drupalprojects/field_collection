@@ -56,17 +56,6 @@ use Drupal\Core\Language\Language;
  */
 class FieldCollectionItem extends ContentEntityBase {
 
- /**
-  * @todo uuid upgrade path
-  * @todo rename item_id => id upgrade path
-  * @todo add langcode column to database
-  * @todo form controller
-  * @todo render controller
-  * @todo storage controller
-  * @todo access controller
-  * @todo translation controller
-  */
-
   /**
    * The id of the host entity.
    *
@@ -113,7 +102,7 @@ class FieldCollectionItem extends ContentEntityBase {
     if ($skip_host_save) {
       return parent::save();
     }
-    /* TODO: Need this?
+    /* TODO: Need this.
     else {
       $host_entity = $this->hostEntity();
       if (!$host_entity) {
