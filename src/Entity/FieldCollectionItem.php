@@ -139,11 +139,6 @@ class FieldCollectionItem extends ContentEntityBase {
     }
     */
 
-    // TODO: Handle revisions for real.
-    if (!isset($this->revision_id->value)) {
-      $this->revision_id->value = 0;
-    }
-
     return parent::save();
   }
 

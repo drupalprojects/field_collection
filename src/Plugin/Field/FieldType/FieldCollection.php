@@ -31,6 +31,16 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 class FieldCollection extends FieldItemBase {
 
   /**
+   * Cache for whether the host is a new revision.
+   *
+   * Set in preSave and used in update().  By the time update() is called
+   * isNewRevision() for the host is always FALSE.
+   *
+   * @var bool
+   */
+  protected $newHostRevision;
+
+  /**
    * {@inheritdoc}
    */
   public static function schema(FieldStorageDefinitionInterface $field) {
@@ -79,6 +89,7 @@ class FieldCollection extends FieldItemBase {
         entity_create('field_collection_item',
                       array('field_name' => $this->getFieldDefinition()->field_name));
 
+      // TODO: Uncomment or delete
       /*
       $field_collection_item->setHostEntity(
         $this->getEntity()->getEntityTypeId(), $this->getEntity(), FALSE);
@@ -94,85 +105,64 @@ class FieldCollection extends FieldItemBase {
     parent::delete();
   }
 
-  // TODO
   public function insert() {
-    /*
-      if ($entity = field_collection_field_get_entity($item)) {
-        if (!empty($host_entity->is_new) && empty($entity->is_new)) {
-          // If the host entity is new but we have a field_collection that is not
-          // new, it means that its host is being cloned. Thus we need to clone
-          // the field collection entity as well.
-          $new_entity = clone $entity;
-          $new_entity->item_id = NULL;
-          $new_entity->revision_id = NULL;
-          $new_entity->is_new = TRUE;
-          $entity = $new_entity;
-        }
-      }
-    */
+    if ($field_collection_item = $this->getFieldCollectionItem()) {
 
-    if (isset($this->field_collection_item) ||
-        $this->getEntity()->isNewRevision())
-    {
-      if ($field_collection_item = $this->getFieldCollectionItem()) {
-        if ($field_collection_item->isNew()) {
-          $field_collection_item->setHostEntity(
-            $this->getEntity()->getEntityTypeId(), $this->getEntity(), FALSE);
-        }
-
-        // TODO: Don't save empty field collection item.
-        $field_collection_item->save(TRUE);
-        $this->value = $field_collection_item->id();
-        $this->revision_id = $field_collection_item->getRevisionId();
+      // TODO: Handle node cloning
+      /*
+      if (!empty($host_entity->is_new) && empty($entity->is_new)) {
+        // If the host entity is new but we have a field_collection that is not
+        // new, it means that its host is being cloned. Thus we need to clone
+        // the field collection entity as well.
+        $new_entity = clone $entity;
+        $new_entity->item_id = NULL;
+        $new_entity->revision_id = NULL;
+        $new_entity->is_new = TRUE;
+        $entity = $new_entity;
       }
+      */
+
+      if ($field_collection_item->isNew()) {
+        $field_collection_item->setHostEntity(
+          $this->getEntity()->getEntityTypeId(), $this->getEntity(), FALSE);
+      }
+
+      $field_collection_item->save(TRUE);
+      $this->value = $field_collection_item->id();
+      $this->revision_id = $field_collection_item->getRevisionId();
     }
   }
 
+  // TODO: Format comment
   /**
-   * TODO
-   * Implements hook_field_update().
-   *
    * Care about removed field collection items.
+   *
    * Support saving field collection items in @code $item['entity'] @endcode. This
    * may be used to seamlessly create field collection items during host-entity
    * creation or to save changes to the host entity and its collections at once.
    */
   public function update() {
-    if (isset($this->field_collection_item) ||
-        $this->getEntity()->isNewRevision())
-    {
-      if ($field_collection_item = $this->getFieldCollectionItem()) {
-        if ($field_collection_item->isNew()) {
-          $field_collection_item->setHostEntity(
-            $this->getEntity()->getEntityTypeId(), $this->getEntity(), FALSE);
-        }
+    $host = $this->getEntity();
 
-        $field_collection_item->save();
-
-        $this->value = $field_collection_item->id();
-        $this->revision_id = $field_collection_item->getRevisionId();
-      }
-    }
-
+    // TODO: Handle deleted items
     /*
-    $items_original = !empty($host_entity->original->{$field['field_name']}[$langcode]) ? $host_entity->original->{$field['field_name']}[$langcode] : array();
+    $field_name = $this->getFieldDefinition()->field_name;
+    $host_original = $host->original;
+    $items_original = !empty($host_original->$field_name) ? $host_original->$field_name : array();
     $original_by_id = array_flip(field_collection_field_item_to_ids($items_original));
-
     foreach ($items as &$item) {
+    */
+
       // In case the entity has been changed / created, save it and set the id.
       // If the host entity creates a new revision, save new item-revisions as
       // well.
-      if (isset($item['entity']) || !empty($host_entity->revision)) {
-
-        if ($entity = field_collection_field_get_entity($item)) {
-
-          if (!empty($entity->is_new)) {
-            $entity->setHostEntity($host_entity_type, $host_entity, LANGUAGE_NONE, FALSE);
-          }
-
+        if ($field_collection_item = $this->getFieldCollectionItem()) {
           // If the host entity is saved as new revision, do the same for the item.
-          if (!empty($host_entity->revision)) {
-            $entity->revision = TRUE;
+          if ($this->newHostRevision) {
+            $field_collection_item->setNewRevision();
+
+            // TODO: Verify for D8, may not be necessary
+            /*
             // Without this cache clear entity_revision_is_default will
             // incorrectly return false here when creating a new published revision
             if (!isset($cleared_host_entity_cache)) {
@@ -180,29 +170,27 @@ class FieldCollection extends FieldItemBase {
               entity_get_controller($host_entity_type)->resetCache(array($entity_id));
               $cleared_host_entity_cache = true;
             }
-            $is_default = entity_revision_is_default($host_entity_type, $host_entity);
-            // If an entity type does not support saving non-default entities,
-            // assume it will be saved as default.
-            if (!isset($is_default) || $is_default) {
-              $entity->default_revision = TRUE;
-              $entity->archived = FALSE;
+            */
+
+            if ($host->isDefaultRevision()) {
+              $field_collection_item->isDefaultRevision(TRUE);
+              //$entity->archived = FALSE;
             }
           }
-          $entity->save(TRUE);
 
-          $item = array(
-            'value' => $entity->item_id,
-            'revision_id' => $entity->revision_id,
-          );
+          $field_collection_item->save();
+
+          $this->value = $field_collection_item->id();
+          $this->revision_id = $field_collection_item->getRevisionId();
         }
-      }
+
+    // TODO: Handle deleted items
+    /*
       unset($original_by_id[$item['value']]);
     }
-
     // If there are removed items, care about deleting the item entities.
     if ($original_by_id) {
       $ids = array_flip($original_by_id);
-
       // If we are creating a new revision, the old-items should be kept but get
       // marked as archived now.
       if (!empty($host_entity->revision)) {
@@ -220,12 +208,17 @@ class FieldCollection extends FieldItemBase {
       }
     }
     */
+
+  }
+
+  public function preSave() {
+    $this->newHostRevision = $this->getEntity()->isNewRevision();
   }
 
   /**
    * {@inheritdoc}
    */
-  function isEmpty() {
+  public function isEmpty() {
     if ($this->value) {
       return FALSE;
     }
