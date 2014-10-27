@@ -13,5 +13,4 @@ use Drupal\Core\Entity\EntityForm;
  * Form controller for field collection forms.
  */
 class FieldCollectionForm extends EntityForm {
-
 }

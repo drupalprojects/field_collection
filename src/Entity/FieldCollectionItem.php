@@ -229,7 +229,7 @@ class FieldCollectionItem extends ContentEntityBase {
   public function getHostId() {
     if (!isset($this->host_id)) {
       $entity_info = \Drupal::entityManager()
-                     ->getDefinition($this->host_type->value, true);
+        ->getDefinition($this->host_type->value, true);
       $host_id_results = db_query(
         "SELECT `entity_id` " .
         "FROM {" . $entity_info->get('base_table') .

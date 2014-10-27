@@ -56,12 +56,24 @@ class FieldCollectionItemForm extends ContentEntityForm {
   /**
    * Overrides \Drupal\Core\Entity\EntityFormController::submit().
    */
-  public function submit(array $form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
     // Build the block object from the submitted values.
-    $field_collection_item = parent::submit($form, $form_state);
+    parent::submitForm($form, $form_state);
+    $field_collection_item = $this->entity;
     $field_collection_item->setNewRevision();
 
-    return $field_collection_item;
+    if (\Drupal::routeMatch()->getRouteName() ==
+        'field_collection_item.add_page')
+    {
+      $host = entity_load(\Drupal::routeMatch()->getParameter('host_type'),
+                          \Drupal::routeMatch()->getParameter('host_id'));
+    }
+    else {
+      $host = $field_collection_item->getHost();
+    }
+
+    $form_state->setRedirect($host->urlInfo()->getRouteName(),
+                             $host->urlInfo()->getRouteParameters());
   }
 
   /**
