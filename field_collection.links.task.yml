@@ -1,13 +1,13 @@
-field_collection_item.view:
-  route_name: field_collection_item.view
-  tab_root_id: field_collection_item.view
+entity.field_collection_item.canonical:
+  route_name: entity.field_collection_item.canonical
+  base_route: entity.field_collection_item.canonical
   title: 'View'
-field_collection_item.page_edit:
-  route_name: field_collection_item.page_edit
-  tab_root_id: field_collection_item.view
+entity.field_collection_item.edit_form:
+  route_name: entity.field_collection_item.edit_form
+  base_route: entity.field_collection_item.canonical
   title: Edit
-field_collection_item.delete_confirm:
-  route_name: field_collection_item.delete_confirm
-  tab_root_id: field_collection_item.view
+entity.field_collection_item.delete_form:
+  route_name: entity.field_collection_item.delete_form
+  base_route: entity.field_collection_item.canonical
   title: Delete
   weight: 10

@@ -5,14 +5,14 @@ field_collection.overview_field_collections:
     _content: '\Drupal\Core\Entity\Controller\EntityListController::listing'
     entity_type: 'field_collection'
   requirements:
-    _permission: 'administer content types'
+    _permission: 'administer field_collection_item fields'
 
 entity.field_collection.edit_form:
   path: '/admin/structure/field-collections/manage/{field_collection}'
   defaults:
     _entity_form: 'field_collection.edit'
   requirements:
-    _permission: 'administer content types'
+    _permission: 'administer field_collection_item fields'
 
 entity.field_collection_item.canonical:
   path: '/field-collection-item/{field_collection_item}'
@@ -20,7 +20,7 @@ entity.field_collection_item.canonical:
     _content: '\Drupal\field_collection\Controller\FieldCollectionItemController::page'
     _title_callback: '\Drupal\field_collection\Controller\FieldCollectionItemController::pageTitle'
   requirements:
-    _permission: 'administer content types' # TODO change this
+    _permission: 'access content' # TODO change this (View permission for host?)
 
 field_collection_item.revision_show:
   path: '/field-collection-item/{field_collection_item}/revisions/{field_collection_item_revision}/view'
@@ -28,7 +28,7 @@ field_collection_item.revision_show:
     _content: '\Drupal\field_collection\Controller\FieldCollectionItemController::revisionShow'
     _title_callback: '\Drupal\field_collection\Controller\FieldCollectionItemController::revisionPageTitle'
   requirements:
-    _permission: 'administer content types' # TODO change this
+    _permission: 'administer content types' # TODO change this (View revision permission for host?)
 
 field_collection_item.add_page:
   path: '/field-collection-item/add/{field_collection}/{host_type}/{host_id}'
@@ -36,21 +36,21 @@ field_collection_item.add_page:
     _content: '\Drupal\field_collection\Controller\FieldCollectionItemController::add'
     _title_callback: '\Drupal\field_collection\Controller\FieldCollectionItemController::addPageTitle'
   requirements:
-    _permission: 'administer content types' # TODO change this
+    _permission: 'administer content types' # TODO change this (Edit permission for host?)
 
 entity.field_collection_item.edit_form:
   path: '/field-collection-item/{field_collection_item}/edit'
   defaults:
     _entity_form: 'field_collection_item.edit'
   requirements:
-    _permission: 'administer content types' # TODO change this
+    _permission: 'administer content types' # TODO change this (Edit permission for host?)
 
 entity.field_collection_item.delete_form:
   path: '/field-collection-item/{field_collection_item}/delete'
   defaults:
     _entity_form: 'field_collection_item.delete'
   requirements:
-    _permission: 'administer content types' # TODO change this
+    _permission: 'administer content types' # TODO change this (Edit permission for host?)
 
 field_collection.ajax_remove:
   path: '/field_collection/ajax/remove'
@@ -59,4 +59,4 @@ field_collection.ajax_remove:
   options:
     _theme: ajax_base_page
   requirements:
-    _permission: 'administer content types' # TODO change this
+    _permission: 'administer content types' # TODO change this (Edit permission for host? / No security? (It doesn't make a change just updates some form input))

@@ -56,14 +56,14 @@ use Drupal\Core\Language\Language;
  */
 class FieldCollectionItem extends ContentEntityBase {
 
+  // TODO: Should references to $this->host_type (a base field) use a getter?
+
   /**
    * The id of the host entity.
    *
    * TODO: Possibly convert it to a FieldInterface.
    */
   protected $host_id;
-
-  /**
 
   /**
    * Implements Drupal\Core\Entity\EntityInterface::id().

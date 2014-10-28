@@ -27,24 +27,26 @@ class FieldCollectionItemDeleteForm extends ContentEntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getCancelUrl() {
+    return $this->entity->getHost()->urlInfo();
   }
 
   /**
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $host_entity = $this->entity->getHost();
-    foreach ($host_entity->{$this->entity->bundle()} as $key => $value) {
+    $host = $this->entity->getHost();
+    foreach ($host->{$this->entity->bundle()} as $key => $value) {
       if ($value->value == $this->entity->id()) {
-        unset($host_entity->{$this->entity->bundle()}[$key]);
+        unset($host->{$this->entity->bundle()}[$key]);
       }
     }
-    $host_entity->save();
+    $host->save();
     $this->entity->delete();
 
     $this->logger('content')->notice('@type: deleted %id.', array(
       '@type' => $this->entity->bundle(),
-      '%id' => $this->entity->id()));
+      '%id' => $this->entity->id())
+    );
 
     $node_type_storage = $this->entityManager->getStorage('field_collection');
     $node_type = $node_type_storage->load($this->entity->bundle())->label();
@@ -53,7 +55,8 @@ class FieldCollectionItemDeleteForm extends ContentEntityConfirmFormBase {
       '@type' => $node_type,
       '%id' => $this->entity->id())));
 
-    $form_state->setRedirect('<front>');
+    $form_state->setRedirect($host->urlInfo()->getRouteName(),
+                             $host->urlInfo()->getRouteParameters());
   }
 
 }

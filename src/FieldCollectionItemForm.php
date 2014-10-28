@@ -60,7 +60,12 @@ class FieldCollectionItemForm extends ContentEntityForm {
     // Build the block object from the submitted values.
     parent::submitForm($form, $form_state);
     $field_collection_item = $this->entity;
-    $field_collection_item->setNewRevision();
+
+    // TODO: Create new revision every edit?  Might be better to make it an
+    // option.  In either case, it doesn't work as is.  The default
+    // revision of the host isn't getting updated to point to the new
+    // field collection item revision.
+    // $field_collection_item->setNewRevision();
 
     if (\Drupal::routeMatch()->getRouteName() ==
         'field_collection_item.add_page')
@@ -92,17 +97,18 @@ class FieldCollectionItemForm extends ContentEntityForm {
 
       $messages = drupal_get_messages(NULL, false);
       if (!isset($messages['warning']) && !isset($messages['error'])) {
-        drupal_set_message(
-          t("Successfully added a @type",
-            array('@type' => $field_collection_item->bundle())));
+        drupal_set_message(t(
+          'Successfully added a @type',
+          array('@type' => $field_collection_item->bundle())));
       }
     }
     else {
       $messages = drupal_get_messages(NULL, false);
       if (!isset($messages['warning']) && !isset($messages['error'])) {
         $field_collection_item->save();
-        drupal_set_message(t("Successfully edited %label.",
-                             array('%label', $field_collection_item->label())));
+        drupal_set_message(t(
+          'Successfully edited %label.',
+          array('%label' => $field_collection_item->label())));
       }
     }
 
@@ -113,8 +119,10 @@ class FieldCollectionItemForm extends ContentEntityForm {
     else {
       // In the unlikely case something went wrong on save, the block will be
       // rebuilt and block form redisplayed.
-      drupal_set_message(t('The field collection item could not be saved.'), 'error');
-      $form_state['rebuild'] = TRUE;
+      drupal_set_message(t(
+        'The field collection item could not be saved.'), 'error');
+
+      $form_state->setRebuild();
     }
 
     /*
@@ -127,6 +135,7 @@ class FieldCollectionItemForm extends ContentEntityForm {
 
   /**
    * Overrides \Drupal\Core\Entity\EntityFormController::delete().
+   * TODO: Is this even called?  I don't think form_state can be used like that.
    */
   public function delete(array $form, FormStateInterface $form_state) {
     $destination = array();
@@ -135,7 +144,10 @@ class FieldCollectionItemForm extends ContentEntityForm {
       unset($_GET['destination']);
     }
     $field_collection_item = $this->buildEntity($form, $form_state);
-    $form_state['redirect'] = array('field-collection/' . $field_collection_item->id() . '/delete', array('query' => $destination));
+    $form_state['redirect'] = array(
+      'field-collection/' . $field_collection_item->id() . '/delete',
+      array('query' => $destination)
+    );
   }
 
 }
