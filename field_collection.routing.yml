@@ -20,7 +20,7 @@ entity.field_collection_item.canonical:
     _content: '\Drupal\field_collection\Controller\FieldCollectionItemController::page'
     _title_callback: '\Drupal\field_collection\Controller\FieldCollectionItemController::pageTitle'
   requirements:
-    _permission: 'access content' # TODO change this (View permission for host?)
+    _access_field_collection_item_host: 'view'
 
 field_collection_item.revision_show:
   path: '/field-collection-item/{field_collection_item}/revisions/{field_collection_item_revision}/view'
@@ -36,21 +36,21 @@ field_collection_item.add_page:
     _content: '\Drupal\field_collection\Controller\FieldCollectionItemController::add'
     _title_callback: '\Drupal\field_collection\Controller\FieldCollectionItemController::addPageTitle'
   requirements:
-    _permission: 'administer content types' # TODO change this (Edit permission for host?)
+    _access_field_collection_item_host: 'update'
 
 entity.field_collection_item.edit_form:
   path: '/field-collection-item/{field_collection_item}/edit'
   defaults:
     _entity_form: 'field_collection_item.edit'
   requirements:
-    _permission: 'administer content types' # TODO change this (Edit permission for host?)
+    _access_field_collection_item_host: 'update'
 
 entity.field_collection_item.delete_form:
   path: '/field-collection-item/{field_collection_item}/delete'
   defaults:
     _entity_form: 'field_collection_item.delete'
   requirements:
-    _permission: 'administer content types' # TODO change this (Edit permission for host?)
+    _access_field_collection_item_host: 'update'
 
 field_collection.ajax_remove:
   path: '/field_collection/ajax/remove'
