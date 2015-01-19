@@ -39,7 +39,7 @@ class FieldCollectionItemController extends ControllerBase {
     $field_collection_item = $this->entityManager()->getStorage('field_collection_item')->create(array(
       'field_name' => $field_collection->id,
       'host_type' => $host_type,
-      'revision_id' => 0, // TODO: set this correctly
+      'revision_id' => 0,
     ));
 
     $form = $this->entityFormBuilder()->getForm($field_collection_item);

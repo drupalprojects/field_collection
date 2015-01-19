@@ -28,7 +28,10 @@ field_collection_item.revision_show:
     _content: '\Drupal\field_collection\Controller\FieldCollectionItemController::revisionShow'
     _title_callback: '\Drupal\field_collection\Controller\FieldCollectionItemController::revisionPageTitle'
   requirements:
-    _permission: 'administer content types' # TODO change this (View revision permission for host?)
+    # TODO: View revision permission isn't a standard entity permission but
+    # could possibly take the code from NodeRevisionAccessCheck to make an
+    # entity generic revision permission checker.
+    _permission: 'administer content types'
 
 field_collection_item.add_page:
   path: '/field-collection-item/add/{field_collection}/{host_type}/{host_id}'
@@ -36,7 +39,7 @@ field_collection_item.add_page:
     _content: '\Drupal\field_collection\Controller\FieldCollectionItemController::add'
     _title_callback: '\Drupal\field_collection\Controller\FieldCollectionItemController::addPageTitle'
   requirements:
-    _access_field_collection_item_host: 'update'
+    _access_field_collection_item_add_to_host: 'probably need something here'
 
 entity.field_collection_item.edit_form:
   path: '/field-collection-item/{field_collection_item}/edit'
@@ -59,4 +62,6 @@ field_collection.ajax_remove:
   options:
     _theme: ajax_base_page
   requirements:
-    _permission: 'administer content types' # TODO change this (Edit permission for host? / No security? (It doesn't make a change just updates some form input))
+    # TODO: Edit permission for host? No security?
+    # It doesn't make a change just updates some form input.
+    _permission: 'administer content types'

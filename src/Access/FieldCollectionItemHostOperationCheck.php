@@ -8,7 +8,6 @@
 namespace Drupal\field_collection\Access;
 
 use Drupal\Core\Access\AccessResult;
-use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Routing\Access\AccessInterface;
 use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\Routing\Route;
@@ -24,8 +23,8 @@ class FieldCollectionItemHostOperationCheck implements AccessInterface {
    *
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The currently logged in account.
-   * @param string $operation
-   *   The operation being checked.
+   *
+   * TODO: Document params
    *
    * @return string
    *   A \Drupal\Core\Access\AccessInterface constant value.
@@ -39,10 +38,7 @@ class FieldCollectionItemHostOperationCheck implements AccessInterface {
 
     return AccessResult::allowedIf(
       $field_collection_item &&
-      $field_collection_item
-        ->getHost()
-        ->access($operation, $account, TRUE)
-        ->isAllowed())
+      $field_collection_item->getHost()->access($operation, $account))
       ->cachePerRole();
   }
 

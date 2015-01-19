@@ -231,10 +231,10 @@ class FieldCollectionItem extends ContentEntityBase {
       $entity_info = \Drupal::entityManager()
         ->getDefinition($this->host_type->value, true);
       $host_id_results = db_query(
-        "SELECT `entity_id` " .
-        "FROM {" . $entity_info->get('base_table') .
-               "__" . $this->bundle() . "} " .
-        "WHERE `" . $this->bundle() . "_value` = " . $this->id())
+        'SELECT `entity_id` ' .
+        'FROM {' . $entity_info->get('base_table') .
+               '__' . $this->bundle() . '} ' .
+        'WHERE `' . $this->bundle() . '_value` = ' . $this->id())
           ->fetchCol();
       $this->host_id = reset($host_id_results);
     }

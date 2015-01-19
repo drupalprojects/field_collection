@@ -72,6 +72,11 @@ class FieldCollection extends FieldItemBase {
       ->setSetting('unsigned', TRUE)
       ->setReadOnly(TRUE);
 
+    $properties['revision_id'] = DataDefinition::create('integer')
+      ->setLabel(t('Field collection item revision'))
+      ->setSetting('unsigned', TRUE)
+      ->setReadOnly(TRUE);
+
     return $properties;
   }
 
