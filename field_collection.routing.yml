@@ -2,10 +2,11 @@ field_collection.overview_field_collections:
   path: '/admin/structure/field-collections'
   defaults:
     _title: 'Manage field collections.'
-    _content: '\Drupal\Core\Entity\Controller\EntityListController::listing'
+    _controller: '\Drupal\Core\Entity\Controller\EntityListController::listing'
     entity_type: 'field_collection'
   requirements:
-    _permission: 'administer field_collection_item fields'
+    _permission: 'access content'
+    #_permission: 'administer field_collection_item fields'
 
 entity.field_collection.edit_form:
   path: '/admin/structure/field-collections/manage/{field_collection}'
@@ -17,7 +18,7 @@ entity.field_collection.edit_form:
 entity.field_collection_item.canonical:
   path: '/field-collection-item/{field_collection_item}'
   defaults:
-    _content: '\Drupal\field_collection\Controller\FieldCollectionItemController::page'
+    _controller: '\Drupal\field_collection\Controller\FieldCollectionItemController::page'
     _title_callback: '\Drupal\field_collection\Controller\FieldCollectionItemController::pageTitle'
   requirements:
     _access_field_collection_item_host: 'view'
@@ -25,7 +26,7 @@ entity.field_collection_item.canonical:
 field_collection_item.revision_show:
   path: '/field-collection-item/{field_collection_item}/revisions/{field_collection_item_revision}/view'
   defaults:
-    _content: '\Drupal\field_collection\Controller\FieldCollectionItemController::revisionShow'
+    _controller: '\Drupal\field_collection\Controller\FieldCollectionItemController::revisionShow'
     _title_callback: '\Drupal\field_collection\Controller\FieldCollectionItemController::revisionPageTitle'
   requirements:
     # TODO: View revision permission isn't a standard entity permission but
@@ -36,7 +37,7 @@ field_collection_item.revision_show:
 field_collection_item.add_page:
   path: '/field-collection-item/add/{field_collection}/{host_type}/{host_id}'
   defaults:
-    _content: '\Drupal\field_collection\Controller\FieldCollectionItemController::add'
+    _controller: '\Drupal\field_collection\Controller\FieldCollectionItemController::add'
     _title_callback: '\Drupal\field_collection\Controller\FieldCollectionItemController::addPageTitle'
   requirements:
     _access_field_collection_item_add_to_host: 'probably need something here'
