@@ -20,7 +20,7 @@ abstract class FieldCollectionLinksFormatter extends FormatterBase {
    */
   protected function getEditLinks(FieldItemInterface $item) {
     $links = '';
-    if ($item->getEntity()->access('update', $this->currentUser)) {
+    if ($item->getEntity()->access('update', \Drupal::currentUser())) {
       $links = '(' . \Drupal::l(t('Edit'),
         Url::FromRoute('entity.field_collection_item.edit_form',
                        array('field_collection_item' => $item->value)));
@@ -44,7 +44,7 @@ abstract class FieldCollectionLinksFormatter extends FormatterBase {
   protected function getAddLink(ContentEntityInterface $host) {
     $link = '';
 
-    if ($host->access('update', $this->currentUser)) {
+    if ($host->access('update', \Drupal::currentUser())) {
       $link = '<ul class="action-links action-links-field-collection-add"><li>';
 
       $link .= _l(t('Add'),

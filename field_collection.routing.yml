@@ -65,4 +65,4 @@ field_collection.ajax_remove:
   requirements:
     # TODO: Edit permission for host? No security?
     # It doesn't make a change just updates some form input.
-    _permission: 'administer content types'
+    _permission: 'access content'

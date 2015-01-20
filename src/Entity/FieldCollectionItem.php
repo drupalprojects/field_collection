@@ -180,7 +180,9 @@ class FieldCollectionItem extends ContentEntityBase {
    */
   public function getDelta() {
     $host = $this->getHost();
-    if (($host = $this->getHost()) && isset($host->{$this->field_name->value})) {
+
+    if (($host = $this->getHost()) && isset($host->{$this->field_name->value}))
+    {
       foreach ($host->{$this->field_name->value} as $delta => $item) {
         if (isset($item->value) && $item->value == $this->id()) {
           return $delta;
@@ -286,7 +288,8 @@ class FieldCollectionItem extends ContentEntityBase {
   /**
    * {@inheritdoc}
    */
-  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
+  public static function baseFieldDefinitions(EntityTypeInterface $entity_type)
+  {
     $fields['item_id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Field collection item ID'))
       ->setDescription(t('The field collection item ID.'))
@@ -295,7 +298,8 @@ class FieldCollectionItem extends ContentEntityBase {
 
     $fields['host_type'] = BaseFieldDefinition::create('string')
       ->setLabel(t("Host's entity type"))
-      ->setDescription(t("Type of entity for the field collection item's host."))
+      ->setDescription(
+        t("Type of entity for the field collection item's host."))
       ->setReadOnly(TRUE);
 
     $fields['uuid'] = BaseFieldDefinition::create('uuid')
@@ -318,15 +322,18 @@ class FieldCollectionItem extends ContentEntityBase {
   }
 
   /**
-   * Determines whether a field collection item entity is empty based on the
-   * collection-fields.
+   * Determine whether a field collection item entity is empty.
+   *
+   * Checks individual collection-fields.
    */
   function isEmpty() {
     $is_empty = TRUE;
 
     foreach ($this->getIterator() as $field) {
       // Only check configured fields, skip base fields like uuid.
-      if (!$field->isEmpty() && 'Drupal\\field\\Entity\\FieldConfig' == get_class($field->getFieldDefinition())) {
+      if (!$field->isEmpty() && 'Drupal\\field\\Entity\\FieldConfig' ==
+                                get_class($field->getFieldDefinition()))
+      {
         $is_empty = FALSE;
       }
     }
