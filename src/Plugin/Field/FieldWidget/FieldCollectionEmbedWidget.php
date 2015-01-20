@@ -127,8 +127,8 @@ class FieldCollectionEmbedWidget extends WidgetBase {
     if ($this->fieldDefinition->getFieldStorageDefinition()->getCardinality() ==
         FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED)
     {
-      $options = array('query' => array('element_parents' =>
-                                        implode('/', $element['#parents']),),);
+      $options = array('query' => array(
+        'element_parents' => implode('/', $element['#parents']),),);
 
       $url = Url::fromRoute('field_collection.ajax_remove');
 
@@ -146,6 +146,7 @@ class FieldCollectionEmbedWidget extends WidgetBase {
           '#limit_validation_errors' => array(),
           '#ajax' => array(
             'url' => $url->setOptions($options),
+            'options' => $options,
             'effect' => 'fade',
             'wrapper' => $field_name . '-ajax-wrapper',
           ),
