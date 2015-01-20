@@ -15,6 +15,7 @@ use Drupal\field_collection\Entity\FieldCollectionItem;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Url;
 
 const FIELD_COLLECTION_EMBED_WIDGET =
   'Drupal\\field_collection\\Plugin\\Field\\FieldWidget\\FieldCollectionEmbedWidget';
@@ -115,7 +116,7 @@ class FieldCollectionEmbedWidget extends WidgetBase {
 
     if (empty($element['#required'])) {
       $element['#after_build'][] = array(
-        'Drupal\\field_collection\\Plugin\\Field\\FieldWidget\\FieldCollectionEmbedWidget',
+        FIELD_COLLECTION_EMBED_WIDGET,
         'delayRequiredValidation',);
 
       // Stop HTML5 form validation so our validation code can run instead.
@@ -126,6 +127,11 @@ class FieldCollectionEmbedWidget extends WidgetBase {
     if ($this->fieldDefinition->getFieldStorageDefinition()->getCardinality() ==
         FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED)
     {
+      $options = array('query' => array('element_parents' =>
+                                        implode('/', $element['#parents']),),);
+
+      $url = Url::fromRoute('field_collection.ajax_remove');
+
       $element['actions'] = array(
         '#type' => 'actions',
         'remove_button' => array(
@@ -139,14 +145,9 @@ class FieldCollectionEmbedWidget extends WidgetBase {
             'removeSubmit')),
           '#limit_validation_errors' => array(),
           '#ajax' => array(
-            'path' => 'field_collection/ajax/remove',
+            'url' => $url->setOptions($options),
             'effect' => 'fade',
             'wrapper' => $field_name . '-ajax-wrapper',
-            'options' => array(
-              'query' => array(
-                'element_parents' => implode('/', $element['#parents']),
-              ),
-            ),
           ),
           '#weight' => 1000,
         ),
@@ -366,8 +367,8 @@ class FieldCollectionEmbedWidget extends WidgetBase {
     // the 3, the order of the two 3s now is undefined and may not match what
     // the user had selected.
     $input = NestedArray::getValue($form_state->getUserInput(), $address);
-    // Sort by weight
-    uasort($input, '_field_sort_items_helper');
+    // Sort by weight.
+    uasort($input, '_field_collection_sort_items_helper');
 
     // Reweight everything in the correct order.
     $weight = -1 * $field_state['items_count'];

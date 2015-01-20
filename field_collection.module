@@ -78,13 +78,31 @@ function field_collection_field_storage_config_insert(EntityInterface $field) {
  *
  * Remove default value from field collection field settings.
  */
-function field_collection_form_field_ui_field_edit_form_alter(&$form, FormStateInterface $form_state) {
+function field_collection_form_field_ui_field_edit_form_alter(
+  &$form, FormStateInterface $form_state)
+{
   if ($form['#field']->getType() == 'field_collection') {
     unset($form['field']['default_value']['widget']);
-    $form['field']['default_value']['#description'] = t('To specify a default value, configure it via the regular default value setting of each field that is part of the field collection. To do so, go to the <a href="!url">Manage fields</a> screen of the field collection.', array('!url' => _url('admin/structure/field-collections/manage/' . $form['#field']->getName() . '/fields')));
+    $form['field']['default_value']['#description'] = t(
+      'To specify a default value, configure it via the regular default ' .
+      'value setting of each field that is part of the field collection. To ' .
+      'do so, go to the <a href="!url">Manage fields</a> screen of the field ' .
+      'collection.',
+      array('!url' => _url('admin/structure/field-collections/manage/' .
+                           $form['#field']->getName() . '/fields')));
   }
 }
 
-function field_collection_form_alter(&$form, FormStateInterface $form_state, $form_id) {
-  //_d($form_id);
+/**
+ * Sort function for items order.
+ *
+ * Copied from D7 '_field_sort_items_helper'.
+ *
+ * TODO: Replace this and references to it with whatever that function was
+ * replaced with in Drupal 8.
+ */
+function _field_collection_sort_items_helper($a, $b) {
+  $a_weight = (is_array($a) ? $a['_weight'] : 0);
+  $b_weight = (is_array($b) ? $b['_weight'] : 0);
+  return $a_weight - $b_weight;
 }
