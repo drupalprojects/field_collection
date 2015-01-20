@@ -20,7 +20,7 @@ class FieldCollectionItemDeleteForm extends ContentEntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getQuestion() {
-    return t('Are you sure you want to delete this field collection item?');
+    return t('Are you sure you want to delete this %title?', array('%title' => $this->entity->label()));
   }
 
   /**

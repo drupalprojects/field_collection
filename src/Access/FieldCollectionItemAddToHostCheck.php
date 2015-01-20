@@ -36,6 +36,4 @@ class FieldCollectionItemAddToHostCheck implements AccessInterface {
     return AccessResult::allowedIf($host && $host->access('update', $account))
       ->cachePerRole();
   }
-
-
 }
