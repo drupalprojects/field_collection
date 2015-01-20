@@ -11,6 +11,20 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function field_collection_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.field_collection':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('The field collection module provides a field, to which any number of fields can be attached. See the <a href="@field-help">Field module help page</a> for more information about fields.', array('@field-help' => \Drupal::url('help.page', array('name' => 'field')))) . '</p>';
+      return $output;
+  }
+}
 
 /**
  * Loads a field collection item.
