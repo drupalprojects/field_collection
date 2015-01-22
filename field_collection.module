@@ -12,6 +12,7 @@ use Drupal\Core\Field\WidgetBase;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Field\FieldItemListInterface;
 
 /**
  * Implements hook_help().
@@ -118,5 +119,23 @@ function field_collection_form_field_ui_field_edit_form_alter(
 function _field_collection_sort_items_helper($a, $b) {
   $a_weight = (is_array($a) ? $a['_weight'] : 0);
   $b_weight = (is_array($b) ? $b['_weight'] : 0);
+
   return $a_weight - $b_weight;
+}
+
+/**
+ * Returns whether or not the FieldItemList is full.
+ *
+ * TODO: Find the standard way to do this and replace calls to it.
+ */
+function _field_collection_field_item_list_full(
+  FieldItemListInterface $field_list)
+{
+  $cardinality = $field_list->getFieldDefinition()
+    ->getFieldStorageDefinition()
+    ->cardinality;
+
+  $total = $field_list->count();
+
+  return ($cardinality <= $total);
 }

@@ -36,14 +36,24 @@ class FieldCollectionItemController extends ControllerBase {
    * TODO: additional fields
    */
   public function add(FieldCollection $field_collection, $host_type, $host_id) {
-    $field_collection_item = $this->entityManager()->getStorage('field_collection_item')->create(array(
-      'field_name' => $field_collection->id,
-      'host_type' => $host_type,
-      'revision_id' => 0,
-    ));
+    $host = entity_load($host_type, $host_id);
+    if (_field_collection_field_item_list_full(
+        $host->{$field_collection->id()}))
+    {
+      drupal_set_message(t('This field is already full.'), 'error');
+      return array('#markup' => 'Can not add to an already full field.');
+    }
+    else {
+      $field_collection_item = $this->entityManager()
+        ->getStorage('field_collection_item')
+        ->create(array(
+          'field_name' => $field_collection->id(),
+          'host_type' => $host_type,
+          'revision_id' => 0,));
 
-    $form = $this->entityFormBuilder()->getForm($field_collection_item);
-    return $form;
+      $form = $this->entityFormBuilder()->getForm($field_collection_item);
+      return $form;
+    }
   }
 
   /**
@@ -70,7 +80,10 @@ class FieldCollectionItemController extends ControllerBase {
    *   An array suitable for drupal_render().
    */
   protected function buildPage(FieldCollectionItem $field_collection_item) {
-    $ret = array('field_collection_items' => $this->entityManager()->getViewBuilder('field_collection_item')->view($field_collection_item));
+    $ret = array('field_collection_items' => $this->entityManager()
+      ->getViewBuilder('field_collection_item')
+      ->view($field_collection_item));
+
     return $ret;
   }
 
@@ -100,7 +113,7 @@ class FieldCollectionItemController extends ControllerBase {
    */
   public function addPageTitle(FieldCollection $field_collection) {
     return $this->t('Create @label',
-                    array('@label' => $field_collection->label));
+                    array('@label' => $field_collection->label()));
   }
 
   /**

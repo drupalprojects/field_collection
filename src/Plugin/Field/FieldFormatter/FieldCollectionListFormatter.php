@@ -33,7 +33,8 @@ class FieldCollectionListFormatter extends FieldCollectionLinksFormatter {
     $element = array();
     $settings = $this->getFieldSettings();
     $count = 0; // TODO: Is there a better way to get an accurate count of the
-                // items from the FileItemList that doesn't count blank items?
+                // items from the FieldItemList that doesn't count blank items?
+                // Possibly \Countable->count()?
 
     foreach ($items as $delta => $item) {
       if ($item->value !== NULL) {
@@ -56,13 +57,13 @@ class FieldCollectionListFormatter extends FieldCollectionLinksFormatter {
               'field_collection_item_revision' => $item->revision_id)));
         }
 
-
         $element[$delta] = array('#markup' => $links);
       }
     }
 
     $cardinality = $this->fieldDefinition
-      ->getFieldStorageDefinition()->cardinality;
+      ->getFieldStorageDefinition()
+      ->cardinality;
 
     if ($cardinality == -1 || $count < $cardinality) {
       $element['#suffix'] =

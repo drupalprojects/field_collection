@@ -271,17 +271,21 @@ class FieldCollectionItem extends ContentEntityBase {
       }
       */
 
-      // TODO: Generate a message if attempting to add a value to a full limited
-      // field
-
       if ($create_link) {
-        $entity->{$this->bundle()}[] = array('field_collection_item' => $this);
-        $entity->save();
+        if (_field_collection_field_item_list_full($entity->{$this->bundle()}))
+        {
+          drupal_set_message(t('Field is already full.'), 'error');
+        }
+        else {
+          $entity->{$this->bundle()}[] =
+            array('field_collection_item' => $this);
+          $entity->save();
+        }
       }
     }
     else {
-      throw new \Exception('The host entity may be set only during creation ' .
-                           'of a field collection item.');
+      throw new \Exception(t('The host entity may be set only during ' .
+                             'creation of a field collection item.'));
     }
   }
 
