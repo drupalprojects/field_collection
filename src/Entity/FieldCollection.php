@@ -50,21 +50,26 @@ class FieldCollection extends ConfigEntityBundleBase implements ConfigEntityInte
    *
    * @var string
    */
-  public $id;
+  protected $id;
 
   /**
    * The UUID of the node type.
    *
    * @var string
    */
-  public $uuid;
+  protected $uuid;
 
   /**
    * The human-readable name of the field collection.
    *
    * @var string
    */
-  public $label;
+  protected $label;
+
+  /**
+   * TODO: Figure out if this is really needed (it may not be defined by entity classes).
+   */
+  protected $entityType;
 
   public function __construct(array $values = array(),
                               $entity_type = 'field_collection')
