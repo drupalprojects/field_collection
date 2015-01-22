@@ -1,5 +1,5 @@
 field_collection.overview_field_collections:
-  path: '/admin/structure/field-collections'
+  path: '/admin/structure/field_collections'
   defaults:
     _title: 'Manage field collections.'
     _controller: '\Drupal\Core\Entity\Controller\EntityListController::listing'
@@ -9,14 +9,14 @@ field_collection.overview_field_collections:
     #_permission: 'administer field_collection_item fields'
 
 entity.field_collection.edit_form:
-  path: '/admin/structure/field-collections/manage/{field_collection}'
+  path: '/admin/structure/field_collections/manage/{field_collection}'
   defaults:
     _entity_form: 'field_collection.edit'
   requirements:
     _permission: 'administer field_collection_item fields'
 
 entity.field_collection_item.canonical:
-  path: '/field-collection-item/{field_collection_item}'
+  path: '/field_collection_item/{field_collection_item}'
   defaults:
     _controller: '\Drupal\field_collection\Controller\FieldCollectionItemController::page'
     _title_callback: '\Drupal\field_collection\Controller\FieldCollectionItemController::pageTitle'
@@ -24,7 +24,7 @@ entity.field_collection_item.canonical:
     _access_field_collection_item_host: 'view'
 
 field_collection_item.revision_show:
-  path: '/field-collection-item/{field_collection_item}/revisions/{field_collection_item_revision}/view'
+  path: '/field_collection_item/{field_collection_item}/revisions/{field_collection_item_revision}/view'
   defaults:
     _controller: '\Drupal\field_collection\Controller\FieldCollectionItemController::revisionShow'
     _title_callback: '\Drupal\field_collection\Controller\FieldCollectionItemController::revisionPageTitle'
@@ -35,7 +35,7 @@ field_collection_item.revision_show:
     _permission: 'administer content types'
 
 field_collection_item.add_page:
-  path: '/field-collection-item/add/{field_collection}/{host_type}/{host_id}'
+  path: '/field_collection_item/add/{field_collection}/{host_type}/{host_id}'
   defaults:
     _controller: '\Drupal\field_collection\Controller\FieldCollectionItemController::add'
     _title_callback: '\Drupal\field_collection\Controller\FieldCollectionItemController::addPageTitle'
@@ -43,14 +43,14 @@ field_collection_item.add_page:
     _access_field_collection_item_add_to_host: 'probably need something here'
 
 entity.field_collection_item.edit_form:
-  path: '/field-collection-item/{field_collection_item}/edit'
+  path: '/field_collection_item/{field_collection_item}/edit'
   defaults:
     _entity_form: 'field_collection_item.edit'
   requirements:
     _access_field_collection_item_host: 'update'
 
 entity.field_collection_item.delete_form:
-  path: '/field-collection-item/{field_collection_item}/delete'
+  path: '/field_collection_item/{field_collection_item}/delete'
   defaults:
     _entity_form: 'field_collection_item.delete'
   requirements:

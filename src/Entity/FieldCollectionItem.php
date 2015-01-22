@@ -50,7 +50,7 @@ use Drupal\Core\Language\Language;
  *   permission_granularity = "bundle",
  *   links = {
  *     "admin-form" = "field_collection.edit",
- *     "canonical" = "field_collection_item.view"
+ *     "canonical" = "/field_collection_item/{field_collection_item}"
  *   }
  * )
  */
