@@ -75,6 +75,6 @@ class FieldCollection extends ConfigEntityBundleBase implements ConfigEntityInte
                               $entity_type = 'field_collection')
   {
     parent::__construct($values, $entity_type);
-    $this->entityType = "field_collection";
+    $this->entityType = 'field_collection';
   }
 }
