@@ -33,7 +33,8 @@ class FieldCollectionBasicTestCase extends WebTestBase {
    *
    * @var array
    */
-  protected static $modules = array('field_collection');
+  protected static $modules = array('field_collection', 'node', 'devel',
+                                    'field', 'field_ui');
 
   public static function getInfo() {
     return array(
@@ -46,32 +47,44 @@ class FieldCollectionBasicTestCase extends WebTestBase {
   public function setUp() {
     parent::setUp();
 
+    // Create Article node type.
+    if ($this->profile != 'standard') {
+      $this->drupalCreateContentType(array('type' => 'article',
+                                           'name' => 'Article'));
+    }
+
     // Create a field_collection field to use for the tests.
     $this->field_name = 'field_test_collection';
-    $this->field = entity_create('field_entity', array(
-      'name' => $this->field_name,
-      'type' => 'field_collection',
-      'entity_type' => 'node',
-    ));
-    $this->field->save();
 
-    $this->instance = entity_create('field_instance', array(
+    $this->field_storage = entity_create('field_storage_config', array(
+      'field_name' => $this->field_name,
+      'entity_type' => 'node',
+      'type' => 'field_collection',
+      'cardinality' => 4,
+    ));
+    $this->field_storage->save();
+
+    $this->field_definition = array(
       'field_name' => $this->field_name,
       'entity_type' => 'node',
       'bundle' => 'article',
-      'label' => $this->randomName() . '_label',
-      'description' => $this->randomName() . '_description',
-      'weight' => mt_rand(0, 127),
+      'field_storage' => $this->field_storage,
+      'label' => $this->randomMachineName() . '_label',
+      'description' => $this->randomMachineName() . '_description',
       'settings' => array(),
+
+      // TODO: Figure out if this is still needed
+      /*
+      'weight' => mt_rand(0, 127),
       'widget' => array(
         'type' => 'hidden',
         'label' => 'Test',
         'settings' => array(),
       ),
-    ));
-    $this->instance->save();
+      */
+    );
 
-    $this->field->cardinality = 4;
+    $this->field = entity_create('field_config', $this->field_definition);
     $this->field->save();
   }
 
@@ -83,9 +96,8 @@ class FieldCollectionBasicTestCase extends WebTestBase {
     // Manually create a field_collection.
     $entity = entity_create('field_collection_item',
                             array('field_name' => $this->field_name));
-    $entity->setHostEntity('node', $node);
+    $entity->setHostEntity($node);
     $entity->save();
-    $node->save();
 
     return array($node, $entity);
   }
@@ -98,7 +110,7 @@ class FieldCollectionBasicTestCase extends WebTestBase {
     $node = node_load($node->nid->value, TRUE);
 
     $this->assertEqual(
-      $entity->id(), $node->{$this->field_name}->value,
+      $entity->id(), $node->{$this->field_name}->getValue(),
       'A field_collection_item has been successfully created and referenced.');
 
     $this->assertEqual(

@@ -9,7 +9,10 @@ namespace Drupal\field_collection\Tests;
 
 use Drupal\simpletest\WebTestBase;
 
-class FieldCollectionRulesIntegrationTestCase extends WebTestBase {
+/**
+ * Test case for rules integration.
+ */
+class FieldCollectionRulesIntegrationTest extends WebTestBase {
 
   /**
    * Field collection field.

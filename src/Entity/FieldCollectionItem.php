@@ -301,9 +301,9 @@ class FieldCollectionItem extends ContentEntityBase {
       ->setSetting('unsigned', TRUE);
 
     $fields['host_type'] = BaseFieldDefinition::create('string')
-      ->setLabel(t("Host's entity type"))
+      ->setLabel(t('Host\'s entity type'))
       ->setDescription(
-        t("Type of entity for the field collection item's host."))
+        t('Type of entity for the field collection item\'s host.'))
       ->setReadOnly(TRUE);
 
     $fields['uuid'] = BaseFieldDefinition::create('uuid')

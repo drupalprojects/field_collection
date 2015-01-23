@@ -135,6 +135,7 @@ class FieldCollectionItemForm extends ContentEntityForm {
 
   /**
    * Overrides \Drupal\Core\Entity\EntityFormController::delete().
+   *
    * TODO: Is this even called?  I don't think form_state can be used like that.
    */
   public function delete(array $form, FormStateInterface $form_state) {
