@@ -67,6 +67,7 @@ class FieldCollectionBasicTestCase extends WebTestBase {
         'entity_type' => 'node',
         'type' => 'field_collection',
         'cardinality' => 4,));
+
     $this->field_collection_storage->save();
 
     $this->field_collection_definition = array(
@@ -91,14 +92,22 @@ class FieldCollectionBasicTestCase extends WebTestBase {
 
     $this->field_collection =
       entity_create('field_config', $this->field_collection_definition);
+
     $this->field_collection->save();
+
+    entity_get_display('node', 'article', 'default')
+      ->setComponent($this->field_collection_name, array(
+        'type' => 'field_collection_editable',))
+      ->save();
 
     // Create an integer field inside the field_collection.
     $this->inner_field_name = 'field_inner';
+
     $this->inner_field_storage = entity_create('field_storage_config', array(
       'field_name' => $this->inner_field_name,
       'entity_type' => 'field_collection_item',
       'type' => 'integer',));
+
     $this->inner_field_storage->save();
 
     $this->inner_field_definition = array(
@@ -112,7 +121,19 @@ class FieldCollectionBasicTestCase extends WebTestBase {
 
     $this->inner_field =
       entity_create('field_config', $this->inner_field_definition);
+
     $this->inner_field->save();
+
+    entity_get_form_display('field_collection_item',
+                            $this->field_collection_name, 'default')
+      ->setComponent($this->inner_field_name, array('type' => 'number'))
+      ->save();
+
+    entity_get_display('field_collection_item',
+                       $this->field_collection_name, 'default')
+      ->setComponent($this->inner_field_name,
+                     array('type' => 'number_decimal',))
+      ->save();
   }
 
   /**
@@ -137,7 +158,7 @@ class FieldCollectionBasicTestCase extends WebTestBase {
    */
   public function testCRUD() {
     list ($node, $entity) = $this->createNodeWithFieldCollection();
-    $node = node_load($node->nid->value, TRUE);
+    $node = node_load($node->id(), TRUE);
 
     $this->assertEqual(
       $entity->id(),
@@ -157,7 +178,7 @@ class FieldCollectionBasicTestCase extends WebTestBase {
 
     $node->{$this->field_collection_name}[1]->field_collection_item = $entity2;
     $node->save();
-    $node = node_load($node->nid->value, TRUE);
+    $node = node_load($node->id(), TRUE);
 
     $this->assertTrue(
       !empty($entity2->id()) && !empty($entity2->getRevisionId()),
@@ -183,7 +204,7 @@ class FieldCollectionBasicTestCase extends WebTestBase {
 
     // Make sure deleting the field_collection removes the reference.
     $entity2->delete();
-    $node = node_load($node->nid->value, TRUE);
+    $node = node_load($node->id(), TRUE);
     $this->assertTrue(!isset($node->{$this->field_collection_name}[1]),
                       'Reference correctly deleted.');
 
@@ -196,7 +217,7 @@ class FieldCollectionBasicTestCase extends WebTestBase {
     // Try deleting nodes with collections without any values.
     $node = $this->drupalCreateNode(array('type' => 'article'));
     $node->delete();
-    $this->assertTrue(node_load($node->nid->value, NULL, TRUE) == FALSE,
+    $this->assertTrue(node_load($node->id(), NULL, TRUE) == FALSE,
                       'Node without collection values deleted.');
 
     // Test creating a field collection entity with a not-yet saved host entity.
@@ -210,7 +231,7 @@ class FieldCollectionBasicTestCase extends WebTestBase {
 
     // Now the node should have been saved with the collection and the link
     // should have been established.
-    $this->assertTrue(!empty($node->nid->value),
+    $this->assertTrue(!empty($node->id()),
                       'Node has been saved with the collection.');
 
     $this->assertTrue(
@@ -345,54 +366,56 @@ class FieldCollectionBasicTestCase extends WebTestBase {
    * Make sure the basic UI and access checks are working.
    */
   public function testBasicUI() {
-    // Add a field to the collection.
-    /*
-    $field = entity_create('field_entity', array(
-      'name' => 'field_text',
-      'entity_type' => 'field_collection_item',
-      'type' => 'text',
-    ));
-    $field->save();
-
-    entity_create('field_instance', array(
-      'field_name' => $field->name,
-      'entity_type' => 'field_collection_item',
-      'bundle' => $this->field_collection_name,
-      /*'label' => 'Test text field',
-      'widget' => array(
-        'type' => 'text_textfield',
-      ),*/
-    /*
-    ))->save();
-
-
-    $user = $this->drupalCreateUser();
     $node = $this->drupalCreateNode(array('type' => 'article'));
 
+    // Login with new user that has no privileges.
+    $user = $this->drupalCreateUser();
     $this->drupalLogin($user);
-    /*
+
     // Make sure access is denied.
-    $path = 'field-collection/field-test-collection/add/node/' . $node->nid;
+    $path =
+      "field_collection_item/add/field_test_collection/node/{$node->id()}";
+
     $this->drupalGet($path);
     $this->assertText(t('Access denied'), 'Access has been denied.');
 
-    $user_privileged = $this->drupalCreateUser(array('access content', 'edit any article content'));
+    // Login with new user that has basic edit rights.
+    $user_privileged = $this->drupalCreateUser(array(
+      'access content',
+      'edit any article content'));
+
     $this->drupalLogin($user_privileged);
-    $this->drupalGet("node/$node->nid");
+
+    // Test field collection item add form.
+    $this->drupalGet('admin/structure/types/manage/article/display');
+    $this->drupalGet("node/{$node->id()}");
     $this->assertLinkByHref($path, 0, 'Add link is shown.');
     $this->drupalGet($path);
-    $this->assertText(t('Test text field'), 'Add form is shown.');
 
-    $edit['field_text[und][0][value]'] = $this->randomName();
-    $this->drupalPost($path, $edit, t('Save'));
-    $this->assertText(t('The changes have been saved.'), 'Field collection saved.');
+    $this->assertText(t($this->inner_field_definition['label']),
+                      'Add form is shown.');
 
-    $this->assertText($edit['field_text[und][0][value]'], "Added field value is shown.");
+    $edit = array("$this->inner_field_name[0][value]" => rand());
+    $this->drupalPostForm(NULL, $edit, t('Save'));
 
-    $edit['field_text[und][0][value]'] = $this->randomName();
-    $this->drupalPost('field-collection/field-test-collection/1/edit', $edit, t('Save'));
-    $this->assertText(t('The changes have been saved.'), 'Field collection saved.');
-    $this->assertText($edit['field_text[und][0][value]'], "Field collection has been edited.");
+    $this->assertText(t('Successfully added a @field.',
+                        array('@field' => $this->field_collection_name)),
+                      'Field collection saved.');
+
+    $this->assertText($edit["$this->inner_field_name[0][value]"],
+                      'Added field value is shown.');
+
+    // Test field collection item edit form.
+    $edit["$this->inner_field_name[0][value]"] = rand();
+    $this->drupalPostForm('field_collection_item/1/edit', $edit, t('Save'));
+
+    $this->assertText(t('Successfully edited @field.',
+                        array('@field' => $this->field_collection_name)),
+                      'Field collection saved.');
+
+    /*
+    $this->assertText($edit["$this->inner_field_name[0][value]"],
+                      'Field collection has been edited.');
 
     $this->drupalGet('field-collection/field-test-collection/1');
     $this->assertText($edit['field_text[und][0][value]'], "Field collection can be viewed.");

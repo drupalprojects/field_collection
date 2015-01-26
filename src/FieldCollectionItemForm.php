@@ -98,7 +98,7 @@ class FieldCollectionItemForm extends ContentEntityForm {
       $messages = drupal_get_messages(NULL, false);
       if (!isset($messages['warning']) && !isset($messages['error'])) {
         drupal_set_message(t(
-          'Successfully added a @type',
+          'Successfully added a @type.',
           array('@type' => $field_collection_item->bundle())));
       }
     }
