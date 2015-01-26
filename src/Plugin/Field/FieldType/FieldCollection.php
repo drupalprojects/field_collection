@@ -187,8 +187,11 @@ class FieldCollection extends FieldItemBase {
             }
           }
 
-          $field_collection_item->save();
+          if ($field_collection_item->isNew()) {
+            $field_collection_item->setHostEntity($host, FALSE);
+          }
 
+          $field_collection_item->save(TRUE);
           $this->value = $field_collection_item->id();
           $this->revision_id = $field_collection_item->getRevisionId();
         }

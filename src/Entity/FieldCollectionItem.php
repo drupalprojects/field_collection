@@ -91,7 +91,7 @@ class FieldCollectionItem extends ContentEntityBase {
    *   revision updates might be skipped. Use with care.
    */
   public function save($skip_host_save = FALSE) {
-    /* TODO
+    /* TODO: Need this.
     // Make sure we have a host entity during creation.
     if (!empty($this->is_new) && !(isset($this->hostEntityId) || isset($this->hostEntity) || isset($this->hostEntityRevisionId))) {
       throw new Exception("Unable to create a field collection item without a given host entity.");
@@ -104,12 +104,14 @@ class FieldCollectionItem extends ContentEntityBase {
     if ($skip_host_save) {
       return parent::save();
     }
-    /* TODO: Need this.
     else {
-      $host_entity = $this->hostEntity();
+      $host_entity = $this->getHost();
       if (!$host_entity) {
-        throw new Exception("Unable to save a field collection item without a valid reference to a host entity.");
+        throw new Exception('Unable to save a field collection item without ' .
+                            'a valid reference to a host entity.');
       }
+
+      /* TODO: Need this.
       // If this is creating a new revision, also do so for the host entity.
       if (!empty($this->revision) || !empty($this->is_new_revision)) {
         $host_entity->revision = TRUE;
@@ -117,20 +119,20 @@ class FieldCollectionItem extends ContentEntityBase {
           entity_revision_set_default($this->hostEntityType, $host_entity);
         }
       }
+
       // Set the host entity reference, so the item will be saved with the host.
       // @see field_collection_field_presave()
-      $delta = $this->delta();
+      $delta = $this->getDelta();
       if (isset($delta)) {
         $host_entity->{$this->field_name}[$this->langcode][$delta] = array('entity' => $this);
       }
       else {
         $host_entity->{$this->field_name}[$this->langcode][] =  array('entity' => $this);
       }
-      return entity_save($this->hostEntityType, $host_entity);
-    }
-    */
+      */
 
-    return parent::save();
+      return $host_entity->save();
+    }
   }
 
   /**
@@ -150,9 +152,9 @@ class FieldCollectionItem extends ContentEntityBase {
     $delta = $this->getDelta();
     if ($this->id() && isset($delta) &&
         NULL !== $this->getHost(TRUE) &&
-        isset($this->getHost()->{$this->field_name->value}[$delta]))
+        isset($this->getHost()->{$this->bundle()}[$delta]))
     {
-      unset($this->getHost()->{$this->field_name->value}[$delta]);
+      unset($this->getHost()->{$this->bundle()}[$delta]);
       $this->getHost()->save();
     }
   }
@@ -175,15 +177,14 @@ class FieldCollectionItem extends ContentEntityBase {
   }
 
   /**
-   * Determines the $delta of the reference pointing to this field collection
-   * item.
+   * Determines the $delta of the reference to this field collection item.
    */
   public function getDelta() {
     $host = $this->getHost();
 
-    if (($host = $this->getHost()) && isset($host->{$this->field_name->value}))
+    if (($host = $this->getHost()) && isset($host->{$this->bundle()}))
     {
-      foreach ($host->{$this->field_name->value} as $delta => $item) {
+      foreach ($host->{$this->bundle()} as $delta => $item) {
         if (isset($item->value) && $item->value == $this->id()) {
           return $delta;
         }
@@ -262,6 +263,7 @@ class FieldCollectionItem extends ContentEntityBase {
       if (!isset($this->host_id)) {
         $this->host_id = FALSE;
       }
+
       /*
       // We are create a new field collection for a non-default entity, thus
       // set archived to TRUE.
@@ -271,6 +273,7 @@ class FieldCollectionItem extends ContentEntityBase {
       }
       */
 
+      // Add the field collection item to its host.
       if ($create_link) {
         if (_field_collection_field_item_list_full($entity->{$this->bundle()}))
         {
