@@ -2,11 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\field_collection\Tests\FieldCollectionBasicTestCase.
+ * Definition of Drupal\field_collection\Tests\FieldCollectionBasicTestCase.
  */
 
 namespace Drupal\field_collection\Tests;
-
 use Drupal\simpletest\WebTestBase;
 
 // TODO: Test field collections with no fields or with no data in their fields
@@ -16,6 +15,8 @@ use Drupal\simpletest\WebTestBase;
 
 /**
  * Test basics.
+ *
+ * @group field_collection
  */
 class FieldCollectionBasicTestCase extends WebTestBase {
 
@@ -176,7 +177,8 @@ class FieldCollectionBasicTestCase extends WebTestBase {
       array('field_name' => $this->field_collection_name));
     $entity2->{$this->inner_field_name}->setValue(2);
 
-    $node->{$this->field_collection_name}[1]->field_collection_item = $entity2;
+    $node->{$this->field_collection_name}[1] =
+      array('field_collection_item' => $entity2);
     $node->save();
     $node = node_load($node->id(), TRUE);
 
@@ -369,7 +371,7 @@ class FieldCollectionBasicTestCase extends WebTestBase {
     $node = $this->drupalCreateNode(array('type' => 'article'));
 
     // Login with new user that has no privileges.
-    $user = $this->drupalCreateUser();
+    $user = $this->drupalCreateUser(array('access content'));
     $this->drupalLogin($user);
 
     // Make sure access is denied.
