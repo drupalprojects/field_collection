@@ -47,12 +47,11 @@ abstract class FieldCollectionLinksFormatter extends FormatterBase {
     if ($host->access('update', \Drupal::currentUser())) {
       $link = '<ul class="action-links action-links-field-collection-add"><li>';
 
-      $link .= _l(t('Add'),
+      $link .= \Drupal::l(t('Add'),
         Url::FromRoute('field_collection_item.add_page', array(
           'field_collection' => $this->fieldDefinition->getName(),
           'host_type' => $host->getEntityTypeId(),
-          'host_id' => $host->id(),))
-        ->toString());
+          'host_id' => $host->id(),)));
 
       $link .= '</li></ul>';
     }

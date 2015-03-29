@@ -39,7 +39,7 @@ use Drupal\Core\Entity\EntityInterface;
  *     "uuid" = "uuid"
  *   },
  *   links = {
- *     "edit-form" = "entity.field_collection.edit_form"
+ *     "edit-form" = "/admin/structure/field_collections/manage/{field_collection}"
  *   }
  * )
  */

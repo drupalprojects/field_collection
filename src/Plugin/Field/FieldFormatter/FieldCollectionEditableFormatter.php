@@ -43,7 +43,10 @@ class FieldCollectionEditableFormatter extends FieldCollectionLinksFormatter {
       }
     }
 
-    $cardinality = $this->fieldDefinition->getFieldStorageDefinition()->cardinality;
+    $cardinality = $this->fieldDefinition
+      ->getFieldStorageDefinition()
+      ->getCardinality();
+
     if ($cardinality == -1 || $count < $cardinality) {
       $render_items['#suffix'] = '<ul class="action-links action-links-field-collection-add"><li>';
       $render_items['#suffix'] .= $this->getAddLink($items->getEntity());

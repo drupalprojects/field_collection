@@ -63,7 +63,7 @@ class FieldCollectionListFormatter extends FieldCollectionLinksFormatter {
 
     $cardinality = $this->fieldDefinition
       ->getFieldStorageDefinition()
-      ->cardinality;
+      ->getCardinality();
 
     if ($cardinality == -1 || $count < $cardinality) {
       $element['#suffix'] =

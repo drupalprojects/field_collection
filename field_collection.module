@@ -13,6 +13,7 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\Url;
 
 /**
  * Implements hook_help().
@@ -103,8 +104,10 @@ function field_collection_form_field_ui_field_edit_form_alter(
       'value setting of each field that is part of the field collection. To ' .
       'do so, go to the <a href="!url">Manage fields</a> screen of the field ' .
       'collection.',
-      array('!url' => _url('admin/structure/field-collections/manage/' .
-                           $form['#field']->getName() . '/fields')));
+      array('!url' =>
+        Url::fromRoute('entity.field_collection.edit_form', array(
+          'field_collection' => $form['#field']->getName()))
+        ->setAbsolute()->toString()));
   }
 }
 

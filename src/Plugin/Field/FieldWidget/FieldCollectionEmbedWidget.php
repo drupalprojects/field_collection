@@ -75,7 +75,7 @@ class FieldCollectionEmbedWidget extends WidgetBase {
       '#field_name' => $field_name,
     );
 
-    if ($this->fieldDefinition->getFieldStorageDefinition()->cardinality == 1) {
+    if ($this->fieldDefinition->getFieldStorageDefinition()->getCardinality() == 1) {
       $element['#type'] = 'fieldset';
     }
 
