@@ -119,17 +119,20 @@ class FieldCollectionItem extends ContentEntityBase {
           entity_revision_set_default($this->hostEntityType, $host_entity);
         }
       }
+      */
 
       // Set the host entity reference, so the item will be saved with the host.
       // @see field_collection_field_presave()
       $delta = $this->getDelta();
+      $value = $host_entity->{$this->bundle()}->getValue();
       if (isset($delta)) {
-        $host_entity->{$this->field_name}[$this->langcode][$delta] = array('entity' => $this);
+        $value[$delta] =
+          array('field_collection_item' => $this);
       }
       else {
-        $host_entity->{$this->field_name}[$this->langcode][] =  array('entity' => $this);
+        $value[] = array('field_collection_item' => $this);
       }
-      */
+      $host_entity->{$this->bundle()}->setValue($value);
 
       return $host_entity->save();
     }
