@@ -49,8 +49,9 @@ use Drupal\Core\Language\Language;
  *   field_ui_base_route = "entity.field_collection.edit_form",
  *   permission_granularity = "bundle",
  *   links = {
- *     "admin-form" = "/field_collection_item/{field_collection_item}/edit",
- *     "canonical" = "/field_collection_item/{field_collection_item}"
+ *     "canonical" = "/field_collection_item/{field_collection_item}",
+ *     "delete-form" = "/field_collection_item/{field_collection_item}",
+ *     "edit-form" = "/field_collection_item/{field_collection_item}/edit"
  *   }
  * )
  */

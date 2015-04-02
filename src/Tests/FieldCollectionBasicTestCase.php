@@ -39,7 +39,7 @@ class FieldCollectionBasicTestCase extends WebTestBase {
    *
    * @var array
    */
-  protected static $modules = array('field_collection', 'node', 'devel',
+  protected static $modules = array('field_collection', 'node',
                                     'field', 'field_ui');
 
   public static function getInfo() {
