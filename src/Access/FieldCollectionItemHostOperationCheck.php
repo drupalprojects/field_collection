@@ -39,7 +39,7 @@ class FieldCollectionItemHostOperationCheck implements AccessInterface {
     return AccessResult::allowedIf(
       $field_collection_item &&
       $field_collection_item->getHost()->access($operation, $account))
-        ->cachePerRole();
+        ->cachePerPermissions();
   }
 
 }

@@ -74,6 +74,42 @@ class FieldCollectionItem extends ContentEntityBase {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public static function baseFieldDefinitions(EntityTypeInterface $entity_type)
+  {
+    $fields['item_id'] = BaseFieldDefinition::create('integer')
+      ->setLabel(t('Field collection item ID'))
+      ->setDescription(t('The field collection item ID.'))
+      ->setReadOnly(TRUE)
+      ->setSetting('unsigned', TRUE);
+
+    $fields['host_type'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Host\'s entity type'))
+      ->setDescription(
+        t('Type of entity for the field collection item\'s host.'))
+      ->setReadOnly(TRUE);
+
+    $fields['uuid'] = BaseFieldDefinition::create('uuid')
+      ->setLabel(t('UUID'))
+      ->setDescription(t('The field collection item UUID.'))
+      ->setReadOnly(TRUE);
+
+    $fields['revision_id'] = BaseFieldDefinition::create('integer')
+      ->setLabel(t('Revision ID'))
+      ->setDescription(t('The field collection item revision ID.'))
+      ->setReadOnly(TRUE);
+
+    $fields['field_name'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Type'))
+      ->setDescription(t('The field collection item field.'))
+      ->setSetting('target_type', 'field_collection')
+      ->setReadOnly(TRUE);
+
+    return $fields;
+  }
+
+  /**
    * Save the field collection item.
    *
    * By default, always save the host entity, so modules are able to react
@@ -150,6 +186,16 @@ class FieldCollectionItem extends ContentEntityBase {
   }
 
   /**
+   * Overrides \Drupal\Core\Entity\Entity::createDuplicate().
+   */
+  public function createDuplicate() {
+    $duplicate = parent::createDuplicate();
+    $duplicate->revision_id->value = NULL;
+    $duplicate->id->value = NULL;
+    return $duplicate;
+  }
+
+  /**
    * Deletes the host entity's reference of the field collection item.
    */
   protected function deleteHostEntityReference() {
@@ -164,16 +210,6 @@ class FieldCollectionItem extends ContentEntityBase {
   }
 
   /**
-   * Overrides \Drupal\Core\Entity\Entity::createDuplicate().
-   */
-  public function createDuplicate() {
-    $duplicate = parent::createDuplicate();
-    $duplicate->revision_id->value = NULL;
-    $duplicate->id->value = NULL;
-    return $duplicate;
-  }
-
-  /**
    * Overrides \Drupal\Core\Entity\Entity::getRevisionId().
    */
   public function getRevisionId() {
@@ -181,7 +217,22 @@ class FieldCollectionItem extends ContentEntityBase {
   }
 
   /**
-   * Determines the $delta of the reference to this field collection item.
+   * Overrides \Drupal\Core\Entity\Entity::uri().
+   */
+  public function uri() {
+    $ret = array(
+      'path' => 'field-collection-item/' . $this->id(),
+      'options' => array(
+        'entity_type' => $this->entityType,
+        'entity' => $this,
+      )
+    );
+
+    return $ret;
+  }
+
+  /**
+   * {@inheritdoc}
    */
   public function getDelta() {
     $host = $this->getHost();
@@ -202,22 +253,7 @@ class FieldCollectionItem extends ContentEntityBase {
   }
 
   /**
-   * Overrides \Drupal\Core\Entity\Entity::uri().
-   */
-  public function uri() {
-    $ret = array(
-      'path' => 'field-collection-item/' . $this->id(),
-      'options' => array(
-        'entity_type' => $this->entityType,
-        'entity' => $this,
-      )
-    );
-
-    return $ret;
-  }
-
-  /**
-   * Returns the host entity of this field collection item.
+   * {@inheritdoc}
    */
   public function getHost($reset = FALSE) {
     $entity_info = \Drupal::entityManager()
@@ -231,7 +267,7 @@ class FieldCollectionItem extends ContentEntityBase {
   }
 
   /**
-   * Returns the id of the host entity for this field collection item.
+   * {@inheritdoc}
    */
   public function getHostId() {
     if (!isset($this->host_id)) {
@@ -250,11 +286,7 @@ class FieldCollectionItem extends ContentEntityBase {
   }
 
   /**
-   * Sets the host entity. Only possible during creation of a item.
-   *
-   * @param $create_link
-   *   (optional) Whether a field-item linking the host entity to the field
-   *   collection item should be created.
+   * {@inheritdoc}
    */
   public function setHostEntity($entity, $create_link = TRUE) {
     if ($this->isNew()) {
@@ -299,45 +331,7 @@ class FieldCollectionItem extends ContentEntityBase {
   /**
    * {@inheritdoc}
    */
-  public static function baseFieldDefinitions(EntityTypeInterface $entity_type)
-  {
-    $fields['item_id'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Field collection item ID'))
-      ->setDescription(t('The field collection item ID.'))
-      ->setReadOnly(TRUE)
-      ->setSetting('unsigned', TRUE);
-
-    $fields['host_type'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Host\'s entity type'))
-      ->setDescription(
-        t('Type of entity for the field collection item\'s host.'))
-      ->setReadOnly(TRUE);
-
-    $fields['uuid'] = BaseFieldDefinition::create('uuid')
-      ->setLabel(t('UUID'))
-      ->setDescription(t('The field collection item UUID.'))
-      ->setReadOnly(TRUE);
-
-    $fields['revision_id'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Revision ID'))
-      ->setDescription(t('The field collection item revision ID.'))
-      ->setReadOnly(TRUE);
-
-    $fields['field_name'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Type'))
-      ->setDescription(t('The field collection item field.'))
-      ->setSetting('target_type', 'field_collection')
-      ->setReadOnly(TRUE);
-
-    return $fields;
-  }
-
-  /**
-   * Determine whether a field collection item entity is empty.
-   *
-   * Checks individual collection-fields.
-   */
-  function isEmpty() {
+  public function isEmpty() {
     $is_empty = TRUE;
 
     foreach ($this->getIterator() as $field) {

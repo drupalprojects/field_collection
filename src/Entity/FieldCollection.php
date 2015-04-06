@@ -12,7 +12,7 @@ use Drupal\Core\Entity\Annotation\EntityType;
 use Drupal\Core\Annotation\Translation;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
-use Drupal\Core\Entity\EntityInterface;
+use Drupal\field_collection\FieldCollectionInterface;
 
 /**
  * Defines the Field collection configuration entity.
@@ -43,7 +43,7 @@ use Drupal\Core\Entity\EntityInterface;
  *   }
  * )
  */
-class FieldCollection extends ConfigEntityBundleBase implements ConfigEntityInterface, EntityInterface {
+class FieldCollection extends ConfigEntityBundleBase implements FieldCollectionInterface {
 
   /**
    * The machine name of this field collection.
@@ -77,4 +77,5 @@ class FieldCollection extends ConfigEntityBundleBase implements ConfigEntityInte
     parent::__construct($values, $entity_type);
     $this->entityType = 'field_collection';
   }
+
 }
