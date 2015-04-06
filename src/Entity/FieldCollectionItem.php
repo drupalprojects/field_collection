@@ -74,6 +74,25 @@ class FieldCollectionItem extends ContentEntityBase {
   }
 
   /**
+   * Overrides \Drupal\Core\Entity\label().
+   */
+  public function label() {
+    $field_label = $this->getHost()
+      ->getFieldDefinition($this->bundle())
+      ->label();
+
+    if (empty($field_label)) {
+      return parent::label();
+    }
+    else {
+      return t('@label @delta of @host',
+               array('@label' => $field_label,
+                     '@delta' => $this->getDelta(),
+                     '@host' => $this->getHost()->label()));
+    }
+  }
+
+  /**
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type)

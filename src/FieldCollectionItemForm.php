@@ -21,7 +21,9 @@ class FieldCollectionItemForm extends ContentEntityForm {
     $field_collection_item = $this->entity;
 
     if ($this->operation == 'edit') {
-      $form['#title'] = $this->t('<em>Edit a @type</em>', array('@type' => $field_collection_item->bundle()));
+      $form['#title'] = $this->t(
+        '<em>Edit @type</em>',
+        array('@type' => $field_collection_item->label()));
     }
 
     /*

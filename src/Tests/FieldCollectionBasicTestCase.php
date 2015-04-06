@@ -407,29 +407,34 @@ class FieldCollectionBasicTestCase extends WebTestBase {
     $this->assertText($edit["$this->inner_field_name[0][value]"],
                       'Added field value is shown.');
 
+    $field_collection_item = field_collection_item_load(1);
+
     // Test field collection item edit form.
     $edit["$this->inner_field_name[0][value]"] = rand();
     $this->drupalPostForm('field_collection_item/1/edit', $edit, t('Save'));
 
     $this->assertText(t('Successfully edited @field.',
-                        array('@field' => $this->field_collection_name)),
+                        array('@field' => $field_collection_item->label())),
                       'Field collection saved.');
 
-    /*
     $this->assertText($edit["$this->inner_field_name[0][value]"],
                       'Field collection has been edited.');
 
-    $this->drupalGet('field-collection/field-test-collection/1');
-    $this->assertText($edit['field_text[und][0][value]'], "Field collection can be viewed.");
+    $this->drupalGet('field_collection_item/1');
+    $this->assertText($edit["$this->inner_field_name[0][value]"],
+                      'Field collection can be viewed.');
 
+    /*
     // Add further 3 items, so we have reached 4 == maxium cardinality.
-    $this->drupalPost($path, $edit, t('Save'));
-    $this->drupalPost($path, $edit, t('Save'));
-    $this->drupalPost($path, $edit, t('Save'));
+    $this->drupalPostForm('field_collection_item/1/edit', $edit, t('Save'));
+    $this->drupalPostForm('field_collection_item/1/edit', $edit, t('Save'));
+    $this->drupalPostForm('field_collection_item/1/edit', $edit, t('Save'));
+
     // Make sure adding doesn't work any more as we have restricted cardinality
     // to 1.
     $this->drupalGet($path);
-    $this->assertText(t('Too many items.'), 'Maxium cardinality has been reached.');
+    $this->assertText(t('Too many items.'),
+                      'Maxium cardinality has been reached.');
 
     $this->drupalPost('field-collection/field-test-collection/1/delete', array(), t('Delete'));
     $this->drupalGet($path);

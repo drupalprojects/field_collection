@@ -36,7 +36,7 @@ use Drupal\field_collection\FieldCollectionInterface;
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "label",
- *     "uuid" = "uuid"
+ *     "uuid" = "uuid",
  *   },
  *   links = {
  *     "edit-form" = "/admin/structure/field_collections/manage/{field_collection}"
