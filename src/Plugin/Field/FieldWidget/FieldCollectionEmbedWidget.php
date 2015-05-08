@@ -16,6 +16,7 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Url;
+use Drupal\Core\Render\Element;
 
 const FIELD_COLLECTION_EMBED_WIDGET =
   'Drupal\\field_collection\\Plugin\\Field\\FieldWidget\\FieldCollectionEmbedWidget';
@@ -183,7 +184,7 @@ class FieldCollectionEmbedWidget extends WidgetBase {
                                                   &$required_elements)
   {
     // Recurse through all children.
-    foreach (element_children($element) as $key) {
+    foreach (Element::children($element) as $key) {
       if (isset($element[$key]) && $element[$key]) {
         static::collectRequiredElements($element[$key], $required_elements);
       }

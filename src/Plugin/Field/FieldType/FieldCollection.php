@@ -98,7 +98,7 @@ class FieldCollection extends FieldItemBase {
       $field_collection_item =
         entity_create('field_collection_item',
                       array('field_name' => $this->getFieldDefinition()
-                        ->field_name));
+                        ->getName()));
 
       // TODO: Uncomment or delete
       /*

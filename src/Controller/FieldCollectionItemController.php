@@ -7,7 +7,7 @@
 
 namespace Drupal\field_collection\Controller;
 
-use Drupal\Component\Utility\String;
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\field_collection\Entity\FieldCollection;
 use Drupal\field_collection\Entity\FieldCollectionItem;
@@ -97,7 +97,7 @@ class FieldCollectionItemController extends ControllerBase {
    *   The page title.
    */
   public function pageTitle(FieldCollectionItem $field_collection_item) {
-    return String::checkPlain($this->entityManager()
+    return SafeMarkup::checkPlain($this->entityManager()
       ->getTranslationFromContext($field_collection_item)
       ->label());
   }
