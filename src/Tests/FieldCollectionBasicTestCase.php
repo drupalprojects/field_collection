@@ -62,44 +62,17 @@ class FieldCollectionBasicTestCase extends WebTestBase {
     // Create a field_collection field to use for the tests.
     $this->field_collection_name = 'field_test_collection';
 
-    $this->field_collection_storage =
+    $this->field_collection_field_storage =
       entity_create('field_storage_config', array(
         'field_name' => $this->field_collection_name,
         'entity_type' => 'node',
         'type' => 'field_collection',
         'cardinality' => 4,));
 
-    $this->field_collection_storage->save();
+    $this->field_collection_field_storage->save();
 
-    $this->field_collection_definition = array(
-      'field_name' => $this->field_collection_name,
-      'entity_type' => 'node',
-      'bundle' => 'article',
-      'field_storage' => $this->field_collection_storage,
-      'label' => $this->randomMachineName() . '_label',
-      'description' => $this->randomMachineName() . '_description',
-      'settings' => array(),
-
-      // TODO: Figure out if this is still needed
-      /*
-      'weight' => mt_rand(0, 127),
-      'widget' => array(
-        'type' => 'hidden',
-        'label' => 'Test',
-        'settings' => array(),
-      ),
-      */
-    );
-
-    $this->field_collection =
-      entity_create('field_config', $this->field_collection_definition);
-
-    $this->field_collection->save();
-
-    entity_get_display('node', 'article', 'default')
-      ->setComponent($this->field_collection_name, array(
-        'type' => 'field_collection_editable',))
-      ->save();
+    $this->field_collection_field =
+      $this->addFieldCollectionFieldToContentType('article');
 
     // Create an integer field inside the field_collection.
     $this->inner_field_name = 'field_inner';
@@ -138,10 +111,37 @@ class FieldCollectionBasicTestCase extends WebTestBase {
   }
 
   /**
+   * Helper function for adding the field collection field to a content type.
+   */
+  protected function addFieldCollectionFieldToContentType($content_type) {
+    $this->field_collection_definition = array(
+      'field_name' => $this->field_collection_name,
+      'entity_type' => 'node',
+      'bundle' => $content_type,
+      'field_storage' => $this->field_collection_field_storage,
+      'label' => $this->randomMachineName() . '_label',
+      'description' => $this->randomMachineName() . '_description',
+      'settings' => array(),
+    );
+
+    $field_config = entity_create('field_config',
+                                  $this->field_collection_definition);
+
+    $field_config->save();
+
+    entity_get_display('node', $content_type, 'default')
+      ->setComponent($this->field_collection_name, array(
+        'type' => 'field_collection_editable',))
+      ->save();
+
+    return $field_config;
+  }
+
+  /**
    * Helper for creating a new node with a field collection item.
    */
-  protected function createNodeWithFieldCollection() {
-    $node = $this->drupalCreateNode(array('type' => 'article'));
+  protected function createNodeWithFieldCollection($content_type) {
+    $node = $this->drupalCreateNode(array('type' => $content_type));
 
     // Manually create a field_collection.
     $entity = entity_create('field_collection_item', array(
@@ -158,78 +158,93 @@ class FieldCollectionBasicTestCase extends WebTestBase {
    * Tests CRUD.
    */
   public function testCRUD() {
-    list ($node, $entity) = $this->createNodeWithFieldCollection();
+    list ($node, $field_collection_item) =
+      $this->createNodeWithFieldCollection('article');
+
     $node = node_load($node->id(), TRUE);
 
     $this->assertEqual(
-      $entity->id(),
+      $field_collection_item->id(),
       $node->{$this->field_collection_name}->value,
       'A field_collection_item has been successfully created and referenced.');
 
     $this->assertEqual(
-      $entity->revision_id->value,
+      $field_collection_item->revision_id->value,
       $node->{$this->field_collection_name}->revision_id,
       'The new field_collection_item has the correct revision.');
 
     // Test adding an additional field_collection_item.
-    $entity2 = entity_create(
+    $field_collection_item_2 = entity_create(
       'field_collection_item',
       array('field_name' => $this->field_collection_name));
-    $entity2->{$this->inner_field_name}->setValue(2);
+
+    $field_collection_item_2->{$this->inner_field_name}->setValue(2);
 
     $node->{$this->field_collection_name}[1] =
-      array('field_collection_item' => $entity2);
+      array('field_collection_item' => $field_collection_item_2);
+
     $node->save();
     $node = node_load($node->id(), TRUE);
 
     $this->assertTrue(
-      !empty($entity2->id()) && !empty($entity2->getRevisionId()),
-      'Another field_collection has been saved.');
+      !empty($field_collection_item_2->id()) &&
+      !empty($field_collection_item_2->getRevisionId()),
+      'Another field_collection_item has been saved.');
 
-    $this->assertEqual($entity->id(),
+    $this->assertTrue(
+      count(entity_load_multiple('field_collection_item', NULL, TRUE)) == 2,
+      'field_collection_items have been stored.');
+
+    $this->assertEqual($field_collection_item->id(),
                        $node->{$this->field_collection_name}->value,
                        'Existing reference has been kept during update.');
 
     $this->assertEqual(
-      $entity->getRevisionId(),
+      $field_collection_item->getRevisionId(),
       $node->{$this->field_collection_name}[0]->revision_id,
       'Revision: Existing reference has been kept during update.');
 
-    $this->assertEqual($entity2->id(),
-                       $node->{$this->field_collection_name}[1]->value,
-                       'New field_collection has been properly referenced.');
+    $this->assertEqual(
+      $field_collection_item_2->id(),
+      $node->{$this->field_collection_name}[1]->value,
+      'New field_collection_item has been properly referenced.');
 
     $this->assertEqual(
-      $entity2->getRevisionId(),
+      $field_collection_item_2->getRevisionId(),
       $node->{$this->field_collection_name}[1]->revision_id,
-      'Revision: New field_collection has been properly referenced.');
+      'Revision: New field_collection_item has been properly referenced.');
 
-    // Make sure deleting the field_collection removes the reference.
-    $entity2->delete();
+    // Make sure deleting the field collection item removes the reference.
+    $field_collection_item_2->delete();
     $node = node_load($node->id(), TRUE);
+
     $this->assertTrue(!isset($node->{$this->field_collection_name}[1]),
                       'Reference correctly deleted.');
 
     // Make sure field_collections are removed during deletion of the host.
     $node->delete();
+
     $this->assertTrue(
       entity_load_multiple('field_collection_item', NULL, TRUE) === array(),
-      'Field collections are deleted when the host is deleted.');
+      'field_collection_item deleted when the host is deleted.');
 
     // Try deleting nodes with collections without any values.
     $node = $this->drupalCreateNode(array('type' => 'article'));
     $node->delete();
+
     $this->assertTrue(node_load($node->id(), NULL, TRUE) == FALSE,
                       'Node without collection values deleted.');
 
     // Test creating a field collection entity with a not-yet saved host entity.
     $node = entity_create('node', array('type' => 'article'));
-    $entity = entity_create(
+
+    $field_collection_item = entity_create(
       'field_collection_item',
       array('field_name' => $this->field_collection_name));
-    $entity->{$this->inner_field_name}->setValue(3);
-    $entity->setHostEntity($node);
-    $entity->save();
+
+    $field_collection_item->{$this->inner_field_name}->setValue(3);
+    $field_collection_item->setHostEntity($node);
+    $field_collection_item->save();
 
     // Now the node should have been saved with the collection and the link
     // should have been established.
@@ -245,14 +260,17 @@ class FieldCollectionBasicTestCase extends WebTestBase {
     // Again, test creating a field collection with a not-yet saved host entity,
     // but this time save both entities via the host.
     $node = entity_create('node', array('type' => 'article'));
-    $entity = entity_create(
+
+    $field_collection_item = entity_create(
       'field_collection_item',
       array('field_name' => $this->field_collection_name));
-    $entity->{$this->inner_field_name}->setValue(4);
-    $entity->setHostEntity($node);
+
+    $field_collection_item->{$this->inner_field_name}->setValue(4);
+    $field_collection_item->setHostEntity($node);
     $node->save();
 
-    $this->assertTrue(!empty($entity->id()) && !empty($entity->getRevisionId()),
+    $this->assertTrue(!empty($field_collection_item->id()) &&
+                      !empty($field_collection_item->getRevisionId()),
                       'Collection has been saved with the host.');
 
     $this->assertTrue(
@@ -365,6 +383,68 @@ class FieldCollectionBasicTestCase extends WebTestBase {
   }
 
   /**
+   * Test deleting the field corrosponding to a field collection.
+   */
+  public function testFieldDeletion() {
+    // Create a separate content type with the field collection field.
+    $this->drupalCreateContentType(array('type' => 'test_content_type',
+                                         'name' => 'Test content type'));
+
+    $field_collection_field_1 = $this->field_collection_field;
+
+    $field_collection_field_2 =
+      $this->addFieldCollectionFieldToContentType('test_content_type');
+
+    list($node_1, $field_collection_item_1) =
+      $this->createNodeWithFieldCollection('article');
+
+    list($node_2, $field_collection_item_2) =
+      $this->createNodeWithFieldCollection('test_content_type');
+
+    $field_collection_field_id_1 =
+      $field_collection_field_1->id();
+
+    $field_collection_field_id_2 =
+      $field_collection_field_2->id();
+
+    $field_collection_item_id_1 = $field_collection_item_1->id();
+    $field_collection_item_id_2 = $field_collection_item_2->id();
+    $field_storage_config_id = $this->field_collection_field_storage->id();
+
+    $field_collection_field_1->delete();
+
+    $this->assertNotNull(
+      entity_load('field_collection', $this->field_collection_name, TRUE),
+      'field_collection config entity still exists.');
+
+    $this->assertNull(
+      entity_load('field_collection_item', $field_collection_item_id_1, TRUE),
+      'field_collection_item deleted with the field_collection field.');
+
+    $this->assertNotNull(
+      entity_load('field_collection_item', $field_collection_item_id_2, TRUE),
+      'Other field_collection_item still exists.');
+
+    $this->assertNotNull(
+      entity_load('field_storage_config', $field_storage_config_id, TRUE),
+      'field_storage_config still exists.');
+
+    $field_collection_field_2->delete();
+
+    $this->assertNull(
+      entity_load('field_collection_item', $field_collection_item_id_2, TRUE),
+      'Other field_collection_item deleted.');
+
+    $this->assertNull(
+      entity_load('field_storage_config', $field_storage_config_id, TRUE),
+      'field_storage_config deleted.');
+
+    $this->assertNull(
+      entity_load('field_collection', $this->field_collection_name, TRUE),
+      'field_collection config entity deleted.');
+  }
+
+  /**
    * Make sure the basic UI and access checks are working.
    */
   public function testBasicUI() {
@@ -421,6 +501,7 @@ class FieldCollectionBasicTestCase extends WebTestBase {
                       'Field collection has been edited.');
 
     $this->drupalGet('field_collection_item/1');
+
     $this->assertText($edit["$this->inner_field_name[0][value]"],
                       'Field collection can be viewed.');
 

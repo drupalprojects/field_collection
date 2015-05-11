@@ -14,6 +14,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Url;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
 
 /**
  * Implements hook_help().
@@ -60,7 +61,7 @@ function field_collection_item_revision_load($revision_id) {
 }
 
 /**
- * Implements hook_ENTITY_TYPE_insert().
+ * Implements hook_ENTITY_TYPE_insert() for field_storage_config.
  *
  * Create a field collection bundle when a new field collection field is made.
  */
@@ -86,6 +87,31 @@ function field_collection_field_storage_config_insert(EntityInterface $field) {
     // https://drupal.org/node/2183531
     //
     // variable_set('menu_rebuild_needed', TRUE);
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_delete() for field_config.
+ *
+ * Delete field collection item entities when their corrosponding field
+ * collection field is deleted.
+ *
+ * TODO: Causing white screen as the entities attempt to remove their references
+ * from their hosts which has already been done.
+ *
+ * TODO: Perform the operation in batches because it will fail when there is
+ * too much data.  See @link field_purge Field API bulk data deletion @endlink
+ * for inspiration.
+ */
+function field_collection_field_config_delete(EntityInterface $field) {
+  if ($field->getType() == 'field_collection') {
+    $field_collection_item_ids = db_query(
+      'SELECT `entity_id` ' .
+      'FROM {' . $field->getTargetEntityTypeId() .
+             '__' . $field->getName() . '} ' .
+      'WHERE `bundle` = \'' . $field->getTargetBundle() . '\' ')
+        ->fetchCol();
+    entity_delete_multiple('field_collection_item', $field_collection_item_ids);
   }
 }
 
@@ -140,5 +166,7 @@ function _field_collection_field_item_list_full(
 
   $total = $field_list->count();
 
-  return ($cardinality <= $total);
+  return (
+    $cardinality != FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED &&
+    $cardinality <= $total);
 }

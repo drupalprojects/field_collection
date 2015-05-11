@@ -256,8 +256,7 @@ class FieldCollectionItem extends ContentEntityBase {
   public function getDelta() {
     $host = $this->getHost();
 
-    if (($host = $this->getHost()) && isset($host->{$this->bundle()}))
-    {
+    if (($host = $this->getHost()) && isset($host->{$this->bundle()})) {
       foreach ($host->{$this->bundle()} as $delta => $item) {
         if (isset($item->value) && $item->value == $this->id()) {
           return $delta;
