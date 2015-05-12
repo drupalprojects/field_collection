@@ -129,8 +129,12 @@ function field_collection_field_config_predelete(EntityInterface $field) {
  * Implements hood_form_FORM_ID_alter() for field_ui_field_edit_form.
  *
  * Remove default value from field collection field settings.
+ *
+ * TODO: Uncomment after figuring out how to get the field type since
+ * $form['#field'] has been removed.
  */
-function field_collection_form_field_ui_field_edit_form_alter(
+/*
+function field_collection_form_field_config_edit_form_alter(
   &$form, FormStateInterface $form_state)
 {
   if ($form['#field']->getType() == 'field_collection') {
@@ -146,6 +150,7 @@ function field_collection_form_field_ui_field_edit_form_alter(
         ->setAbsolute()->toString()));
   }
 }
+*/
 
 /**
  * Sort function for items order.
