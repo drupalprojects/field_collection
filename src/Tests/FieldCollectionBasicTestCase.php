@@ -401,21 +401,11 @@ class FieldCollectionBasicTestCase extends WebTestBase {
     list($node_2, $field_collection_item_2) =
       $this->createNodeWithFieldCollection('test_content_type');
 
-    $field_collection_field_id_1 =
-      $field_collection_field_1->id();
-
-    $field_collection_field_id_2 =
-      $field_collection_field_2->id();
-
     $field_collection_item_id_1 = $field_collection_item_1->id();
     $field_collection_item_id_2 = $field_collection_item_2->id();
     $field_storage_config_id = $this->field_collection_field_storage->id();
 
     $field_collection_field_1->delete();
-
-    $this->assertNotNull(
-      entity_load('field_collection', $this->field_collection_name, TRUE),
-      'field_collection config entity still exists.');
 
     $this->assertNull(
       entity_load('field_collection_item', $field_collection_item_id_1, TRUE),
@@ -426,18 +416,14 @@ class FieldCollectionBasicTestCase extends WebTestBase {
       'Other field_collection_item still exists.');
 
     $this->assertNotNull(
-      entity_load('field_storage_config', $field_storage_config_id, TRUE),
-      'field_storage_config still exists.');
+      entity_load('field_collection', $this->field_collection_name, TRUE),
+      'field_collection config entity still exists.');
 
     $field_collection_field_2->delete();
 
     $this->assertNull(
       entity_load('field_collection_item', $field_collection_item_id_2, TRUE),
-      'Other field_collection_item deleted.');
-
-    $this->assertNull(
-      entity_load('field_storage_config', $field_storage_config_id, TRUE),
-      'field_storage_config deleted.');
+      'Other field_collection_item deleted with it\'s field.');
 
     $this->assertNull(
       entity_load('field_collection', $this->field_collection_name, TRUE),
@@ -543,4 +529,5 @@ class FieldCollectionBasicTestCase extends WebTestBase {
     $this->drupalGet("node/$node->nid/revisions");
   */
   }
+
 }

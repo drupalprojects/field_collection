@@ -91,19 +91,30 @@ function field_collection_field_storage_config_insert(EntityInterface $field) {
 }
 
 /**
- * Implements hook_ENTITY_TYPE_delete() for field_config.
+ * Implements hook_ENTITY_TYPE_delete() for field_storage_config.
+ *
+ * Delete the field collection bundle when it's corrosponding field no longer
+ * exists in any bundle.
+ */
+function field_collection_field_storage_config_delete(EntityInterface $field) {
+  if ($field->getType() == 'field_collection') {
+    $field_collection_bundle =
+      entity_load('field_collection', $field->getName());
+    $field_collection_bundle->delete();
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_predelete() for field_config.
  *
  * Delete field collection item entities when their corrosponding field
  * collection field is deleted.
- *
- * TODO: Causing white screen as the entities attempt to remove their references
- * from their hosts which has already been done.
  *
  * TODO: Perform the operation in batches because it will fail when there is
  * too much data.  See @link field_purge Field API bulk data deletion @endlink
  * for inspiration.
  */
-function field_collection_field_config_delete(EntityInterface $field) {
+function field_collection_field_config_predelete(EntityInterface $field) {
   if ($field->getType() == 'field_collection') {
     $field_collection_item_ids = db_query(
       'SELECT `entity_id` ' .

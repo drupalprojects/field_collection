@@ -239,5 +239,6 @@ class FieldCollection extends FieldItemBase {
     }
     return TRUE;
   }
+
 }
 
