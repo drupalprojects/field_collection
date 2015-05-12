@@ -36,8 +36,7 @@ function field_collection_help($route_name, RouteMatchInterface $route_match) {
  *   The field collection item entity or FALSE.
  */
 function field_collection_item_load($item_id, $reset = FALSE) {
-  $result = field_collection_item_load_multiple(array($item_id), $reset);
-  return $result ? reset($result) : FALSE;
+  return entity_load('field_collection_item', $item_id, $reset);
 }
 
 /**

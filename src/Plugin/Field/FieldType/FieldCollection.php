@@ -87,7 +87,9 @@ class FieldCollection extends FieldItemBase {
     elseif (isset($this->value)) {
       // By default always load the default revision, so caches get used.
       $field_collection_item = field_collection_item_load($this->value);
-      if ($field_collection_item->getRevisionId() != $this->revision_id) {
+      if ($field_collection_item !== NULL &&
+          $field_collection_item->getRevisionId() != $this->revision_id)
+      {
         // A non-default revision is a referenced, so load this one.
         $field_collection_item =
           field_collection_item_revision_load($this->revision_id);
@@ -111,7 +113,10 @@ class FieldCollection extends FieldItemBase {
   }
 
   public function delete() {
-    $this->getFieldCollectionItem()->delete();
+    $field_collection_item = $this->getFieldCollectionItem();
+    if ($field_collection_item !== NULL) {
+      $field_collection_item->delete();
+    }
     parent::delete();
   }
 
