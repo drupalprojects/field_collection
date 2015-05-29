@@ -11,6 +11,8 @@ use Drupal\simpletest\WebTestBase;
 
 /**
  * Test case for rules integration.
+ *
+ * @group field_collection
  */
 class FieldCollectionRulesIntegrationTest extends WebTestBase {
 
