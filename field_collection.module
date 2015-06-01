@@ -15,6 +15,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\field_collection\Entity\FieldCollectionItem;
 
 /**
  * Implements hook_help().
@@ -36,7 +37,7 @@ function field_collection_help($route_name, RouteMatchInterface $route_match) {
  *   The field collection item entity or FALSE.
  */
 function field_collection_item_load($item_id, $reset = FALSE) {
-  return entity_load('field_collection_item', $item_id, $reset);
+  return FieldCollectionItem::load($item_id);
 }
 
 /**
@@ -46,7 +47,7 @@ function field_collection_item_load($item_id, $reset = FALSE) {
  *   An array of field collection item entities.
  */
 function field_collection_item_load_multiple($ids = array(), $reset = FALSE) {
-  return entity_load_multiple('field_collection_item', $ids, $reset);
+  return FieldCollectionItem::loadMultiple($ids);
 }
 
 /**
