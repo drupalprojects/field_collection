@@ -134,24 +134,25 @@ function field_collection_field_config_predelete(EntityInterface $field) {
  * TODO: Uncomment after figuring out how to get the field type since
  * $form['#field'] has been removed.
  */
-/*
 function field_collection_form_field_config_edit_form_alter(
   &$form, FormStateInterface $form_state)
 {
-  if ($form['#field']->getType() == 'field_collection') {
-    unset($form['field']['default_value']['widget']);
-    $form['field']['default_value']['#description'] = t(
+  if ($form_state->getFormObject()->getEntity()->getType() ==
+    'field_collection')
+  {
+    unset($form['default_value']['widget']);
+    $form['default_value']['#description'] = t(
       'To specify a default value, configure it via the regular default ' .
       'value setting of each field that is part of the field collection. To ' .
-      'do so, go to the <a href="!url">Manage fields</a> screen of the field ' .
-      'collection.',
+      'do so, go to the <a href="!url/fields">Manage fields</a> screen of ' .
+      'the field collection.',
       array('!url' =>
         Url::fromRoute('entity.field_collection.edit_form', array(
-          'field_collection' => $form['#field']->getName()))
+          'field_collection' =>
+            $form_state->getFormObject()->getEntity()->getName()))
         ->setAbsolute()->toString()));
   }
 }
-*/
 
 /**
  * Sort function for items order.
