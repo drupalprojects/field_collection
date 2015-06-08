@@ -49,7 +49,7 @@ class FieldCollectionRulesIntegrationTest extends WebTestBase {
    *
    * @var array
    */
-  protected static $modules = array('field_collection', 'rules');
+  public static $modules = array('field_collection', 'rules');
 
   public static function getInfo() {
     return array(
