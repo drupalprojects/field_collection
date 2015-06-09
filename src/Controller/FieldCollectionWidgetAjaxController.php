@@ -75,14 +75,12 @@ class FieldCollectionWidgetAjaxController extends FormAjaxController {
 
     $output = drupal_render($form);
     drupal_process_attached($form);
-    $js = _drupal_add_js();
-    $settings = $js['drupalSettings']['data'];
-
+    // TODO: Preserve javascript.  See https://www.drupal.org/node/2502743 .
     $response = new AjaxResponse();
     foreach ($commands as $command) {
       $response->addCommand($command, TRUE);
     }
-    return $response->addCommand(new ReplaceCommand(NULL, $output, $settings));
+    return $response->addCommand(new ReplaceCommand(NULL, $output));
   }
 
 }

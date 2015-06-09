@@ -132,9 +132,13 @@ function field_collection_field_config_predelete(EntityInterface $field) {
  * Remove the save button since there are no options to save.
  */
 function field_collection_form_field_collection_edit_form_alter(
-  &$form, FormStateInterface$form_state)
+  &$form, FormStateInterface $form_state)
 {
   unset($form['actions']);
+}
+
+function field_collection_page_attachments(array &$attachments) {
+  $s = \Drupal::service('user.permissions');
 }
 
 /**

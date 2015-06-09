@@ -5,8 +5,7 @@ field_collection.overview_field_collections:
     _controller: '\Drupal\Core\Entity\Controller\EntityListController::listing'
     entity_type: 'field_collection'
   requirements:
-    _permission: 'access content'
-    #_permission: 'administer field_collection_item fields'
+    _permission: 'administer field_collection_item fields'
 
 entity.field_collection.edit_form:
   path: '/admin/structure/field_collections/manage/{field_collection}'
@@ -29,10 +28,7 @@ field_collection_item.revision_show:
     _controller: '\Drupal\field_collection\Controller\FieldCollectionItemController::revisionShow'
     _title_callback: '\Drupal\field_collection\Controller\FieldCollectionItemController::revisionPageTitle'
   requirements:
-    # TODO: View revision permission isn't a standard entity permission but
-    # could possibly take the code from NodeRevisionAccessCheck to make an
-    # entity generic revision permission checker.
-    _permission: 'administer content types'
+    _access_field_collection_item_host_revisions: 'view'
 
 field_collection_item.add_page:
   path: '/field_collection_item/add/{field_collection}/{host_type}/{host_id}'
@@ -40,7 +36,7 @@ field_collection_item.add_page:
     _controller: '\Drupal\field_collection\Controller\FieldCollectionItemController::add'
     _title_callback: '\Drupal\field_collection\Controller\FieldCollectionItemController::addPageTitle'
   requirements:
-    _access_field_collection_item_add_to_host: 'probably need something here'
+    _access_field_collection_item_host: 'update'
 
 entity.field_collection_item.edit_form:
   path: '/field_collection_item/{field_collection_item}/edit'
@@ -63,6 +59,8 @@ field_collection.ajax_remove:
   options:
     _theme: ajax_base_page
   requirements:
-    # TODO: Edit permission for host? No security?
-    # It doesn't make a change just updates some form input.
+    # TODO: Set to permission to edit host.
+    #
+    # It should be ok as it is because the function doesn't make any change to
+    # the data, it just updates some form input.
     _permission: 'access content'
