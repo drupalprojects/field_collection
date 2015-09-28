@@ -129,10 +129,12 @@ class FieldCollectionBasicTestCase extends WebTestBase {
 
     $field_config->save();
 
+    /*
     entity_get_display('node', $content_type, 'default')
       ->setComponent($this->field_collection_name, array(
         'type' => 'field_collection_editable',))
       ->save();
+    */
 
     return $field_config;
   }
@@ -236,7 +238,7 @@ class FieldCollectionBasicTestCase extends WebTestBase {
                       'Node without collection values deleted.');
 
     // Test creating a field collection entity with a not-yet saved host entity.
-    $node = entity_create('node', array('type' => 'article'));
+    $node = $this->drupalCreateNode(array('type' => 'article'));
 
     $field_collection_item = entity_create(
       'field_collection_item',
@@ -259,7 +261,7 @@ class FieldCollectionBasicTestCase extends WebTestBase {
 
     // Again, test creating a field collection with a not-yet saved host entity,
     // but this time save both entities via the host.
-    $node = entity_create('node', array('type' => 'article'));
+    $node = $this->drupalCreateNode(array('type' => 'article'));
 
     $field_collection_item = entity_create(
       'field_collection_item',
