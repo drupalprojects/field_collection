@@ -28,8 +28,10 @@ class FieldCollectionListFormatter extends FieldCollectionLinksFormatter {
 
   /**
    * {@inheritdoc}
+   *
+   * TODO: Use $langcode.
    */
-  public function viewElements(FieldItemListInterface $items) {
+  public function viewElements(FieldItemListInterface $items, $langcode) {
     $element = array();
     $settings = $this->getFieldSettings();
     $count = 0; // TODO: Is there a better way to get an accurate count of the
