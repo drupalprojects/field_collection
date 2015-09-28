@@ -51,16 +51,3 @@ entity.field_collection_item.delete_form:
     _entity_form: 'field_collection_item.delete'
   requirements:
     _access_field_collection_item_host: 'update'
-
-field_collection.ajax_remove:
-  path: '/field_collection/ajax/remove'
-  defaults:
-    _controller: '\Drupal\field_collection\Controller\FieldCollectionWidgetAjaxController::remove'
-  options:
-    _theme: ajax_base_page
-  requirements:
-    # TODO: Set to permission to edit host.
-    #
-    # It should be ok as it is because the function doesn't make any change to
-    # the data, it just updates some form input.
-    _permission: 'access content'

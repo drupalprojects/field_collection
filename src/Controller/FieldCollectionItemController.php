@@ -131,7 +131,7 @@ class FieldCollectionItemController extends ControllerBase {
       ->loadRevision($field_collection_item_revision);
 
     $field_collection_item_view_controller =
-      new EntityViewController($this->entityManager);
+      new EntityViewController($this->entityManager, \Drupal::service('renderer'));
 
     $page = $field_collection_item_view_controller
       ->view($field_collection_item);

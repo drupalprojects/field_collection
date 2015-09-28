@@ -7,15 +7,14 @@
 
 namespace Drupal\field_collection\Plugin\Field\FieldWidget;
 
+use Drupal\Core\Ajax\AjaxResponse;
+use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
-use Symfony\Component\Validator\ConstraintViolationInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\field_collection\Entity\FieldCollectionItem;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\Unicode;
-use Drupal\Core\Url;
 use Drupal\Core\Render\Element;
 
 const FIELD_COLLECTION_EMBED_WIDGET =
@@ -131,8 +130,6 @@ class FieldCollectionEmbedWidget extends WidgetBase {
       $options = array('query' => array(
         'element_parents' => implode('/', $element['#parents']),),);
 
-      $url = Url::fromRoute('field_collection.ajax_remove');
-
       $element['actions'] = array(
         '#type' => 'actions',
         'remove_button' => array(
@@ -146,7 +143,7 @@ class FieldCollectionEmbedWidget extends WidgetBase {
             'removeSubmit')),
           '#limit_validation_errors' => array(),
           '#ajax' => array(
-            'url' => $url->setOptions($options),
+            'callback' => array($this, 'ajaxRemove'),
             'options' => $options,
             'effect' => 'fade',
             'wrapper' => $field_name . '-ajax-wrapper',
@@ -389,4 +386,35 @@ class FieldCollectionEmbedWidget extends WidgetBase {
     $form_state->setRebuild();
   }
 
+  /**
+   * Ajax callback to remove a field collection from a multi-valued field.
+   *
+   * @param array $form
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *
+   * @return \Drupal\Core\Ajax\AjaxResponse
+   *   An AjaxResponse object.
+   */
+  function ajaxRemove(array $form, FormStateInterface &$form_state) {
+    // Process user input. $form and $form_state are modified in the process.
+    //\Drupal::formBuilder()->processForm($form['#form_id'], $form, $form_state);
+
+    // Retrieve the element to be rendered.
+    $trigger = $form_state->getTriggeringElement();
+    $form_parents = explode('/', $trigger['#ajax']['options']['query']['element_parents']);
+    $address = array_slice($form_parents, 0, -1);
+    $form = NestedArray::getValue($form, $address);
+    $status_messages = array('#theme' => 'status_messages');
+
+    $renderer = \Drupal::service('renderer');
+    $form['#prefix'] = empty($form['#prefix']) ?
+      $renderer->render($status_messages) :
+      $form['#prefix'] . $renderer->render($status_messages);
+
+    $output = $renderer->render($form);
+    drupal_process_attached($form);
+    // TODO: Preserve javascript.  See https://www.drupal.org/node/2502743 .
+    $response = new AjaxResponse();
+    return $response->addCommand(new ReplaceCommand(NULL, $output));
+  }
 }
