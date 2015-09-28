@@ -129,12 +129,12 @@ class FieldCollectionBasicTestCase extends WebTestBase {
 
     $field_config->save();
 
-    /*
-    entity_get_display('node', $content_type, 'default')
+    \Drupal::entityManager()
+      ->getStorage('entity_view_display')
+      ->load("node.$content_type.default")
       ->setComponent($this->field_collection_name, array(
         'type' => 'field_collection_editable',))
       ->save();
-    */
 
     return $field_config;
   }

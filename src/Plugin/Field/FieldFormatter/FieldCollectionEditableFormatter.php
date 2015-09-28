@@ -27,7 +27,7 @@ class FieldCollectionEditableFormatter extends FieldCollectionLinksFormatter {
   /**
    * {@inheritdoc}
    */
-  public function viewElements(FieldItemListInterface $items) {
+  public function viewElements(FieldItemListInterface $items, $langcode) {
     $count = 0; // TODO: Is there a better way to get an accurate count of the
                 // items from the FileItemList that doesn't count blank items?
     $render_items = array();
