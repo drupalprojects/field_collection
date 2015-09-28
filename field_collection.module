@@ -156,9 +156,9 @@ function field_collection_form_field_config_edit_form_alter(
     $form['default_value']['#description'] = t(
       'To specify a default value, configure it via the regular default ' .
       'value setting of each field that is part of the field collection. To ' .
-      'do so, go to the <a href="!url/fields">Manage fields</a> screen of ' .
+      'do so, go to the <a href=":url/fields">manage fields</a> screen of ' .
       'the field collection.',
-      array('!url' =>
+      array(':url' =>
         Url::fromRoute('entity.field_collection.edit_form', array(
           'field_collection' =>
             $form_state->getFormObject()->getEntity()->getName()))
