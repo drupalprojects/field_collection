@@ -120,9 +120,17 @@ class FieldCollection extends FieldItemBase {
     parent::delete();
   }
 
-  public function insert() {
-    if ($field_collection_item = $this->getFieldCollectionItem()) {
+  // TODO: Format comment
+  /**
+   * Care about removed field collection items.
+   *
+   * Support saving field collection items in @code $item['entity'] @endcode. This
+   * may be used to seamlessly create field collection items during host-entity
+   * creation or to save changes to the host entity and its collections at once.
+   */
+  public function preSave() {
 
+    if ($field_collection_item = $this->getFieldCollectionItem()) {
       // TODO: Handle node cloning
       /*
       if (!empty($host_entity->is_new) && empty($entity->is_new)) {
@@ -137,6 +145,66 @@ class FieldCollection extends FieldItemBase {
       }
       */
 
+      // TODO: Handle deleted items
+      /*
+      $field_name = $this->getFieldDefinition()->field_name;
+      $host_original = $host->original;
+      $items_original = !empty($host_original->$field_name) ? $host_original->$field_name : array();
+      $original_by_id = array_flip(field_collection_field_item_to_ids($items_original));
+      foreach ($items as &$item) {
+      */
+
+
+      // TODO: Handle deleted items
+      /*
+        unset($original_by_id[$item['value']]);
+      }
+      // If there are removed items, care about deleting the item entities.
+      if ($original_by_id) {
+        $ids = array_flip($original_by_id);
+        // If we are creating a new revision, the old-items should be kept but get
+        // marked as archived now.
+        if (!empty($host_entity->revision)) {
+          db_update('field_collection_item')
+            ->fields(array('archived' => 1))
+            ->condition('item_id', $ids, 'IN')
+            ->execute();
+        }
+        else {
+          // Delete unused field collection items now.
+          foreach (field_collection_item_load_multiple($ids) as $un_item) {
+            $un_item->updateHostEntity($host_entity);
+            $un_item->deleteRevision(TRUE);
+          }
+        }
+      }
+      */
+
+      $this->newHostRevision = $this->getEntity()->isNewRevision();
+
+      // If the host entity is saved as new revision, do the same for the item.
+      if ($this->newHostRevision) {
+        $host = $this->getEntity();
+
+        $field_collection_item->setNewRevision();
+
+        // TODO: Verify for D8, may not be necessary
+        /*
+        // Without this cache clear entity_revision_is_default will
+        // incorrectly return false here when creating a new published revision
+        if (!isset($cleared_host_entity_cache)) {
+          list($entity_id) = entity_extract_ids($host_entity_type, $host_entity);
+          entity_get_controller($host_entity_type)->resetCache(array($entity_id));
+          $cleared_host_entity_cache = true;
+        }
+        */
+
+        if ($host->isDefaultRevision()) {
+          $field_collection_item->isDefaultRevision(TRUE);
+          //$entity->archived = FALSE;
+        }
+      }
+
       if ($field_collection_item->isNew()) {
         $field_collection_item->setHostEntity($this->getEntity(), FALSE);
       }
@@ -145,91 +213,6 @@ class FieldCollection extends FieldItemBase {
       $this->value = $field_collection_item->id();
       $this->revision_id = $field_collection_item->getRevisionId();
     }
-  }
-
-  // TODO: Format comment
-  /**
-   * Care about removed field collection items.
-   *
-   * Support saving field collection items in @code $item['entity'] @endcode. This
-   * may be used to seamlessly create field collection items during host-entity
-   * creation or to save changes to the host entity and its collections at once.
-   */
-  public function update() {
-    $host = $this->getEntity();
-
-    // TODO: Handle deleted items
-    /*
-    $field_name = $this->getFieldDefinition()->field_name;
-    $host_original = $host->original;
-    $items_original = !empty($host_original->$field_name) ? $host_original->$field_name : array();
-    $original_by_id = array_flip(field_collection_field_item_to_ids($items_original));
-    foreach ($items as &$item) {
-    */
-
-      // In case the entity has been changed / created, save it and set the id.
-      // If the host entity creates a new revision, save new item-revisions as
-      // well.
-        if ($field_collection_item = $this->getFieldCollectionItem()) {
-          // If the host entity is saved as new revision, do the same for the item.
-          if ($this->newHostRevision) {
-            $field_collection_item->setNewRevision();
-
-            // TODO: Verify for D8, may not be necessary
-            /*
-            // Without this cache clear entity_revision_is_default will
-            // incorrectly return false here when creating a new published revision
-            if (!isset($cleared_host_entity_cache)) {
-              list($entity_id) = entity_extract_ids($host_entity_type, $host_entity);
-              entity_get_controller($host_entity_type)->resetCache(array($entity_id));
-              $cleared_host_entity_cache = true;
-            }
-            */
-
-            if ($host->isDefaultRevision()) {
-              $field_collection_item->isDefaultRevision(TRUE);
-              //$entity->archived = FALSE;
-            }
-          }
-
-          if ($field_collection_item->isNew()) {
-            $field_collection_item->setHostEntity($host, FALSE);
-          }
-
-          $field_collection_item->save(TRUE);
-          $this->value = $field_collection_item->id();
-          $this->revision_id = $field_collection_item->getRevisionId();
-        }
-
-    // TODO: Handle deleted items
-    /*
-      unset($original_by_id[$item['value']]);
-    }
-    // If there are removed items, care about deleting the item entities.
-    if ($original_by_id) {
-      $ids = array_flip($original_by_id);
-      // If we are creating a new revision, the old-items should be kept but get
-      // marked as archived now.
-      if (!empty($host_entity->revision)) {
-        db_update('field_collection_item')
-          ->fields(array('archived' => 1))
-          ->condition('item_id', $ids, 'IN')
-          ->execute();
-      }
-      else {
-        // Delete unused field collection items now.
-        foreach (field_collection_item_load_multiple($ids) as $un_item) {
-          $un_item->updateHostEntity($host_entity);
-          $un_item->deleteRevision(TRUE);
-        }
-      }
-    }
-    */
-
-  }
-
-  public function preSave() {
-    $this->newHostRevision = $this->getEntity()->isNewRevision();
   }
 
   /**
