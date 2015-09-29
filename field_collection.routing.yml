@@ -36,7 +36,7 @@ field_collection_item.add_page:
     _controller: '\Drupal\field_collection\Controller\FieldCollectionItemController::add'
     _title_callback: '\Drupal\field_collection\Controller\FieldCollectionItemController::addPageTitle'
   requirements:
-    _access_field_collection_item_host: 'update'
+    _access_add_field_collection_item_to_host: '{host_type}:{host_id}'
 
 entity.field_collection_item.edit_form:
   path: '/field_collection_item/{field_collection_item}/edit'
