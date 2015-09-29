@@ -11,8 +11,10 @@ use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Routing\Access\AccessInterface;
 use Drupal\Core\Session\AccountInterface;
-use Symfony\Component\Routing\Route;
 use Drupal\field_collection\Entity\FieldCollectionItem;
+use Drupal\Core\Language\LanguageInterface;
+
+use Symfony\Component\Routing\Route;
 
 /**
  * Determines access to operations on the field collection item's host.
@@ -54,7 +56,7 @@ class FieldCollectionItemHostAddOperationCheck implements AccessInterface {
     $host = $this->entityManager->getStorage($host_type)->load($host_id);
 
     return $access_control_handler->access(
-      $host, 'update', LANGCODE_DEFAULT, NULL, TRUE);
+      $host, 'update', LanguageInterface::LANGCODE_DEFAULT, NULL, TRUE);
   }
 
 }
