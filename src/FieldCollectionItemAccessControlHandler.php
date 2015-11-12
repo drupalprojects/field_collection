@@ -31,10 +31,8 @@ class FieldCollectionItemAccessControlHandler extends EntityAccessControlHandler
    * @return \Drupal\Core\Access\AccessResultInterface
    *   The access result.
    */
-  protected function checkAccess(EntityInterface $entity, $operation, $langcode,
-                                 AccountInterface $account)
-  {
-    $result = parent::checkAccess($entity, $operation, $langcode, $account);
+  protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
+    $result = parent::checkAccess($entity, $operation, $account);
     if ($result->isForbidden()) {
       return $result;
     }
