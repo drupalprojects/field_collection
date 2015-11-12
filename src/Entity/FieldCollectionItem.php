@@ -12,6 +12,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\Core\Language\Language;
+use Drupal\field_collection\FieldCollectionItemInterface;
 
 /**
  * Defines the field collection item entity class.
@@ -55,7 +56,7 @@ use Drupal\Core\Language\Language;
  *   }
  * )
  */
-class FieldCollectionItem extends ContentEntityBase {
+class FieldCollectionItem extends ContentEntityBase implements FieldCollectionItemInterface {
 
   // TODO: Should references to $this->host_type (a base field) use a getter?
 
