@@ -3,7 +3,7 @@ description: 'Provides a field collection field, to which any number of fields c
 package: Field types
 version: VERSION
 core: 8.x
-configure: admin/structure/field_collections
+configure: field_collection.overview_field_collections
 type: module
 dependencies:
   - field
