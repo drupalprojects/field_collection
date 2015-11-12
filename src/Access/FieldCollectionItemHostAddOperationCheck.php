@@ -8,13 +8,9 @@
 namespace Drupal\field_collection\Access;
 
 use Drupal\Core\Entity\EntityManagerInterface;
-use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Routing\Access\AccessInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\field_collection\Entity\FieldCollectionItem;
-use Drupal\Core\Language\LanguageInterface;
-
-use Symfony\Component\Routing\Route;
 
 /**
  * Determines access to operations on the field collection item's host.
@@ -22,20 +18,20 @@ use Symfony\Component\Routing\Route;
 class FieldCollectionItemHostAddOperationCheck implements AccessInterface {
 
   /**
-   * The entity manager.
+   * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityManagerInterface
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityManager;
+  protected $entityTypeManager;
 
   /**
    * Constructs a FieldCollectionItemHostAddOperationCheck object.
    *
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
-   *   The entity manager.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    */
-  public function __construct(EntityManagerInterface $entity_manager) {
-    $this->entityManager = $entity_manager;
+  public function __construct(EntityTypeManagerInterface $entity_type_manager) {
+    $this->entityTypeManager = $entity_type_manager;
   }
 
   /**
@@ -50,13 +46,11 @@ class FieldCollectionItemHostAddOperationCheck implements AccessInterface {
    *   A \Drupal\Core\Access\AccessInterface constant value.
    */
   public function access(AccountInterface $account, $host_type, $host_id) {
-    $access_control_handler =
-      $this->entityManager->getAccessControlHandler($host_type);
+    $access_control_handler = $this->entityTypeManager->getAccessControlHandler($host_type);
 
-    $host = $this->entityManager->getStorage($host_type)->load($host_id);
+    $host = $this->entityTypeManager->getStorage($host_type)->load($host_id);
 
-    return $access_control_handler->access(
-      $host, 'update', LanguageInterface::LANGCODE_DEFAULT, NULL, TRUE);
+    return $access_control_handler->access($host, 'update', $account, TRUE);
   }
 
 }
