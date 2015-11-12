@@ -412,7 +412,6 @@ class FieldCollectionEmbedWidget extends WidgetBase {
       $form['#prefix'] . $renderer->render($status_messages);
 
     $output = $renderer->render($form);
-    drupal_process_attached($form);
     // TODO: Preserve javascript.  See https://www.drupal.org/node/2502743 .
     $response = new AjaxResponse();
     return $response->addCommand(new ReplaceCommand(NULL, $output));
