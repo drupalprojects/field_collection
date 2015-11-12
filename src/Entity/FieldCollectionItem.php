@@ -163,8 +163,7 @@ class FieldCollectionItem extends ContentEntityBase {
     else {
       $host_entity = $this->getHost();
       if (!$host_entity) {
-        throw new Exception('Unable to save a field collection item without ' .
-                            'a valid reference to a host entity.');
+        throw new \Exception('Unable to save a field collection item without a valid reference to a host entity');
       }
 
       /* TODO: Need this.
