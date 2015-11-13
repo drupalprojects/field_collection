@@ -5,6 +5,7 @@
  * Module implementing field collection field type.
  */
 
+use Drupal\field\FieldStorageConfigInterface;
 use Drupal\field_collection\Entity\FieldCollection;
 use Drupal\Core\Extension\ModuleHandler;
 use Drupal\Core\Entity\EntityInterface;
@@ -45,13 +46,19 @@ function field_collection_item_revision_load($revision_id) {
  *
  * Create a field collection bundle when a new field collection field is made.
  */
-function field_collection_field_storage_config_insert(EntityInterface $field) {
+function field_collection_field_storage_config_insert(FieldStorageConfigInterface $field) {
   if ($field->getType() == 'field_collection') {
-    $field_collection = new FieldCollection();
-    $field_collection->set('label', $field->getName());
-    $field_collection->set('id', $field->getName());
-    $field_collection->enforceIsNew();
-    $field_collection->save();
+    $field_collection_exists = \Drupal::entityQuery('field_collection')
+      ->condition('id', $field->getName())
+      ->count()
+      ->execute();
+    if (!$field_collection_exists) {
+      $field_collection = new FieldCollection();
+      $field_collection->set('label', $field->getName());
+      $field_collection->set('id', $field->getName());
+      $field_collection->enforceIsNew();
+      $field_collection->save();
+    }
 
     // TODO: entity_invoke_bundle_hook in post save like in nodeType ?
 
