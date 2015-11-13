@@ -6,6 +6,11 @@
  */
 
 namespace Drupal\field_collection\Tests;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\field_collection\Entity\FieldCollection;
+use Drupal\field_collection\Entity\FieldCollectionItem;
+use Drupal\node\Entity\Node;
 use Drupal\simpletest\WebTestBase;
 
 // TODO: Test field collections with no fields or with no data in their fields
@@ -45,6 +50,9 @@ class FieldCollectionBasicTestCase extends WebTestBase {
 
   protected $field_collection_field_storage;
 
+  /**
+   * @var \Drupal\Core\Field\FieldConfigInterface
+   */
   protected $field_collection_field;
 
   protected $inner_field_name;
@@ -57,19 +65,24 @@ class FieldCollectionBasicTestCase extends WebTestBase {
 
   protected $field_collection_definition;
 
+  /**
+   * @var \Drupal\Core\Entity\EntityStorageInterface
+   */
+  protected $nodeStorage;
+
   public function setUp() {
     parent::setUp();
+    $this->nodeStorage = \Drupal::entityTypeManager()->getStorage('node');
 
     // Create Article node type.
     if ($this->profile != 'standard') {
-      $this->drupalCreateContentType(array('type' => 'article',
-                                           'name' => 'Article'));
+      $this->drupalCreateContentType(['type' => 'article', 'name' => 'Article']);
     }
 
     // Create a field_collection field to use for the tests.
     $this->field_collection_name = 'field_test_collection';
 
-    $this->field_collection_field_storage = entity_create('field_storage_config', [
+    $this->field_collection_field_storage = FieldStorageConfig::create([
       'field_name' => $this->field_collection_name,
       'entity_type' => 'node',
       'type' => 'field_collection',
@@ -83,7 +96,7 @@ class FieldCollectionBasicTestCase extends WebTestBase {
     // Create an integer field inside the field_collection.
     $this->inner_field_name = 'field_inner';
 
-    $this->inner_field_storage = entity_create('field_storage_config', [
+    $this->inner_field_storage = FieldStorageConfig::create([
       'field_name' => $this->inner_field_name,
       'entity_type' => 'field_collection_item',
       'type' => 'integer',
@@ -101,7 +114,7 @@ class FieldCollectionBasicTestCase extends WebTestBase {
       'settings' => [],
     ];
 
-    $this->inner_field = entity_create('field_config', $this->inner_field_definition);
+    $this->inner_field = FieldConfig::create($this->inner_field_definition);
 
     $this->inner_field->save();
 
@@ -128,11 +141,11 @@ class FieldCollectionBasicTestCase extends WebTestBase {
       'settings' => [],
     ];
 
-    $field_config = entity_create('field_config', $this->field_collection_definition);
+    $field_config = FieldConfig::create($this->field_collection_definition);
 
     $field_config->save();
 
-    \Drupal::entityManager()
+    \Drupal::entityTypeManager()
       ->getStorage('entity_view_display')
       ->load("node.$content_type.default")
       ->setComponent($this->field_collection_name, array('type' => 'field_collection_editable'))
@@ -148,7 +161,7 @@ class FieldCollectionBasicTestCase extends WebTestBase {
     $node = $this->drupalCreateNode(array('type' => $content_type));
 
     // Manually create a field_collection.
-    $entity = entity_create('field_collection_item', ['field_name' => $this->field_collection_name]);
+    $entity = FieldCollectionItem::create(['field_name' => $this->field_collection_name]);
 
     $entity->{$this->inner_field_name}->setValue(1);
     $entity->setHostEntity($node);
@@ -161,27 +174,28 @@ class FieldCollectionBasicTestCase extends WebTestBase {
    * Tests CRUD.
    */
   public function testCRUD() {
+    /** @var \Drupal\node\NodeInterface $node */
+    /** @var \Drupal\field_collection\FieldCollectionItemInterface $field_collection_item */
     list ($node, $field_collection_item) = $this->createNodeWithFieldCollection('article');
-
-    $node = node_load($node->id(), TRUE);
 
     $this->assertEqual($field_collection_item->id(), $node->{$this->field_collection_name}->value);
 
     $this->assertEqual($field_collection_item->revision_id->value, $node->{$this->field_collection_name}->revision_id);
 
     // Test adding an additional field_collection_item.
-    $field_collection_item_2 = entity_create('field_collection_item', array('field_name' => $this->field_collection_name));
+    $field_collection_item_2 = FieldCollectionItem::create(['field_name' => $this->field_collection_name]);
 
     $field_collection_item_2->{$this->inner_field_name}->setValue(2);
 
     $node->{$this->field_collection_name}[1] = array('field_collection_item' => $field_collection_item_2);
 
     $node->save();
-    $node = node_load($node->id(), TRUE);
+    $this->nodeStorage->resetCache([$node->id()]);
+    $node = Node::load($node->id());
 
     $this->assertTrue(!empty($field_collection_item_2->id()) && !empty($field_collection_item_2->getRevisionId()));
 
-    $this->assertEqual(count(entity_load_multiple('field_collection_item', NULL, TRUE)), 2);
+    $this->assertEqual(count(FieldCollectionItem::loadMultiple()), 2);
 
     $this->assertEqual($field_collection_item->id(), $node->{$this->field_collection_name}->value);
 
@@ -193,25 +207,28 @@ class FieldCollectionBasicTestCase extends WebTestBase {
 
     // Make sure deleting the field collection item removes the reference.
     $field_collection_item_2->delete();
-    $node = node_load($node->id(), TRUE);
+    $this->nodeStorage->resetCache([$node->id()]);
+    $node = Node::load($node->id());
 
     $this->assertTrue(!isset($node->{$this->field_collection_name}[1]));
 
     // Make sure field_collections are removed during deletion of the host.
     $node->delete();
 
-    $this->assertIdentical(entity_load_multiple('field_collection_item', NULL, TRUE), array());
+    $this->assertIdentical(FieldCollectionItem::loadMultiple(), array());
 
     // Try deleting nodes with collections without any values.
     $node = $this->drupalCreateNode(array('type' => 'article'));
     $node->delete();
 
-    $this->assertTrue(node_load($node->id(), NULL, TRUE) == FALSE);
+    $this->nodeStorage->resetCache([$node->id()]);
+    $node = Node::load($node->id());
+    $this->assertFalse($node);
 
     // Test creating a field collection entity with a not-yet saved host entity.
     $node = $this->drupalCreateNode(array('type' => 'article'));
 
-    $field_collection_item = entity_create('field_collection_item', array('field_name' => $this->field_collection_name));
+    $field_collection_item = FieldCollectionItem::create(['field_name' => $this->field_collection_name]);
 
     $field_collection_item->{$this->inner_field_name}->setValue(3);
     $field_collection_item->setHostEntity($node);
@@ -227,7 +244,7 @@ class FieldCollectionBasicTestCase extends WebTestBase {
     // but this time save both entities via the host.
     $node = $this->drupalCreateNode(array('type' => 'article'));
 
-    $field_collection_item = entity_create('field_collection_item', array('field_name' => $this->field_collection_name));
+    $field_collection_item = FieldCollectionItem::create(array('field_name' => $this->field_collection_name));
 
     $field_collection_item->{$this->inner_field_name}->setValue(4);
     $field_collection_item->setHostEntity($node);
@@ -240,7 +257,7 @@ class FieldCollectionBasicTestCase extends WebTestBase {
   }
 
   /**
-   * Test deleting the field corrosponding to a field collection.
+   * Test deleting the field corresponding to a field collection.
    */
   public function testFieldDeletion() {
     // Create a separate content type with the field collection field.
@@ -250,27 +267,28 @@ class FieldCollectionBasicTestCase extends WebTestBase {
 
     $field_collection_field_2 = $this->addFieldCollectionFieldToContentType('test_content_type');
 
-    list($node_1, $field_collection_item_1) = $this->createNodeWithFieldCollection('article');
+    list(, $field_collection_item_1) = $this->createNodeWithFieldCollection('article');
 
-    list($node_2, $field_collection_item_2) = $this->createNodeWithFieldCollection('test_content_type');
+    list(, $field_collection_item_2) = $this->createNodeWithFieldCollection('test_content_type');
 
+    /** @var \Drupal\field_collection\FieldCollectionItemInterface $field_collection_item_1 */
     $field_collection_item_id_1 = $field_collection_item_1->id();
+    /** @var \Drupal\field_collection\FieldCollectionItemInterface $field_collection_item_2 */
     $field_collection_item_id_2 = $field_collection_item_2->id();
-    $field_storage_config_id = $this->field_collection_field_storage->id();
 
     $field_collection_field_1->delete();
 
-    $this->assertNull(entity_load('field_collection_item', $field_collection_item_id_1, TRUE), 'field_collection_item deleted with the field_collection field.');
+    $this->assertNull(FieldCollectionItem::load($field_collection_item_id_1), 'field_collection_item deleted with the field_collection field.');
 
-    $this->assertNotNull(entity_load('field_collection_item', $field_collection_item_id_2, TRUE), 'Other field_collection_item still exists.');
+    $this->assertNotNull(FieldCollectionItem::load($field_collection_item_id_2), 'Other field_collection_item still exists.');
 
-    $this->assertNotNull(entity_load('field_collection', $this->field_collection_name, TRUE), 'field_collection config entity still exists.');
+    $this->assertNotNull(FieldCollection::load($this->field_collection_name), 'field_collection config entity still exists.');
 
     $field_collection_field_2->delete();
 
-    $this->assertNull(entity_load('field_collection_item', $field_collection_item_id_2, TRUE), 'Other field_collection_item deleted with it\'s field.');
+    $this->assertNull(FieldCollectionItem::load($field_collection_item_id_2), 'Other field_collection_item deleted with it\'s field.');
 
-    $this->assertNull(entity_load('field_collection', $this->field_collection_name, TRUE), 'field_collection config entity deleted.');
+    $this->assertNull(FieldCollection::load($this->field_collection_name), 'field_collection config entity deleted.');
   }
 
   /**
@@ -312,7 +330,7 @@ class FieldCollectionBasicTestCase extends WebTestBase {
 
     $this->assertText($edit["$this->inner_field_name[0][value]"]);
 
-    $field_collection_item = field_collection_item_load(1);
+    $field_collection_item = FieldCollectionItem::load(1);
 
     // Test field collection item edit form.
     $edit["$this->inner_field_name[0][value]"] = rand();
