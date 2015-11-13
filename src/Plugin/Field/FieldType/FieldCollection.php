@@ -65,9 +65,7 @@ class FieldCollection extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
-  public static function propertyDefinitions(
-    FieldStorageDefinitionInterface $field_definition)
-  {
+  public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     $properties['value'] = DataDefinition::create('integer')
       ->setLabel(t('Field collection item ID'))
       ->setSetting('unsigned', TRUE)
@@ -88,20 +86,14 @@ class FieldCollection extends FieldItemBase {
     elseif (isset($this->value)) {
       // By default always load the default revision, so caches get used.
       $field_collection_item = FieldCollectionItem::load($this->value);
-      if ($field_collection_item !== NULL &&
-          $field_collection_item->getRevisionId() != $this->revision_id)
-      {
+      if ($field_collection_item !== NULL && $field_collection_item->getRevisionId() != $this->revision_id) {
         // A non-default revision is a referenced, so load this one.
-        $field_collection_item =
-          field_collection_item_revision_load($this->revision_id);
+        $field_collection_item = field_collection_item_revision_load($this->revision_id);
       }
       return $field_collection_item;
     }
     elseif ($create) {
-      $field_collection_item =
-        entity_create('field_collection_item',
-                      array('field_name' => $this->getFieldDefinition()
-                        ->getName()));
+      $field_collection_item = entity_create('field_collection_item', array('field_name' => $this->getFieldDefinition()->getName()));
 
       // TODO: Uncomment or delete
       /*

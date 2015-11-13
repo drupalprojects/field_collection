@@ -54,34 +54,23 @@ class FieldCollectionItemHostRevisionsOperationCheck implements AccessInterface 
    * @return string
    *   A \Drupal\Core\Access\AccessInterface constant value.
    */
-  public function access(Route $route,
-                         AccountInterface $account,
-                         $field_collection_item_revision = NULL,
-                         FieldCollectionItem $field_collection_item = NULL)
-  {
+  public function access(Route $route, AccountInterface $account, $field_collection_item_revision = NULL, FieldCollectionItem $field_collection_item = NULL) {
     if ($field_collection_item_revision) {
-      $field_collection_item =
-        field_collection_item_revision_load($field_collection_item_revision);
+      $field_collection_item = field_collection_item_revision_load($field_collection_item_revision);
     }
-    $permissions = $this->permissionHandler->getPermissions();
-    $operation =
-      $route->getRequirement('_access_field_collection_item_host_revisions');
+    $operation = $route->getRequirement('_access_field_collection_item_host_revisions');
 
     $host = $field_collection_item->getHost();
 
     if ($host->getEntityType()->id() == 'node') {
-      return AccessResult::allowedIf($account->hasPermission(
-        $operation . ' ' . $host->getType() . ' revisions'));
+      return AccessResult::allowedIf($account->hasPermission($operation . ' ' . $host->getType() . ' revisions'));
     }
     else if ($host->getEntityType()->id() == 'field_collection_item') {
       return $this->access($route, $account, $host->revision_id, $host);
     }
     // TODO: Other revisionable entity types?
     else {
-      return AccessResult::allowedIf(
-        $field_collection_item &&
-        $field_collection_item->getHost()->access($operation, $account))
-          ->cachePerPermissions();
+      return AccessResult::allowedIf($field_collection_item && $field_collection_item->getHost()->access($operation, $account))->cachePerPermissions();
     }
   }
 

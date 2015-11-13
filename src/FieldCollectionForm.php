@@ -29,8 +29,7 @@ class FieldCollectionForm extends EntityForm {
       // this form but set up a message for it just in case.
       $form['#title'] = SafeMarkup::checkPlain(
         $this->t('Add field collection'));
-      drupal_set_message(t('To add a field collection create a field of type ' .
-                         'field collection on the host entity type.'));
+      drupal_set_message(t('To add a field collection create a field of type field collection on the host entity type.'));
     }
     else {
       $form['#title'] = $this->t('Edit %label field collection',
@@ -40,13 +39,11 @@ class FieldCollectionForm extends EntityForm {
       // host bundles.
       $form['help'] = array(
         '#type' => 'markup',
-        '#markup' => t(
-         '<p>There are no options to edit for field collection bundles.</p>' .
-         '<p><a href="@url">Manage fields inside this collection.</a></p>',
-         array('@url' =>
-           \Drupal::url('entity.field_collection_item.field_ui_fields', array(
-             $field_collection->getEntityTypeId() => $field_collection->id()
-           )))));
+        '#markup' => t('<p>There are no options to edit for field collection bundles.</p><p><a href="@url">Manage fields inside this collection.</a></p>', array(
+          '@url' => \Drupal::url('entity.field_collection_item.field_ui_fields', array(
+            $field_collection->getEntityTypeId() => $field_collection->id()
+          )),
+        )));
     }
 
     return $form;

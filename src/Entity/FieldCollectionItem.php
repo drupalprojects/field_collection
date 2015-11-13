@@ -96,8 +96,7 @@ class FieldCollectionItem extends ContentEntityBase implements FieldCollectionIt
   /**
    * {@inheritdoc}
    */
-  public static function baseFieldDefinitions(EntityTypeInterface $entity_type)
-  {
+  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields['item_id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Field collection item ID'))
       ->setDescription(t('The field collection item ID.'))
@@ -182,8 +181,7 @@ class FieldCollectionItem extends ContentEntityBase implements FieldCollectionIt
       $delta = $this->getDelta();
       $value = $host_entity->{$this->bundle()}->getValue();
       if (isset($delta)) {
-        $value[$delta] =
-          array('field_collection_item' => $this);
+        $value[$delta] = array('field_collection_item' => $this);
       }
       else {
         $value[] = array('field_collection_item' => $this);
@@ -219,10 +217,7 @@ class FieldCollectionItem extends ContentEntityBase implements FieldCollectionIt
    */
   protected function deleteHostEntityReference() {
     $delta = $this->getDelta();
-    if ($this->id() && isset($delta) &&
-        NULL !== $this->getHost(TRUE) &&
-        isset($this->getHost()->{$this->bundle()}[$delta]))
-    {
+    if ($this->id() && isset($delta) && NULL !== $this->getHost(TRUE) && isset($this->getHost()->{$this->bundle()}[$delta])) {
       unset($this->getHost()->{$this->bundle()}[$delta]);
       $this->getHost()->save();
     }
@@ -261,9 +256,7 @@ class FieldCollectionItem extends ContentEntityBase implements FieldCollectionIt
         if (isset($item->value) && $item->value == $this->id()) {
           return $delta;
         }
-        elseif (isset($item->field_collection_item) &&
-                $item->field_collection_item === $this)
-        {
+        elseif (isset($item->field_collection_item) && $item->field_collection_item === $this) {
           return $delta;
         }
       }
@@ -293,10 +286,8 @@ class FieldCollectionItem extends ContentEntityBase implements FieldCollectionIt
       $table = $entity_info->get('base_table') . '__' . $this->bundle();
 
       if (db_table_exists($table)) {
-        $host_id_results = db_query(
-          'SELECT `entity_id` FROM {' . $table . '} ' .
-          'WHERE `' . $this->bundle() . '_value` = ' . $this->id())
-            ->fetchCol();
+        // @todo This is now how you interpolate variables into a db_query().
+        $host_id_results = db_query('SELECT `entity_id` FROM {' . $table . '} ' . 'WHERE `' . $this->bundle() . '_value` = ' . $this->id())->fetchCol();
         $this->host_id = reset($host_id_results);
       }
       else {
@@ -333,20 +324,17 @@ class FieldCollectionItem extends ContentEntityBase implements FieldCollectionIt
 
       // Add the field collection item to its host.
       if ($create_link) {
-        if (_field_collection_field_item_list_full($entity->{$this->bundle()}))
-        {
+        if (_field_collection_field_item_list_full($entity->{$this->bundle()})) {
           drupal_set_message(t('Field is already full.'), 'error');
         }
         else {
-          $entity->{$this->bundle()}[] =
-            array('field_collection_item' => $this);
+          $entity->{$this->bundle()}[] = array('field_collection_item' => $this);
           $entity->save();
         }
       }
     }
     else {
-      throw new \Exception(t('The host entity may be set only during ' .
-                             'creation of a field collection item.'));
+      throw new \Exception(t('The host entity may be set only during creation of a field collection item.'));
     }
   }
 
@@ -358,9 +346,7 @@ class FieldCollectionItem extends ContentEntityBase implements FieldCollectionIt
 
     foreach ($this->getIterator() as $field) {
       // Only check configured fields, skip base fields like uuid.
-      if (!$field->isEmpty() && 'Drupal\\field\\Entity\\FieldConfig' ==
-                                get_class($field->getFieldDefinition()))
-      {
+      if (!$field->isEmpty() && 'Drupal\\field\\Entity\\FieldConfig' == get_class($field->getFieldDefinition())) {
         $is_empty = FALSE;
       }
     }

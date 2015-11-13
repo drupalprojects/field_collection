@@ -29,11 +29,7 @@ class FieldCollectionItemHostOperationCheck implements AccessInterface {
    * @return string
    *   A \Drupal\Core\Access\AccessInterface constant value.
    */
-  public function access(Route $route,
-                         AccountInterface $account,
-                         $field_collection_item_revision = NULL,
-                         FieldCollectionItem $field_collection_item = NULL)
-  {
+  public function access(Route $route, AccountInterface $account, $field_collection_item_revision = NULL, FieldCollectionItem $field_collection_item = NULL) {
     $operation = $route->getRequirement('_access_field_collection_item_host');
 
     return AccessResult::allowedIf(

@@ -37,9 +37,7 @@ class FieldCollectionItemController extends ControllerBase {
    */
   public function add(FieldCollection $field_collection, $host_type, $host_id) {
     $host = entity_load($host_type, $host_id);
-    if (_field_collection_field_item_list_full(
-        $host->{$field_collection->id()}))
-    {
+    if (_field_collection_field_item_list_full($host->{$field_collection->id()})) {
       drupal_set_message(t('This field is already full.'), 'error');
       return array('#markup' => 'Can not add to an already full field.');
     }
@@ -49,7 +47,8 @@ class FieldCollectionItemController extends ControllerBase {
         ->create(array(
           'field_name' => $field_collection->id(),
           'host_type' => $host_type,
-          'revision_id' => 0,));
+          'revision_id' => 0,
+        ));
 
       $form = $this->entityFormBuilder()->getForm($field_collection_item);
       return $form;
@@ -112,8 +111,7 @@ class FieldCollectionItemController extends ControllerBase {
    *   The page title.
    */
   public function addPageTitle(FieldCollection $field_collection) {
-    return $this->t('Create @label',
-                    array('@label' => $field_collection->label()));
+    return $this->t('Create @label', array('@label' => $field_collection->label()));
   }
 
   /**
@@ -130,8 +128,7 @@ class FieldCollectionItemController extends ControllerBase {
       ->getStorage('field_collection_item')
       ->loadRevision($field_collection_item_revision);
 
-    $field_collection_item_view_controller =
-      new EntityViewController($this->entityManager, \Drupal::service('renderer'));
+    $field_collection_item_view_controller = new EntityViewController($this->entityManager, \Drupal::service('renderer'));
 
     $page = $field_collection_item_view_controller
       ->view($field_collection_item);
@@ -154,9 +151,7 @@ class FieldCollectionItemController extends ControllerBase {
       ->getStorage('field_collection_item')
       ->loadRevision($field_collection_item_revision);
 
-    return $this->t('Revision %revision of %title',
-                    array('%revision' => $field_collection_item_revision,
-                          '%title' => $field_collection_item->label()));
+    return $this->t('Revision %revision of %title', array('%revision' => $field_collection_item_revision, '%title' => $field_collection_item->label()));
   }
 
 }

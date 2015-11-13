@@ -69,11 +69,8 @@ class FieldCollectionItemForm extends ContentEntityForm {
     // field collection item revision.
     // $field_collection_item->setNewRevision();
 
-    if (\Drupal::routeMatch()->getRouteName() ==
-        'field_collection_item.add_page')
-    {
-      $host = entity_load(\Drupal::routeMatch()->getParameter('host_type'),
-                          \Drupal::routeMatch()->getParameter('host_id'));
+    if (\Drupal::routeMatch()->getRouteName() == 'field_collection_item.add_page') {
+      $host = entity_load(\Drupal::routeMatch()->getParameter('host_type'), \Drupal::routeMatch()->getParameter('host_id'));
     }
     else {
       $host = $field_collection_item->getHost();

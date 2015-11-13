@@ -78,8 +78,7 @@ function field_collection_field_storage_config_insert(EntityInterface $field) {
  */
 function field_collection_field_storage_config_delete(EntityInterface $field) {
   if ($field->getType() == 'field_collection') {
-    $field_collection_bundle =
-      entity_load('field_collection', $field->getName());
+    $field_collection_bundle = entity_load('field_collection', $field->getName());
     $field_collection_bundle->delete();
   }
 }
@@ -96,12 +95,8 @@ function field_collection_field_storage_config_delete(EntityInterface $field) {
  */
 function field_collection_field_config_predelete(EntityInterface $field) {
   if ($field->getType() == 'field_collection') {
-    $field_collection_item_ids = db_query(
-      'SELECT `entity_id` ' .
-      'FROM {' . $field->getTargetEntityTypeId() .
-             '__' . $field->getName() . '} ' .
-      'WHERE `bundle` = \'' . $field->getTargetBundle() . '\' ')
-        ->fetchCol();
+    // @todo This is now how you interpolate variables into a db_query().
+    $field_collection_item_ids = db_query('SELECT `entity_id` FROM {' . $field->getTargetEntityTypeId() . '__' . $field->getName() . '} WHERE `bundle` = \'' . $field->getTargetBundle() . '\' ')->fetchCol();
     entity_delete_multiple('field_collection_item', $field_collection_item_ids);
   }
 }
@@ -111,9 +106,7 @@ function field_collection_field_config_predelete(EntityInterface $field) {
  *
  * Remove the save button since there are no options to save.
  */
-function field_collection_form_field_collection_edit_form_alter(
-  &$form, FormStateInterface $form_state)
-{
+function field_collection_form_field_collection_edit_form_alter(&$form, FormStateInterface $form_state) {
   unset($form['actions']);
 }
 
@@ -126,23 +119,14 @@ function field_collection_page_attachments(array &$attachments) {
  *
  * Remove default value from field collection field settings.
  */
-function field_collection_form_field_config_edit_form_alter(
-  &$form, FormStateInterface $form_state)
-{
-  if ($form_state->getFormObject()->getEntity()->getType() ==
-    'field_collection')
-  {
+function field_collection_form_field_config_edit_form_alter(&$form, FormStateInterface $form_state) {
+  if ($form_state->getFormObject()->getEntity()->getType() == 'field_collection') {
     unset($form['default_value']['widget']);
-    $form['default_value']['#description'] = t(
-      'To specify a default value, configure it via the regular default ' .
-      'value setting of each field that is part of the field collection. To ' .
-      'do so, go to the <a href=":url/fields">manage fields</a> screen of ' .
-      'the field collection.',
-      array(':url' =>
-        Url::fromRoute('entity.field_collection.edit_form', array(
-          'field_collection' =>
-            $form_state->getFormObject()->getEntity()->getName()))
-        ->setAbsolute()->toString()));
+    $form['default_value']['#description'] = t('To specify a default value, configure it via the regular default value setting of each field that is part of the field collection. To do so, go to the <a href=":url/fields">manage fields</a> screen of the field collection.', array(
+      ':url' => Url::fromRoute('entity.field_collection.edit_form', array(
+        'field_collection' => $form_state->getFormObject()->getEntity()->getName()
+      ))->setAbsolute()->toString(),
+    ));
   }
 }
 
@@ -166,16 +150,12 @@ function _field_collection_sort_items_helper($a, $b) {
  *
  * TODO: Find the standard way to do this and replace calls to it.
  */
-function _field_collection_field_item_list_full(
-  FieldItemListInterface $field_list)
-{
+function _field_collection_field_item_list_full(FieldItemListInterface $field_list) {
   $cardinality = $field_list->getFieldDefinition()
     ->getFieldStorageDefinition()
     ->getCardinality();
 
   $total = $field_list->count();
 
-  return (
-    $cardinality != FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED &&
-    $cardinality <= $total);
+  return ($cardinality != FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED && $cardinality <= $total);
 }

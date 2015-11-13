@@ -42,8 +42,7 @@ class FieldCollectionListFormatter extends FieldCollectionLinksFormatter {
       if ($item->value !== NULL) {
         $count++;
 
-        $field_collection_item =
-          field_collection_item_revision_load($item->revision_id);
+        $field_collection_item = field_collection_item_revision_load($item->revision_id);
 
         if ($field_collection_item->isDefaultRevision()) {
           $links = \Drupal::l($this->fieldDefinition->getName() . ' ' . $delta,
@@ -68,8 +67,7 @@ class FieldCollectionListFormatter extends FieldCollectionLinksFormatter {
       ->getCardinality();
 
     if ($cardinality == -1 || $count < $cardinality) {
-      $element['#suffix'] =
-        '<ul class="action-links action-links-field-collection-add"><li>';
+      $element['#suffix'] = '<ul class="action-links action-links-field-collection-add"><li>';
       $element['#suffix'] .= $this->getAddLink($items->getEntity());
       $element['#suffix'] .= '</li></ul>';
     }
