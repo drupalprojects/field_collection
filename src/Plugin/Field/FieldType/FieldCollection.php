@@ -10,6 +10,7 @@ namespace Drupal\field_collection\Plugin\Field\FieldType;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\field_collection\Entity\FieldCollectionItem;
 
 /**
  * Plugin implementation of the 'field_collection' field type.
@@ -86,7 +87,7 @@ class FieldCollection extends FieldItemBase {
     }
     elseif (isset($this->value)) {
       // By default always load the default revision, so caches get used.
-      $field_collection_item = field_collection_item_load($this->value);
+      $field_collection_item = FieldCollectionItem::load($this->value);
       if ($field_collection_item !== NULL &&
           $field_collection_item->getRevisionId() != $this->revision_id)
       {
@@ -172,7 +173,7 @@ class FieldCollection extends FieldItemBase {
         }
         else {
           // Delete unused field collection items now.
-          foreach (field_collection_item_load_multiple($ids) as $un_item) {
+          foreach (FieldCollectionItem::loadMultiple($ids) as $un_item) {
             $un_item->updateHostEntity($host_entity);
             $un_item->deleteRevision(TRUE);
           }

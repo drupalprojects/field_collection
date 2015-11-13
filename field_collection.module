@@ -31,26 +31,6 @@ function field_collection_help($route_name, RouteMatchInterface $route_match) {
 }
 
 /**
- * Loads a field collection item.
- *
- * @return field_collection_item
- *   The field collection item entity or FALSE.
- */
-function field_collection_item_load($item_id, $reset = FALSE) {
-  return FieldCollectionItem::load($item_id);
-}
-
-/**
- * Loads field collection items.
- *
- * @return
- *   An array of field collection item entities.
- */
-function field_collection_item_load_multiple($ids = array(), $reset = FALSE) {
-  return FieldCollectionItem::loadMultiple($ids);
-}
-
-/**
  * Loads a field collection revision.
  *
  * @param $revision_id
