@@ -8,10 +8,7 @@
 namespace Drupal\field_collection\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
-use Drupal\Core\Entity\Annotation\EntityType;
 use Drupal\Core\Annotation\Translation;
-use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\field_collection\FieldCollectionInterface;
 
 /**

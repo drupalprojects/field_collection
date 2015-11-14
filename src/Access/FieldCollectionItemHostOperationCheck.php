@@ -32,10 +32,7 @@ class FieldCollectionItemHostOperationCheck implements AccessInterface {
   public function access(Route $route, AccountInterface $account, $field_collection_item_revision = NULL, FieldCollectionItem $field_collection_item = NULL) {
     $operation = $route->getRequirement('_access_field_collection_item_host');
 
-    return AccessResult::allowedIf(
-      $field_collection_item &&
-      $field_collection_item->getHost()->access($operation, $account))
-        ->cachePerPermissions();
+    return AccessResult::allowedIf($field_collection_item && $field_collection_item->getHost()->access($operation, $account))->cachePerPermissions();
   }
 
 }

@@ -8,22 +8,18 @@
 namespace Drupal\field_collection;
 
 use Drupal\Core\Entity\ContentEntityForm;
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\field_collection\Entity\FieldCollectionItem;
 use Drupal\Core\Form\FormStateInterface;
 
 class FieldCollectionItemForm extends ContentEntityForm {
 
   /**
-   * Overrides \Drupal\Core\Entity\EntityForm::form().
+   * {@inheritdoc}
    */
   public function form(array $form, FormStateInterface $form_state) {
     $field_collection_item = $this->entity;
 
     if ($this->operation == 'edit') {
-      $form['#title'] = $this->t(
-        '<em>Edit @type</em>',
-        array('@type' => $field_collection_item->label()));
+      $form['#title'] = $this->t('<em>Edit @type</em>', ['@type' => $field_collection_item->label()]);
     }
 
     /*
@@ -56,7 +52,7 @@ class FieldCollectionItemForm extends ContentEntityForm {
   }
 
   /**
-   * Overrides \Drupal\Core\Entity\EntityFormController::submit().
+   * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     // Build the block object from the submitted values.
@@ -69,26 +65,25 @@ class FieldCollectionItemForm extends ContentEntityForm {
     // field collection item revision.
     // $field_collection_item->setNewRevision();
 
-    if (\Drupal::routeMatch()->getRouteName() == 'field_collection_item.add_page') {
-      $host = entity_load(\Drupal::routeMatch()->getParameter('host_type'), \Drupal::routeMatch()->getParameter('host_id'));
+    $route_match = \Drupal::routeMatch();
+    if ($route_match->getRouteName() == 'field_collection_item.add_page') {
+      $host = $this->entityTypeManager->getStorage($route_match->getParameter('host_type'))->load($route_match->getParameter('host_id'));
     }
     else {
       $host = $field_collection_item->getHost();
     }
 
-    $form_state->setRedirect($host->urlInfo()->getRouteName(),
-                             $host->urlInfo()->getRouteParameters());
+    $form_state->setRedirectUrl($host->toUrl());
   }
 
   /**
-   * Overrides \Drupal\Core\Entity\EntityFormController::save().
+   * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    $field_collection_item = $this->getEntity($form_state);
+    $field_collection_item = $this->getEntity();
 
     if ($field_collection_item->isNew()) {
-      $host = entity_load($this->getRequest()->get('host_type'),
-                          $this->getRequest()->get('host_id'));
+      $host = $this->entityTypeManager->getStorage($this->getRequest()->get('host_type'))->load($this->getRequest()->get('host_id'));
 
       $field_collection_item->setHostEntity($host);
       $field_collection_item->save();
@@ -96,18 +91,14 @@ class FieldCollectionItemForm extends ContentEntityForm {
 
       $messages = drupal_get_messages(NULL, false);
       if (!isset($messages['warning']) && !isset($messages['error'])) {
-        drupal_set_message(t(
-          'Successfully added a @type.',
-          array('@type' => $field_collection_item->bundle())));
+        drupal_set_message(t('Successfully added a @type.', array('@type' => $field_collection_item->bundle())));
       }
     }
     else {
       $messages = drupal_get_messages(NULL, false);
       if (!isset($messages['warning']) && !isset($messages['error'])) {
         $field_collection_item->save();
-        drupal_set_message(t(
-          'Successfully edited %label.',
-          array('%label' => $field_collection_item->label())));
+        drupal_set_message(t('Successfully edited %label.', array('%label' => $field_collection_item->label())));
       }
     }
 
@@ -118,8 +109,7 @@ class FieldCollectionItemForm extends ContentEntityForm {
     else {
       // In the unlikely case something went wrong on save, the block will be
       // rebuilt and block form redisplayed.
-      drupal_set_message(t(
-        'The field collection item could not be saved.'), 'error');
+      drupal_set_message(t('The field collection item could not be saved.'), 'error');
 
       $form_state->setRebuild();
     }
@@ -130,24 +120,6 @@ class FieldCollectionItemForm extends ContentEntityForm {
       array('field_collection_item' => $field_collection_item->id()
     ));
     */
-  }
-
-  /**
-   * Overrides \Drupal\Core\Entity\EntityFormController::delete().
-   *
-   * TODO: Is this even called?  I don't think form_state can be used like that.
-   */
-  public function delete(array $form, FormStateInterface $form_state) {
-    $destination = array();
-    if (isset($_GET['destination'])) {
-      $destination = drupal_get_destination();
-      unset($_GET['destination']);
-    }
-    $field_collection_item = $this->buildEntity($form, $form_state);
-    $form_state['redirect'] = array(
-      'field-collection/' . $field_collection_item->id() . '/delete',
-      array('query' => $destination)
-    );
   }
 
 }

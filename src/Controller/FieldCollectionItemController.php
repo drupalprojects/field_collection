@@ -7,7 +7,6 @@
 
 namespace Drupal\field_collection\Controller;
 
-use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\field_collection\Entity\FieldCollection;
 use Drupal\field_collection\Entity\FieldCollectionItem;
@@ -36,13 +35,13 @@ class FieldCollectionItemController extends ControllerBase {
    * TODO: additional fields
    */
   public function add(FieldCollection $field_collection, $host_type, $host_id) {
-    $host = entity_load($host_type, $host_id);
+    $host = $this->entityTypeManager()->getStorage($host_type)->load($host_id);
     if (_field_collection_field_item_list_full($host->{$field_collection->id()})) {
       drupal_set_message(t('This field is already full.'), 'error');
       return array('#markup' => 'Can not add to an already full field.');
     }
     else {
-      $field_collection_item = $this->entityManager()
+      $field_collection_item = $this->entityTypeManager()
         ->getStorage('field_collection_item')
         ->create(array(
           'field_name' => $field_collection->id(),
@@ -79,7 +78,7 @@ class FieldCollectionItemController extends ControllerBase {
    *   An array suitable for drupal_render().
    */
   protected function buildPage(FieldCollectionItem $field_collection_item) {
-    $ret = array('field_collection_items' => $this->entityManager()
+    $ret = array('field_collection_items' => $this->entityTypeManager()
       ->getViewBuilder('field_collection_item')
       ->view($field_collection_item));
 
@@ -96,9 +95,7 @@ class FieldCollectionItemController extends ControllerBase {
    *   The page title.
    */
   public function pageTitle(FieldCollectionItem $field_collection_item) {
-    return SafeMarkup::checkPlain($this->entityManager()
-      ->getTranslationFromContext($field_collection_item)
-      ->label());
+    return \Drupal::service('entity.repository')->getTranslationFromContext($field_collection_item)->label();
   }
 
   /**
@@ -124,11 +121,11 @@ class FieldCollectionItemController extends ControllerBase {
    *   An array suitable for drupal_render().
    */
   public function revisionShow($field_collection_item_revision) {
-    $field_collection_item = $this->entityManager()
+    $field_collection_item = $this->entityTypeManager()
       ->getStorage('field_collection_item')
       ->loadRevision($field_collection_item_revision);
 
-    $field_collection_item_view_controller = new EntityViewController($this->entityManager, \Drupal::service('renderer'));
+    $field_collection_item_view_controller = new EntityViewController($this->entityManager(), \Drupal::service('renderer'));
 
     $page = $field_collection_item_view_controller
       ->view($field_collection_item);
@@ -147,7 +144,7 @@ class FieldCollectionItemController extends ControllerBase {
    *   The page title.
    */
   public function revisionPageTitle($field_collection_item_revision) {
-    $field_collection_item = $this->entityManager()
+    $field_collection_item = $this->entityTypeManager()
       ->getStorage('field_collection_item')
       ->loadRevision($field_collection_item_revision);
 

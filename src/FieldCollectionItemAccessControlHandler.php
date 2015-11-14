@@ -23,8 +23,6 @@ class FieldCollectionItemAccessControlHandler extends EntityAccessControlHandler
    * @param string $operation
    *   The entity operation. Usually one of 'view', 'update', 'create' or
    *   'delete'.
-   * @param string $langcode
-   *   The language code for which to check access.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The user for which to check access.
    *

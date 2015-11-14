@@ -19,11 +19,10 @@ use Drupal\Core\Field\FieldItemListInterface;
  *   field_types = {
  *     "field_collection"
  *   },
- *   settings = {
- *   }
  * )
  */
 class FieldCollectionItemsFormatter extends FormatterBase {
+
   /**
    * {@inheritdoc}
    */
@@ -31,9 +30,7 @@ class FieldCollectionItemsFormatter extends FormatterBase {
     $render_items = array();
     foreach ($items as $delta => $item) {
       if ($item->value !== NULL) {
-        $render_items[] = \Drupal::entityManager()
-                            ->getViewBuilder('field_collection_item')
-                            ->view($item->getFieldCollectionItem());
+        $render_items[] = \Drupal::entityTypeManager()->getViewBuilder('field_collection_item')->view($item->getFieldCollectionItem());
       }
     }
     return $render_items;

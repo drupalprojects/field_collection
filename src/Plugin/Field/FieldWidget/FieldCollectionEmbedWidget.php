@@ -9,6 +9,7 @@ namespace Drupal\field_collection\Plugin\Field\FieldWidget;
 
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\ReplaceCommand;
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -16,8 +17,7 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Render\Element;
-
-const FIELD_COLLECTION_EMBED_WIDGET = 'Drupal\\field_collection\\Plugin\\Field\\FieldWidget\\FieldCollectionEmbedWidget';
+use Drupal\field_collection\Entity\FieldCollectionItem;
 
 /**
  * Plugin implementation of the 'field_collection_embed' widget.
@@ -28,8 +28,6 @@ const FIELD_COLLECTION_EMBED_WIDGET = 'Drupal\\field_collection\\Plugin\\Field\\
  *   field_types = {
  *     "field_collection"
  *   },
- *   settings = {
- *   }
  * )
  */
 class FieldCollectionEmbedWidget extends WidgetBase {
@@ -58,23 +56,19 @@ class FieldCollectionEmbedWidget extends WidgetBase {
     // Nest the field collection item entity form in a dedicated parent space,
     // by appending [field_name, delta] to the current parent space.
     // That way the form values of the field collection item are separated.
-    $parents = array_merge($element['#field_parents'],
-                           array($field_name, $delta));
+    $parents = array_merge($element['#field_parents'], array($field_name, $delta));
 
-    $element += array(
-      '#element_validate' => array(array(
-        FIELD_COLLECTION_EMBED_WIDGET,
-        'validate',)),
+    $element += [
+      '#element_validate' => [[static::class, 'validate']],
       '#parents' => $parents,
       '#field_name' => $field_name,
-    );
+    ];
 
     if ($this->fieldDefinition->getFieldStorageDefinition()->getCardinality() == 1) {
       $element['#type'] = 'fieldset';
     }
 
-    $field_state = static::getWidgetState($element['#field_parents'],
-                                          $field_name, $form_state);
+    $field_state = static::getWidgetState($element['#field_parents'], $field_name, $form_state);
 
     /*
       // TODO
@@ -103,15 +97,12 @@ class FieldCollectionEmbedWidget extends WidgetBase {
     static::setWidgetState(
       $element['#field_parents'], $field_name, $form_state, $field_state);
 
-    $display = entity_get_form_display('field_collection_item', $field_name,
-                                       'default');
+    $display = EntityFormDisplay::load("field_collection_item.{$field_name}.default");
 
     $display->buildForm($field_collection_item, $element, $form_state);
 
     if (empty($element['#required'])) {
-      $element['#after_build'][] = array(
-        FIELD_COLLECTION_EMBED_WIDGET,
-        'delayRequiredValidation',);
+      $element['#after_build'][] = [static::class, 'delayRequiredValidation'];
 
       // Stop HTML5 form validation so our validation code can run instead.
       $form['#attributes']['novalidate'] = 'novalidate';
@@ -119,30 +110,27 @@ class FieldCollectionEmbedWidget extends WidgetBase {
 
     // Put the remove button on unlimited cardinality field collection fields.
     if ($this->fieldDefinition->getFieldStorageDefinition()->getCardinality() == FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED) {
-      $options = array('query' => array(
-        'element_parents' => implode('/', $element['#parents']),),);
+      $options = ['query' => ['element_parents' => implode('/', $element['#parents'])]];
 
-      $element['actions'] = array(
+      $element['actions'] = [
         '#type' => 'actions',
-        'remove_button' => array(
+        'remove_button' => [
           '#delta' => $delta,
           '#name' => implode('_', $parents) . '_remove_button',
           '#type' => 'submit',
           '#value' => t('Remove'),
-          '#validate' => array(),
-          '#submit' => array(array(
-            FIELD_COLLECTION_EMBED_WIDGET,
-            'removeSubmit')),
-          '#limit_validation_errors' => array(),
-          '#ajax' => array(
-            'callback' => array($this, 'ajaxRemove'),
+          '#validate' => [],
+          '#submit' => [[static::class, 'removeSubmit']],
+          '#limit_validation_errors' => [],
+          '#ajax' => [
+            'callback' => [$this, 'ajaxRemove'],
             'options' => $options,
             'effect' => 'fade',
             'wrapper' => $field_name . '-ajax-wrapper',
-          ),
+          ],
           '#weight' => 1000,
-        ),
-      );
+        ],
+      ];
     }
 
     return $element;
@@ -158,8 +146,7 @@ class FieldCollectionEmbedWidget extends WidgetBase {
     // validated. Prevent #required (sub)fields from throwing errors while
     // their non-#required field collection item is empty.
     if ($form_state->isProcessingInput()) {
-      static::collectRequiredElements(
-        $element, $element['#field_collection_required_elements']);
+      static::collectRequiredElements($element, $element['#field_collection_required_elements']);
     }
     return $element;
   }
@@ -179,9 +166,7 @@ class FieldCollectionEmbedWidget extends WidgetBase {
       $element['#required'] = FALSE;
       $required_elements[] = &$element;
       $element += array('#pre_render' => array());
-      array_unshift($element['#pre_render'], array(
-        FIELD_COLLECTION_EMBED_WIDGET,
-        'renderRequired',));
+      array_unshift($element['#pre_render'], [static::class, 'renderRequired']);
     }
   }
 
@@ -204,7 +189,7 @@ class FieldCollectionEmbedWidget extends WidgetBase {
 
     $field_collection_item = $field_state['field_collection_item'][$element['#delta']];
 
-    $display = entity_get_form_display('field_collection_item', $field_name, 'default');
+    $display = EntityFormDisplay::load("field_collection_item.{$field_name}.default");
 
     $display->extractFormValues($field_collection_item, $element, $form_state);
 
@@ -215,20 +200,16 @@ class FieldCollectionEmbedWidget extends WidgetBase {
         // #1676206: Modified to support options widget.
         if (isset($elements['#needs_validation'])) {
           $is_empty_multiple = (!count($elements['#value']));
-          $is_empty_string = (is_string($elements['#value']) &&
-                              Unicode::strlen(trim($elements['#value'])) == 0);
+          $is_empty_string = (is_string($elements['#value']) && Unicode::strlen(trim($elements['#value'])) == 0);
           $is_empty_value = ($elements['#value'] === 0);
-          $is_empty_option = (isset($elements['#options']['_none']) &&
-                              $elements['#value'] == '_none');
+          $is_empty_option = (isset($elements['#options']['_none']) && $elements['#value'] == '_none');
 
           if ($is_empty_multiple || $is_empty_string || $is_empty_value || $is_empty_option) {
             if (isset($elements['#required_error'])) {
               $form_state->setError($elements, $elements['#required_error']);
             }
             else if (isset($elements['#title'])) {
-              $form_state->setError(
-                $elements, t('!name field is required.',
-                             array('!name' => $elements['#title'])));
+              $form_state->setError($elements, t('!name field is required.', array('!name' => $elements['#title'])));
             }
             else {
               $form_state->setError($elements);
@@ -243,8 +224,7 @@ class FieldCollectionEmbedWidget extends WidgetBase {
     if ($form_state->isSubmitted() && !$form_state->hasAnyErrors()) {
       // Load initial form values into $item, so any other form values below the
       // same parents are kept.
-      $field = NestedArray::getValue($form_state->getValues(),
-                                     $element['#parents']);
+      $field = NestedArray::getValue($form_state->getValues(), $element['#parents']);
 
       // Set the _weight if it is a multiple field.
       if (isset($element['_weight']) && $form[$field_name]['widget']['#cardinality_multiple']) {
@@ -293,11 +273,9 @@ class FieldCollectionEmbedWidget extends WidgetBase {
 
       $moving_element = NestedArray::getValue($form, $old_element_address);
 
-      $moving_element_value = NestedArray::getValue(
-        $form_state->getValues(), $old_element_state_address);
+      $moving_element_value = NestedArray::getValue($form_state->getValues(), $old_element_state_address);
 
-      $moving_element_input = NestedArray::getValue(
-        $form_state->getUserInput(), $old_element_state_address);
+      $moving_element_input = NestedArray::getValue($form_state->getUserInput(), $old_element_state_address);
 
       // Tell the element where it's being moved to.
       $moving_element['#parents'] = $new_element_state_address;
@@ -305,8 +283,7 @@ class FieldCollectionEmbedWidget extends WidgetBase {
       // Move the element around.
       $form_state->setValueForElement($moving_element, $moving_element_value);
       $user_input = $form_state->getUserInput();
-      NestedArray::setValue($user_input, $moving_element['#parents'],
-                            $moving_element_input);
+      NestedArray::setValue($user_input, $moving_element['#parents'], $moving_element_input);
       $form_state->setUserInput($user_input);
 
       // Move the entity in our saved state.
@@ -323,8 +300,7 @@ class FieldCollectionEmbedWidget extends WidgetBase {
     // trash bin.
     $count = count($field_state['field_collection_item']);
 
-    $field_state['field_collection_item'][$count] = entity_create(
-      'field_collection_item', array('field_name' => $field_name));
+    $field_state['field_collection_item'][$count] = FieldCollectionItem::create(['field_name' => $field_name]);
 
     // Then remove the last item. But we must not go negative.
     if ($field_state['items_count'] > 0) {
@@ -382,13 +358,12 @@ class FieldCollectionEmbedWidget extends WidgetBase {
     $status_messages = array('#theme' => 'status_messages');
 
     $renderer = \Drupal::service('renderer');
-    $form['#prefix'] = empty($form['#prefix']) ?
-      $renderer->render($status_messages) :
-      $form['#prefix'] . $renderer->render($status_messages);
+    $form['#prefix'] = empty($form['#prefix']) ? $renderer->render($status_messages) : $form['#prefix'] . $renderer->render($status_messages);
 
     $output = $renderer->render($form);
     // TODO: Preserve javascript.  See https://www.drupal.org/node/2502743 .
     $response = new AjaxResponse();
     return $response->addCommand(new ReplaceCommand(NULL, $output));
   }
+
 }

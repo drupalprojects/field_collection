@@ -7,11 +7,10 @@
 
 namespace Drupal\field_collection\Entity;
 
+use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Entity\EntityStorageControllerInterface;
-use Drupal\Core\Language\Language;
 use Drupal\field_collection\FieldCollectionItemInterface;
 
 /**
@@ -267,8 +266,12 @@ class FieldCollectionItem extends ContentEntityBase implements FieldCollectionIt
    * {@inheritdoc}
    */
   public function getHost($reset = FALSE) {
-    if ($this->getHostId()) {
-      return entity_load($this->host_type->value, $this->getHostId(), $reset);
+    if ($id = $this->getHostId()) {
+      $storage = $this->entityTypeManager()->getStorage($this->host_type->value);
+      if ($reset) {
+        $storage->resetCache([$id]);
+      }
+      return $storage->load($id);
     }
     else {
       return NULL;
@@ -280,14 +283,14 @@ class FieldCollectionItem extends ContentEntityBase implements FieldCollectionIt
    */
   public function getHostId() {
     if (!isset($this->host_id)) {
-      $entity_info = \Drupal::entityManager()
+      $entity_info = \Drupal::entityTypeManager()
         ->getDefinition($this->host_type->value, true);
 
       $table = $entity_info->get('base_table') . '__' . $this->bundle();
 
-      if (db_table_exists($table)) {
-        // @todo This is now how you interpolate variables into a db_query().
-        $host_id_results = db_query('SELECT `entity_id` FROM {' . $table . '} ' . 'WHERE `' . $this->bundle() . '_value` = ' . $this->id())->fetchCol();
+      if (Database::getConnection()->schema()->tableExists($table)) {
+        // @todo This is not how you interpolate variables into a db_query().
+        $host_id_results = \Drupal::database()->query('SELECT `entity_id` FROM {' . $table . '} ' . 'WHERE `' . $this->bundle() . '_value` = ' . $this->id())->fetchCol();
         $this->host_id = reset($host_id_results);
       }
       else {

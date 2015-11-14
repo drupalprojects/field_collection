@@ -8,7 +8,6 @@
 namespace Drupal\field_collection\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Field\FieldItemListInterface;
-use Drupal\field_collection\Plugin\Field\FieldFormatter\FieldCollectionLinksFormatter;
 
 /**
  * Plugin implementation of the 'field_collection_editable' formatter.
@@ -19,8 +18,6 @@ use Drupal\field_collection\Plugin\Field\FieldFormatter\FieldCollectionLinksForm
  *   field_types = {
  *     "field_collection"
  *   },
- *   settings = {
- *   }
  * )
  */
 class FieldCollectionEditableFormatter extends FieldCollectionLinksFormatter {
@@ -34,9 +31,7 @@ class FieldCollectionEditableFormatter extends FieldCollectionLinksFormatter {
     foreach ($items as $delta => $item) {
       if ($item->value !== NULL) {
         $count++;
-        $to_render = \Drupal::entityManager()
-                       ->getViewBuilder('field_collection_item')
-                       ->view($item->getFieldCollectionItem());
+        $to_render = \Drupal::entityTypeManager()->getViewBuilder('field_collection_item')->view($item->getFieldCollectionItem());
 
         $to_render['#suffix'] = $this->getEditLinks($item);
         $render_items[] = $to_render;

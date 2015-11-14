@@ -56,7 +56,7 @@ class FieldCollectionItemHostRevisionsOperationCheck implements AccessInterface 
    */
   public function access(Route $route, AccountInterface $account, $field_collection_item_revision = NULL, FieldCollectionItem $field_collection_item = NULL) {
     if ($field_collection_item_revision) {
-      $field_collection_item = field_collection_item_revision_load($field_collection_item_revision);
+      $field_collection_item = \Drupal::entityTypeManager()->getStorage('field_collection_item')->loadRevision($field_collection_item_revision);
     }
     $operation = $route->getRequirement('_access_field_collection_item_host_revisions');
 

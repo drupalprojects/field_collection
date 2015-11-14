@@ -9,7 +9,6 @@ namespace Drupal\field_collection\Form;
 
 use Drupal\Core\Entity\ContentEntityConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Cache\Cache;
 
 /**
  * Provides a form for deleting a field collection item.
@@ -27,7 +26,7 @@ class FieldCollectionItemDeleteForm extends ContentEntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getCancelUrl() {
-    return $this->entity->getHost()->urlInfo();
+    return $this->entity->getHost()->toUrl();
   }
 
   /**
@@ -48,15 +47,14 @@ class FieldCollectionItemDeleteForm extends ContentEntityConfirmFormBase {
       '%id' => $this->entity->id())
     );
 
-    $node_type_storage = $this->entityManager->getStorage('field_collection');
+    $node_type_storage = $this->entityTypeManager->getStorage('field_collection');
     $node_type = $node_type_storage->load($this->entity->bundle())->label();
 
     drupal_set_message(t('@type %id has been deleted.', array(
       '@type' => $node_type,
       '%id' => $this->entity->id())));
 
-    $form_state->setRedirect($host->urlInfo()->getRouteName(),
-                             $host->urlInfo()->getRouteParameters());
+    $form_state->setRedirectUrl($host->toUrl());
   }
 
 }

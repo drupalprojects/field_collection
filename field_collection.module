@@ -7,16 +7,12 @@
 
 use Drupal\field\FieldStorageConfigInterface;
 use Drupal\field_collection\Entity\FieldCollection;
-use Drupal\Core\Extension\ModuleHandler;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Field\WidgetBase;
-use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
-use Drupal\field_collection\Entity\FieldCollectionItem;
 
 /**
  * Implements hook_help().
@@ -26,19 +22,11 @@ function field_collection_help($route_name, RouteMatchInterface $route_match) {
     case 'help.page.field_collection':
       $output = '';
       $output .= '<h3>' . t('About') . '</h3>';
-      $output .= '<p>' . t('The field collection module provides a field, to which any number of fields can be attached. See the <a href="@field-help">Field module help page</a> for more information about fields.', array('@field-help' => \Drupal::url('help.page', array('name' => 'field')))) . '</p>';
+      $output .= '<p>' . t('The field collection module provides a field, to which any number of fields can be attached. See the <a href="@field-help">Field module help page</a> for more information about fields.', [
+        '@field-help' => Url::fromRoute('help.page', ['name' => 'field']),
+      ]) . '</p>';
       return $output;
   }
-}
-
-/**
- * Loads a field collection revision.
- *
- * @param $revision_id
- *   The field collection revision ID.
- */
-function field_collection_item_revision_load($revision_id) {
-  return entity_revision_load('field_collection_item', $revision_id);
 }
 
 /**
@@ -85,7 +73,7 @@ function field_collection_field_storage_config_insert(FieldStorageConfigInterfac
  */
 function field_collection_field_storage_config_delete(EntityInterface $field) {
   if ($field->getType() == 'field_collection') {
-    $field_collection_bundle = entity_load('field_collection', $field->getName());
+    $field_collection_bundle = FieldCollection::load($field->getName());
     $field_collection_bundle->delete();
   }
 }
@@ -102,9 +90,11 @@ function field_collection_field_storage_config_delete(EntityInterface $field) {
  */
 function field_collection_field_config_predelete(EntityInterface $field) {
   if ($field->getType() == 'field_collection') {
-    // @todo This is now how you interpolate variables into a db_query().
-    $field_collection_item_ids = db_query('SELECT `entity_id` FROM {' . $field->getTargetEntityTypeId() . '__' . $field->getName() . '} WHERE `bundle` = \'' . $field->getTargetBundle() . '\' ')->fetchCol();
-    entity_delete_multiple('field_collection_item', $field_collection_item_ids);
+    // @todo This is not how you interpolate variables into a db_query().
+    $field_collection_item_ids = \Drupal::database()->query('SELECT `entity_id` FROM {' . $field->getTargetEntityTypeId() . '__' . $field->getName() . '} WHERE `bundle` = \'' . $field->getTargetBundle() . '\' ')->fetchCol();
+    $controller = \Drupal::entityTypeManager()->getStorage('field_collection_item');
+    $entities = $controller->loadMultiple($field_collection_item_ids);
+    $controller->delete($entities);
   }
 }
 

@@ -8,7 +8,6 @@
 namespace Drupal\field_collection\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Field\FieldItemListInterface;
-use Drupal\field_collection\Plugin\Field\FieldFormatter\FieldCollectionLinksFormatter;
 use Drupal\Core\Url;
 
 /**
@@ -20,8 +19,6 @@ use Drupal\Core\Url;
  *   field_types = {
  *     "field_collection"
  *   },
- *   settings = {
- *   }
  * )
  */
 class FieldCollectionListFormatter extends FieldCollectionLinksFormatter {
@@ -38,24 +35,23 @@ class FieldCollectionListFormatter extends FieldCollectionLinksFormatter {
                 // items from the FieldItemList that doesn't count blank items?
                 // Possibly \Countable->count()?
 
+    $storage = \Drupal::entityTypeManager()->getStorage('field_collection_item');
     foreach ($items as $delta => $item) {
       if ($item->value !== NULL) {
         $count++;
 
-        $field_collection_item = field_collection_item_revision_load($item->revision_id);
+        $field_collection_item = $storage->loadRevision($item->revision_id);
 
         if ($field_collection_item->isDefaultRevision()) {
-          $links = \Drupal::l($this->fieldDefinition->getName() . ' ' . $delta,
-            Url::FromRoute('entity.field_collection_item.canonical',
-                           array('field_collection_item' => $item->value)));
+          $links = \Drupal::l($this->fieldDefinition->getName() . ' ' . $delta, Url::FromRoute('entity.field_collection_item.canonical', array('field_collection_item' => $item->value)));
 
           $links .= ' ' . $this->getEditLinks($item);
         }
         else {
-          $links = \Drupal::l($this->fieldDefinition->getName() . ' ' . $delta,
-            Url::FromRoute('field_collection_item.revision_show', array(
-              'field_collection_item' => $item->value,
-              'field_collection_item_revision' => $item->revision_id)));
+          $links = \Drupal::l($this->fieldDefinition->getName() . ' ' . $delta, Url::FromRoute('field_collection_item.revision_show', [
+            'field_collection_item' => $item->value,
+            'field_collection_item_revision' => $item->revision_id,
+          ]));
         }
 
         $element[$delta] = array('#markup' => $links);
