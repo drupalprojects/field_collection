@@ -217,8 +217,13 @@ class FieldCollectionItem extends ContentEntityBase implements FieldCollectionIt
   protected function deleteHostEntityReference() {
     $delta = $this->getDelta();
     if ($this->id() && isset($delta) && NULL !== $this->getHost(TRUE) && isset($this->getHost()->{$this->bundle()}[$delta])) {
-      unset($this->getHost()->{$this->bundle()}[$delta]);
-      $this->getHost()->save();
+      $host = $this->getHost();
+      unset($host->{$this->bundle()}[$delta]);
+      // Do not save when the host entity is being deleted. See
+      // \Drupal\field_collection\Plugin\Field\FieldType\FieldCollection::delete().
+      if (empty($host->field_collection_deleting)) {
+        $host->save();
+      }
     }
   }
 
