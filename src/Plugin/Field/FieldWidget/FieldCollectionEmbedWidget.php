@@ -9,7 +9,6 @@ namespace Drupal\field_collection\Plugin\Field\FieldWidget;
 
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\ReplaceCommand;
-use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -97,8 +96,7 @@ class FieldCollectionEmbedWidget extends WidgetBase {
     static::setWidgetState(
       $element['#field_parents'], $field_name, $form_state, $field_state);
 
-    $display = EntityFormDisplay::load("field_collection_item.{$field_name}.default");
-
+    $display = entity_get_form_display('field_collection_item', $field_name, 'default');
     $display->buildForm($field_collection_item, $element, $form_state);
 
     if (empty($element['#required'])) {
@@ -189,8 +187,7 @@ class FieldCollectionEmbedWidget extends WidgetBase {
 
     $field_collection_item = $field_state['field_collection_item'][$element['#delta']];
 
-    $display = EntityFormDisplay::load("field_collection_item.{$field_name}.default");
-
+    $display = entity_get_form_display('field_collection_item', $field_name, 'default');
     $display->extractFormValues($field_collection_item, $element, $form_state);
 
     // Now validate required elements if the entity is not empty.

@@ -6,8 +6,6 @@
  */
 
 namespace Drupal\field_collection\Tests;
-use Drupal\Core\Entity\Entity\EntityFormDisplay;
-use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field_collection\Entity\FieldCollection;
@@ -120,21 +118,11 @@ class FieldCollectionBasicTestCase extends WebTestBase {
 
     $this->inner_field->save();
 
-    EntityFormDisplay::create([
-        'targetEntityType' => 'field_collection_item',
-        'bundle' => $this->field_collection_name,
-        'mode' => 'default',
-        'status' => TRUE,
-      ])
+    entity_get_form_display('field_collection_item', $this->field_collection_name, 'default')
       ->setComponent($this->inner_field_name, array('type' => 'number'))
       ->save();
 
-    EntityViewDisplay::create([
-        'targetEntityType' => 'field_collection_item',
-        'bundle' => $this->field_collection_name,
-        'mode' => 'default',
-        'status' => TRUE,
-      ])
+    entity_get_display('field_collection_item', $this->field_collection_name, 'default')
       ->setComponent($this->inner_field_name, array('type' => 'number_decimal'))
       ->save();
   }
