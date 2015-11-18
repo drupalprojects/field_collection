@@ -1,0 +1,9 @@
+name: Field Collection
+description: 'Provides a field collection field, to which any number of fields can be attached.'
+package: Field types
+version: VERSION
+core: 8.x
+type: module
+dependencies:
+  - field
+  - inline_entity_form
