@@ -7,6 +7,7 @@
 
 namespace Drupal\field_collection\Plugin\Field\FieldWidget;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -30,20 +31,6 @@ use Drupal\field_collection\Entity\FieldCollectionItem;
  * )
  */
 class FieldCollectionEmbedWidget extends WidgetBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  public function form(FieldItemListInterface $items, array &$form, FormStateInterface $form_state, $get_delta = NULL) {
-    $ret = parent::form($items, $form, $form_state, $get_delta);
-    $field_name = $this->fieldDefinition->getName();
-
-    // Add a new wrapper around all the elements for Ajax replacement.
-    $ret['#prefix'] = '<div id="' . $field_name . '-ajax-wrapper">';
-    $ret['#suffix'] = '</div>';
-
-    return $ret;
-  }
 
   /**
    * {@inheritdoc}
@@ -124,7 +111,7 @@ class FieldCollectionEmbedWidget extends WidgetBase {
             'callback' => [$this, 'ajaxRemove'],
             'options' => $options,
             'effect' => 'fade',
-            'wrapper' => $field_name . '-ajax-wrapper',
+            'wrapper' => $form['#wrapper_id'],
           ],
           '#weight' => 1000,
         ],
@@ -132,6 +119,20 @@ class FieldCollectionEmbedWidget extends WidgetBase {
     }
 
     return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function formMultipleElements(FieldItemListInterface $items, array &$form, FormStateInterface $form_state) {
+    // Adjust wrapper identifiers as they are shared between parents and
+    // children in nested field collections.
+    $form['#wrapper_id'] = Html::getUniqueID($items->getName());
+    $elements = parent::formMultipleElements($items, $form, $form_state);
+    $elements['#prefix'] = '<div id="' . $form['#wrapper_id'] . '">';
+    $elements['#suffix'] = '</div>';
+    $elements['add_more']['#ajax']['wrapper'] = $form['#wrapper_id'];
+    return $elements;
   }
 
   /**
@@ -253,6 +254,7 @@ class FieldCollectionEmbedWidget extends WidgetBase {
 
     // Where in the form we'll find the parent element.
     $address = array_slice($button['#array_parents'], 0, -4);
+    $address_state = array_slice($button['#parents'], 0, -3);
 
     // Go one level up in the form, to the widgets container.
     $parent_element = NestedArray::getValue($form, array_merge($address, array('widget')));
@@ -266,8 +268,8 @@ class FieldCollectionEmbedWidget extends WidgetBase {
     // item down one. This will overwrite the item being removed.
     for ($i = $delta; $i <= $field_state['items_count']; $i++) {
       $old_element_address = array_merge($address, array('widget', $i + 1));
-      $old_element_state_address = array_merge($address, array($i + 1));
-      $new_element_state_address = array_merge($address, array($i));
+      $old_element_state_address = array_merge($address_state, array($i + 1));
+      $new_element_state_address = array_merge($address_state, array($i));
 
       $moving_element = NestedArray::getValue($form, $old_element_address);
 
@@ -343,25 +345,14 @@ class FieldCollectionEmbedWidget extends WidgetBase {
    *
    * @return \Drupal\Core\Ajax\AjaxResponse
    *   An AjaxResponse object.
+   *
+   * @see self::removeSubmit()
    */
   function ajaxRemove(array $form, FormStateInterface &$form_state) {
-    // Process user input. $form and $form_state are modified in the process.
-    //\Drupal::formBuilder()->processForm($form['#form_id'], $form, $form_state);
-
-    // Retrieve the element to be rendered.
-    $trigger = $form_state->getTriggeringElement();
-    $form_parents = explode('/', $trigger['#ajax']['options']['query']['element_parents']);
-    $address = array_slice($form_parents, 0, -1);
-    $form = NestedArray::getValue($form, $address);
-    $status_messages = array('#theme' => 'status_messages');
-
-    $renderer = \Drupal::service('renderer');
-    $form['#prefix'] = empty($form['#prefix']) ? $renderer->render($status_messages) : $form['#prefix'] . $renderer->render($status_messages);
-
-    $output = $renderer->render($form);
-    // TODO: Preserve javascript.  See https://www.drupal.org/node/2502743 .
-    $response = new AjaxResponse();
-    return $response->addCommand(new ReplaceCommand(NULL, $output));
+    // At this point, $this->removeSubmit() removed the element so we just need
+    // to return the parent element.
+    $button = $form_state->getTriggeringElement();
+    return NestedArray::getValue($form, array_slice($button['#array_parents'], 0, -3));
   }
 
 }
