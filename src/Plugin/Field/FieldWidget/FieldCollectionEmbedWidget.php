@@ -224,7 +224,8 @@ class FieldCollectionEmbedWidget extends WidgetBase {
       $field = NestedArray::getValue($form_state->getValues(), $element['#parents']);
 
       // Set the _weight if it is a multiple field.
-      if (isset($element['_weight']) && $form[$field_name]['widget']['#cardinality_multiple']) {
+      $element_widget = NestedArray::getValue($form, array_slice($element['#array_parents'], 0, -1));
+      if (isset($element['_weight']) && $element_widget['#cardinality_multiple']) {
         $field['_weight'] = $element['_weight']['#value'];
       }
 
