@@ -216,7 +216,7 @@ class FieldCollectionItem extends ContentEntityBase implements FieldCollectionIt
    */
   protected function deleteHostEntityReference() {
     $delta = $this->getDelta();
-    if ($this->id() && isset($delta) && NULL !== $this->getHost(TRUE) && isset($this->getHost()->{$this->bundle()}[$delta])) {
+    if ($this->id() && isset($delta) && NULL !== $this->getHost() && isset($this->getHost()->{$this->bundle()}[$delta])) {
       $host = $this->getHost();
       unset($host->{$this->bundle()}[$delta]);
       // Do not save when the host entity is being deleted. See
