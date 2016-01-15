@@ -56,21 +56,6 @@ class FieldCollectionEmbedWidget extends WidgetBase {
 
     $field_state = static::getWidgetState($element['#field_parents'], $field_name, $form_state);
 
-    /*
-      // TODO
-      if (!empty($field['settings']['hide_blank_items']) && $delta == $field_state['items_count'] && $delta > 0) {
-        // Do not add a blank item. Also see
-        // field_collection_field_attach_form() for correcting #max_delta.
-        $recursion--;
-        return FALSE;
-      }
-      elseif (!empty($field['settings']['hide_blank_items']) && $field_state['items_count'] == 0) {
-        // We show one item, so also specify that as item count. So when the
-        // add button is pressed the item count will be 2 and we show to items.
-        $field_state['items_count'] = 1;
-      }
-    */
-
     if (isset($field_state['field_collection_item'][$delta])) {
       $field_collection_item = $field_state['field_collection_item'][$delta];
     }
@@ -80,8 +65,7 @@ class FieldCollectionEmbedWidget extends WidgetBase {
       $field_state['field_collection_item'][$delta] = $field_collection_item;
     }
 
-    static::setWidgetState(
-      $element['#field_parents'], $field_name, $form_state, $field_state);
+    static::setWidgetState($element['#field_parents'], $field_name, $form_state, $field_state);
 
     $display = entity_get_form_display('field_collection_item', $field_name, 'default');
     $display->buildForm($field_collection_item, $element, $form_state);
@@ -125,6 +109,21 @@ class FieldCollectionEmbedWidget extends WidgetBase {
    * {@inheritdoc}
    */
   protected function formMultipleElements(FieldItemListInterface $items, array &$form, FormStateInterface $form_state) {
+    // We don't want to render empty items on field collection fields
+    // unless a) the field collection is empty ; b) the form is rebuilding,
+    // which means that the user clicked on "Add another item"; or
+    // c) we are creating a new entity.
+    if ((count($items) > 0) && !$form_state->isRebuilding() && !$items->getEntity()->isNew()) {
+      $field_name = $this->fieldDefinition->getName();
+      $cardinality = $this->fieldDefinition->getFieldStorageDefinition()->getCardinality();
+      $parents = $form['#parents'];
+      if ($cardinality == FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED) {
+        $field_state = static::getWidgetState($parents, $field_name, $form_state);
+        $field_state['items_count']--;
+        static::setWidgetState($parents, $field_name, $form_state, $field_state);
+      }
+    }
+
     // Adjust wrapper identifiers as they are shared between parents and
     // children in nested field collections.
     $form['#wrapper_id'] = Html::getUniqueID($items->getName());
