@@ -18,7 +18,7 @@ class FieldCollectionInlineForm extends EntityInlineForm {
   /**
    * {@inheritdoc}
    */
-  public function saveEntity(ContentEntityInterface $entity, array $context) {
+  public function saveEntity(ContentEntityInterface $entity, array $widget_state = NULL) {
 
     if (isset($context['instance'])) {
       /** @var \Drupal\field\Entity\FieldConfig $field */
