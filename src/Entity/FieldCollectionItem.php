@@ -24,6 +24,7 @@ use Drupal\field_collection\FieldCollectionItemInterface;
  *     "storage" = "Drupal\Core\Entity\Sql\SqlContentEntityStorage",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "access" = "Drupal\field_collection\FieldCollectionItemAccessControlHandler",
+ *     "views_data" = "Drupal\views\EntityViewsData",
  *     "inline_form" = "Drupal\field_collection\Form\FieldCollectionInlineForm",
  *     "form" = {
  *       "default" = "Drupal\field_collection\FieldCollectionForm.phpFormForm",
