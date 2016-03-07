@@ -14,9 +14,6 @@ function field_collection_field_widget_info_alter(array &$info) {
   if (isset($info['inline_entity_form_simple'])) {
     $info['inline_entity_form_simple']['field_types'][] = 'field_collection';
   }
-  if (isset($info['inline_entity_form_complex'])) {
-    $info['inline_entity_form_complex']['field_types'][] = 'field_collection';
-  }
 }
 
 /**

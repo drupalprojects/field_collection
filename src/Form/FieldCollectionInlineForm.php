@@ -10,12 +10,15 @@ namespace Drupal\field_collection\Form;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\inline_entity_form\Form\EntityInlineForm;
 
 /**
  * Field Collection inline form handler.
  */
 class FieldCollectionInlineForm extends EntityInlineForm {
+
+  use StringTranslationTrait;
 
   /**
    * {@inheritdoc}
@@ -35,5 +38,13 @@ class FieldCollectionInlineForm extends EntityInlineForm {
     $entity->host_type = $field->getTargetEntityTypeId();
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getTableFields($bundles) {
+    $table_fields = parent::getTableFields($bundles);
+    $table_fields['label']['label'] = $this->t('Item');
+    return $table_fields;
+  }
 
 }
