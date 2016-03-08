@@ -152,6 +152,11 @@ class FieldCollectionItem extends ContentEntityBase implements FieldCollectionIt
    *   revision updates might be skipped. Use with care.
    */
   public function save($skip_host_save = FALSE) {
+    // @todo This is needed for IEF now.
+    //   Remove when https://www.drupal.org/node/2680681 is committed.
+    if (isset($this->skip_host_save)) {
+      $skip_host_save = $this->skip_host_save;
+    }
     /* TODO: Need this.
     // Make sure we have a host entity during creation.
     if (!empty($this->is_new) && !(isset($this->hostEntityId) || isset($this->hostEntity) || isset($this->hostEntityRevisionId))) {

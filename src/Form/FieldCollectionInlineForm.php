@@ -22,10 +22,11 @@ class FieldCollectionInlineForm extends EntityInlineForm {
 
   /**
    * {@inheritdoc}
-   */
-  public function save(EntityInterface $entity) {
-    return $entity->save(TRUE);
-  }
+   * @todo Current save() is not in InlineFormInterface
+   *  Uncomment once https://www.drupal.org/node/2680681 is committed for IEF
+  * public function save(EntityInterface $entity) {
+    * return $entity->save(TRUE);
+  * }*/
 
   /**
    * {@inheritdoc}
@@ -36,6 +37,7 @@ class FieldCollectionInlineForm extends EntityInlineForm {
     /** @var \Drupal\field\FieldConfigInterface $field */
     $field = $ief_state['instance'];
     $entity->host_type = $field->getTargetEntityTypeId();
+    $entity->skip_host_save = TRUE;
   }
 
   /**
