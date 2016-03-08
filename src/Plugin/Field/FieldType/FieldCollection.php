@@ -31,8 +31,8 @@ use Drupal\field_collection\Entity\FieldCollectionItem;
  *   },
  *   instance_settings = {
  *   },
- *   default_widget = "inline_entity_form_simple",
- *   default_formatter = "entity_reference_label",
+ *   default_widget = "field_collection_complex",
+ *   default_formatter = "entity_reference_entity_view",
  *   list_class = "\Drupal\Core\Field\EntityReferenceFieldItemList"
  * )
  */

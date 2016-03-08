@@ -6,17 +6,6 @@
  */
 
 /**
- * Implements hook_field_widget_info_alter().
- *
- * Allow Inline Entity Form Widgets to be used with Field Collection fields.
- */
-function field_collection_field_widget_info_alter(array &$info) {
-  if (isset($info['inline_entity_form_simple'])) {
-    $info['inline_entity_form_simple']['field_types'][] = 'field_collection';
-  }
-}
-
-/**
  * Implements hook_field_formatter_info_alter().
  *
  * Allow any formatter that works with Entity References to be used with Field Collection.
