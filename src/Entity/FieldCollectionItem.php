@@ -29,6 +29,7 @@ use Drupal\field_collection\FieldCollectionItemInterface;
  *       "edit" = "Drupal\field_collection\FieldCollectionItemForm",
  *       "delete" = "Drupal\field_collection\Form\FieldCollectionItemDeleteForm"
  *     },
+ *     "views_data" = "Drupal\views\EntityViewsData",
  *   },
  *   base_table = "field_collection_item",
  *   revision_table = "field_collection_item_revision",
