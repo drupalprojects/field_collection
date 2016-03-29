@@ -21,7 +21,14 @@
  * @ingroup themeable
  */
 #}
-<div class="{{ attributes.class }} clearfix"{{ attributes }}>
+{%
+  set classes = [
+    'field-collection-item',
+    'field-collection-item--name-' ~ field_collection_item.name|clean_class,
+    'field-collection-item--view-mode-' ~ field_collection_item.view_mode|clean_class,
+  ]
+%}
+<div{{ attributes.addClass(classes) }}>
   <div class="content"{{ content_attributes }}>
     {{ content }}
   </div>

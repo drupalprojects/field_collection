@@ -13,6 +13,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Render\Element;
 
 /**
  * Implements hook_help().
@@ -155,4 +156,58 @@ function _field_collection_field_item_list_full(FieldItemListInterface $field_li
   $total = $field_list->count();
 
   return ($cardinality != FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED && $cardinality <= $total);
+}
+
+/**
+ * Implements hook_theme to define field_collection templates
+ */
+function field_collection_theme() {
+  return array(
+    'field_collection_item' => array(
+      'render element' => 'item',
+    ),
+  );
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function field_collection_theme_suggestions_field_collection_item(array $variables) {
+  $suggestions = array();
+  $item = $variables['item']['#field_collection_item'];
+
+  $sanitized_view_mode = strtr($variables['item']['#view_mode'], '.', '_');
+
+  $suggestions[] = 'field_collection_item__' . $sanitized_view_mode;
+  $suggestions[] = 'field_collection_item__' . $item->bundle();
+  $suggestions[] = 'field_collection_item__' . $item->bundle() . '__' . $sanitized_view_mode;
+  $suggestions[] = 'field_collection_item__' . $item->id();
+  $suggestions[] = 'field_collection_item__' . $item->id() . '__' . $sanitized_view_mode;
+
+  return $suggestions;
+}
+
+/**
+ * Prepares variables for field_collection_item templates.
+ *
+ * Default template: field-collection-item.html.twig.
+ *
+ * @param array $variables
+ * An associative array containing:
+ *   - item: An array of information about the field_collection_item to display.
+ */
+function template_preprocess_field_collection_item(&$variables) {
+  $item = $variables['item']['#field_collection_item'];
+
+  // Supply useful metadata for the item.
+  $variables['field_collection_item'] = [
+    'name' => $item->bundle(),
+    'view_mode' => $variables['item']['#view_mode']
+  ];
+
+  // Provide field_collection_item $content variable for the template.
+  $variables += array('content' => array());
+  foreach (Element::children($variables['item']) as $key) {
+    $variables['content'][$key] = $variables['item'][$key];
+  }
 }
