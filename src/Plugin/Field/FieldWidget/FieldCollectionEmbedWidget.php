@@ -139,7 +139,7 @@ class FieldCollectionEmbedWidget extends WidgetBase {
    *
    * Delays the validation of #required.
    */
-  public static function delayRequiredValidation( &$element, FormStateInterface $form_state) {
+  public static function delayRequiredValidation($element, FormStateInterface $form_state) {
     // If the process_input flag is set, the form and its input is going to be
     // validated. Prevent #required (sub)fields from throwing errors while
     // their non-#required field collection item is empty.
