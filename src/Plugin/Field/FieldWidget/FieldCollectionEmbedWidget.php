@@ -206,7 +206,7 @@ class FieldCollectionEmbedWidget extends WidgetBase {
               $form_state->setError($elements, $elements['#required_error']);
             }
             else if (isset($elements['#title'])) {
-              $form_state->setError($elements, t('!name field is required.', array('!name' => $elements['#title'])));
+              $form_state->setError($elements, t('@name field is required.', array('@name' => $elements['#title'])));
             }
             else {
               $form_state->setError($elements);
