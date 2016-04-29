@@ -294,13 +294,6 @@ class FieldCollectionEmbedWidget extends WidgetBase {
       }
     }
 
-    // Replace the deleted entity with an empty one. This helps to ensure that
-    // trying to add a new entity won't ressurect a deleted entity from the
-    // trash bin.
-    $count = count($field_state['field_collection_item']);
-
-    $field_state['field_collection_item'][$count] = FieldCollectionItem::create(['field_name' => $field_name]);
-
     // Then remove the last item. But we must not go negative.
     if ($field_state['items_count'] > 0) {
       $field_state['items_count']--;
@@ -352,6 +345,31 @@ class FieldCollectionEmbedWidget extends WidgetBase {
     // to return the parent element.
     $button = $form_state->getTriggeringElement();
     return NestedArray::getValue($form, array_slice($button['#array_parents'], 0, -3));
+  }
+
+  /**
+   * Submission handler for the "Add another item" button.
+   */
+  public static function addMoreSubmit(array $form, FormStateInterface $form_state) {
+    $button = $form_state->getTriggeringElement();
+
+    // Go one level up in the form, to the widgets container.
+    $element = NestedArray::getValue($form, array_slice($button['#array_parents'], 0, -1));
+    $field_name = $element['#field_name'];
+    $parents = $element['#field_parents'];
+
+    // Increment the items count.
+    $field_state = static::getWidgetState($parents, $field_name, $form_state);
+    $field_state['items_count']++;
+
+    // Make a new field collection item. This helps to ensure that
+    // trying to add a field collection item won't ressurect a deleted one from
+    // the trash bin.
+    $field_state['field_collection_item'][$field_state['items_count']] = FieldCollectionItem::create(['field_name' => $field_name]);
+
+    static::setWidgetState($parents, $field_name, $form_state, $field_state);
+
+    $form_state->setRebuild();
   }
 
 }
