@@ -308,7 +308,7 @@ class FieldCollectionEmbedWidget extends WidgetBase {
     // if I have items weight weights 3 and 4, and I change 4 to 3 but leave
     // the 3, the order of the two 3s now is undefined and may not match what
     // the user had selected.
-    $input = NestedArray::getValue($form_state->getUserInput(), $address);
+    $input = NestedArray::getValue($form_state->getUserInput(), $address_state);
     // Sort by weight.
     uasort($input, '_field_collection_sort_items_helper');
 
@@ -321,7 +321,7 @@ class FieldCollectionEmbedWidget extends WidgetBase {
     }
 
     $user_input = $form_state->getUserInput();
-    NestedArray::setValue($user_input, $address, $input);
+    NestedArray::setValue($user_input, $address_state, $input);
     $form_state->setUserInput($user_input);
 
     static::setWidgetState($parents, $field_name, $form_state, $field_state);
