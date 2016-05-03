@@ -42,9 +42,8 @@ function field_collection_field_storage_config_insert(FieldStorageConfigInterfac
       ->count()
       ->execute();
     if (!$field_collection_exists) {
-      $field_collection = new FieldCollection();
-      $field_collection->set('label', $field->getName());
-      $field_collection->set('id', $field->getName());
+      $values = array('label' => $field->getName(), 'id' => $field->getName());
+      $field_collection = \Drupal::service('entity.manager')->getStorage('field_collection')->create($values);
       $field_collection->enforceIsNew();
       $field_collection->save();
     }
