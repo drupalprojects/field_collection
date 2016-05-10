@@ -21,11 +21,11 @@ class EntityFieldCollection extends EntityContentBase {
     $field_collection = $this->getEntity($row, $old_destination_id_values);
 
     // Set host entity based on values passed from source.
-    $host_entity = \Drupal::entityTypeManager()->getStorage($row->getDestinationProperty('host_entity_type'))->load($row->getDestinationProperty('host_entity_id'));
+    $host_entity = \Drupal::entityTypeManager()->getStorage($row->getDestinationProperty('host_type'))->load($row->getDestinationProperty('host_entity_id'));
     $field_collection->setHostEntity($host_entity);
 
     $field_collection->save();
 
-    return $field_collection->id();
+    return [$field_collection->id()];
   }
 }
