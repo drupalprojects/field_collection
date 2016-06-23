@@ -1,7 +1,6 @@
 name: Field collection
 description: 'Provides a field collection field, to which any number of fields can be attached.'
 package: Field types
-version: VERSION
 core: 8.x
 configure: field_collection.overview_field_collections
 type: module
