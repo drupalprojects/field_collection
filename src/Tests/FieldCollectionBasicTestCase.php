@@ -187,9 +187,9 @@ class FieldCollectionBasicTestCase extends WebTestBase {
     /** @var \Drupal\field_collection\FieldCollectionItemInterface $field_collection_item */
     list ($node, $field_collection_item) = $this->createNodeWithFieldCollection('article');
 
-    $this->assertEqual($field_collection_item->id(), $node->{$this->field_collection_name}->value);
+    $this->assertEqual($field_collection_item->id(), $node->{$this->field_collection_name}->value, 'A field_collection_item has been successfully created and referenced.');
 
-    $this->assertEqual($field_collection_item->revision_id->value, $node->{$this->field_collection_name}->revision_id);
+    $this->assertEqual($field_collection_item->revision_id->value, $node->{$this->field_collection_name}->revision_id, 'The new field_collection_item has the correct revision.');
 
     // Test adding an additional field_collection_item.
     $field_collection_item_2 = FieldCollectionItem::create(['field_name' => $this->field_collection_name]);
@@ -202,29 +202,29 @@ class FieldCollectionBasicTestCase extends WebTestBase {
     $this->nodeStorage->resetCache([$node->id()]);
     $node = Node::load($node->id());
 
-    $this->assertTrue(!empty($field_collection_item_2->id()) && !empty($field_collection_item_2->getRevisionId()));
+    $this->assertTrue(!empty($field_collection_item_2->id()) && !empty($field_collection_item_2->getRevisionId()), 'Another field_collection_item has been saved.');
 
-    $this->assertEqual(count(FieldCollectionItem::loadMultiple()), 2);
+    $this->assertEqual(count(FieldCollectionItem::loadMultiple()), 2, 'Field_collection_items have been stored.');
 
-    $this->assertEqual($field_collection_item->id(), $node->{$this->field_collection_name}->value);
+    $this->assertEqual($field_collection_item->id(), $node->{$this->field_collection_name}->value, 'Existing reference has been kept during update.');
 
-    $this->assertEqual($field_collection_item->getRevisionId(), $node->{$this->field_collection_name}[0]->revision_id);
+    $this->assertEqual($field_collection_item->getRevisionId(), $node->{$this->field_collection_name}[0]->revision_id, 'Revision: Existing reference has been kept during update.');
 
-    $this->assertEqual($field_collection_item_2->id(), $node->{$this->field_collection_name}[1]->value);
+    $this->assertEqual($field_collection_item_2->id(), $node->{$this->field_collection_name}[1]->value, 'New field_collection_item has been properly referenced.');
 
-    $this->assertEqual($field_collection_item_2->getRevisionId(), $node->{$this->field_collection_name}[1]->revision_id);
+    $this->assertEqual($field_collection_item_2->getRevisionId(), $node->{$this->field_collection_name}[1]->revision_id, 'Revision: New field_collection_item has been properly referenced.');
 
     // Make sure deleting the field collection item removes the reference.
     $field_collection_item_2->delete();
     $this->nodeStorage->resetCache([$node->id()]);
     $node = Node::load($node->id());
 
-    $this->assertTrue(!isset($node->{$this->field_collection_name}[1]));
+    $this->assertTrue(!isset($node->{$this->field_collection_name}[1]), 'Reference correctly deleted.');
 
     // Make sure field_collections are removed during deletion of the host.
     $node->delete();
 
-    $this->assertIdentical(FieldCollectionItem::loadMultiple(), array());
+    $this->assertIdentical(FieldCollectionItem::loadMultiple(), array(), 'field_collection_item deleted when the host is deleted.');
 
     // Try deleting nodes with collections without any values.
     $node = $this->drupalCreateNode(array('type' => 'article'));
@@ -245,9 +245,9 @@ class FieldCollectionBasicTestCase extends WebTestBase {
 
     // Now the node should have been saved with the collection and the link
     // should have been established.
-    $this->assertTrue(!empty($node->id()));
+    $this->assertTrue(!empty($node->id()), 'Node has been saved with the collection.');
 
-    $this->assertTrue(count($node->{$this->field_collection_name}) == 1 && !empty($node->{$this->field_collection_name}[0]->value) && !empty($node->{$this->field_collection_name}[0]->revision_id));
+    $this->assertTrue(count($node->{$this->field_collection_name}) == 1 && !empty($node->{$this->field_collection_name}[0]->value) && !empty($node->{$this->field_collection_name}[0]->revision_id), 'Link has been established.');
 
     // Again, test creating a field collection with a not-yet saved host entity,
     // but this time save both entities via the host.
@@ -259,9 +259,9 @@ class FieldCollectionBasicTestCase extends WebTestBase {
     $field_collection_item->setHostEntity($node);
     $node->save();
 
-    $this->assertTrue(!empty($field_collection_item->id()) && !empty($field_collection_item->getRevisionId()));
+    $this->assertTrue(!empty($field_collection_item->id()) && !empty($field_collection_item->getRevisionId()), 'Removed field collection item still exists.');
 
-    $this->assertTrue(count($node->{$this->field_collection_name}) == 1 && !empty($node->{$this->field_collection_name}[0]->value) && !empty($node->{$this->field_collection_name}[0]->revision_id));
+    $this->assertTrue(count($node->{$this->field_collection_name}) == 1 && !empty($node->{$this->field_collection_name}[0]->value) && !empty($node->{$this->field_collection_name}[0]->revision_id), 'Removed field collection item is archived.');
 
   }
 
@@ -330,14 +330,14 @@ class FieldCollectionBasicTestCase extends WebTestBase {
     $this->assertLinkByHref($path, 0, 'Add link is shown.');
     $this->drupalGet($path);
 
-    $this->assertText(t($this->inner_field_definition['label']));
+    $this->assertText(t($this->inner_field_definition['label']), 'Add form is shown.');
 
     $edit = array("$this->inner_field_name[0][value]" => rand());
     $this->drupalPostForm(NULL, $edit, t('Save'));
 
-    $this->assertText(t('Successfully added a @field.', array('@field' => $this->field_collection_name)));
+    $this->assertText(t('Successfully added a @field.', array('@field' => $this->field_collection_name)), 'Field collection saved.');
 
-    $this->assertText($edit["$this->inner_field_name[0][value]"]);
+    $this->assertText($edit["$this->inner_field_name[0][value]"], 'Added field value is shown.');
 
     $field_collection_item = FieldCollectionItem::load(1);
 
@@ -345,13 +345,13 @@ class FieldCollectionBasicTestCase extends WebTestBase {
     $edit["$this->inner_field_name[0][value]"] = rand();
     $this->drupalPostForm('field_collection_item/1/edit', $edit, t('Save'));
 
-    $this->assertText(t('Successfully edited @field.', array('@field' => $field_collection_item->label())));
+    $this->assertText(t('Successfully edited @field.', array('@field' => $field_collection_item->label())), 'Field collection saved.');
 
-    $this->assertText($edit["$this->inner_field_name[0][value]"]);
+    $this->assertText($edit["$this->inner_field_name[0][value]"], 'Field collection has been edited.');
 
     $this->drupalGet('field_collection_item/1');
 
-    $this->assertText($edit["$this->inner_field_name[0][value]"]);
+    $this->assertText($edit["$this->inner_field_name[0][value]"], 'Field collection can be viewed.');
   }
 
   /**
