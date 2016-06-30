@@ -298,6 +298,12 @@ class FieldCollectionEmbedWidget extends WidgetBase {
     if ($field_state['items_count'] > 0) {
       $field_state['items_count']--;
     }
+    else {
+      // Create a new field collection item after deleting the last one so the
+      // form will show a blank field collection item instead of resurrecting
+      // the first one if there was already data.
+      $field_state['field_collection_item'][0] = FieldCollectionItem::create(['field_name' => $field_name]);
+    }
 
     // Fix the weights. Field UI lets the weights be in a range of
     // (-1 * item_count) to (item_count). This means that when we remove one,
