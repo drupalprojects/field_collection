@@ -28,46 +28,50 @@ use Drupal\simpletest\WebTestBase;
 class FieldCollectionBasicTestCase extends WebTestBase {
 
   /**
-   * Field collection field.
-   *
-   * @var
-   */
-  protected $field;
-
-  /**
-   * Field collection field instance.
-   *
-   * @var
-   */
-  protected $instance;
-
-  /**
    * Modules to enable.
    *
    * @var array
    */
   protected static $modules = ['field_collection', 'node', 'field', 'field_ui'];
 
+  /**
+   * Name of the field collection bundle ie. the field in the host entity.
+   *
+   * @var string
+   */
   protected $field_collection_name;
 
+  /**
+   * Field storage config for the field collection bundle.
+   *
+   * @var \Drupal\field\Entity\FieldStorageConfig
+   */
   protected $field_collection_field_storage;
 
   /**
+   * Field config for the field collection bundle.
+   *
    * @var \Drupal\Core\Field\FieldConfigInterface
    */
   protected $field_collection_field;
 
+  /**
+   * Name of the field inside the field collection being used for testing.
+   *
+   * @var string
+   */
   protected $inner_field_name;
 
-  protected $inner_field_storage;
-
+  /**
+   * Definition of the inner field that can be passed to FieldConfig::create().
+   *
+   * @var array
+   */
   protected $inner_field_definition;
 
-  protected $inner_field;
-
-  protected $field_collection_definition;
-
   /**
+   * EntityStorageInterface for nodes.
+   *
    * @var \Drupal\Core\Entity\EntityStorageInterface
    */
   protected $nodeStorage;
@@ -98,27 +102,27 @@ class FieldCollectionBasicTestCase extends WebTestBase {
     // Create an integer field inside the field_collection.
     $this->inner_field_name = 'field_inner';
 
-    $this->inner_field_storage = FieldStorageConfig::create([
+    $inner_field_storage = FieldStorageConfig::create([
       'field_name' => $this->inner_field_name,
       'entity_type' => 'field_collection_item',
       'type' => 'integer',
     ]);
 
-    $this->inner_field_storage->save();
+    $inner_field_storage->save();
 
     $this->inner_field_definition = [
       'field_name' => $this->inner_field_name,
       'entity_type' => 'field_collection_item',
       'bundle' => $this->field_collection_name,
-      'field_storage' => $this->inner_field_storage,
+      'field_storage' => $inner_field_storage,
       'label' => $this->randomMachineName() . '_label',
       'description' => $this->randomMachineName() . '_description',
       'settings' => [],
     ];
 
-    $this->inner_field = FieldConfig::create($this->inner_field_definition);
+    $inner_field = FieldConfig::create($this->inner_field_definition);
 
-    $this->inner_field->save();
+    $inner_field->save();
 
     entity_get_form_display('field_collection_item', $this->field_collection_name, 'default')
       ->setComponent($this->inner_field_name, array('type' => 'number'))
@@ -133,7 +137,7 @@ class FieldCollectionBasicTestCase extends WebTestBase {
    * Helper function for adding the field collection field to a content type.
    */
   protected function addFieldCollectionFieldToContentType($content_type) {
-    $this->field_collection_definition = [
+    $field_collection_definition = [
       'field_name' => $this->field_collection_name,
       'entity_type' => 'node',
       'bundle' => $content_type,
@@ -143,7 +147,7 @@ class FieldCollectionBasicTestCase extends WebTestBase {
       'settings' => [],
     ];
 
-    $field_config = FieldConfig::create($this->field_collection_definition);
+    $field_config = FieldConfig::create($field_collection_definition);
 
     $field_config->save();
 
