@@ -1,9 +1,5 @@
 <?php
 
-/**
- * Contains \Drupal\node\FieldCollectionListController.
- */
-
 namespace Drupal\field_collection;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;

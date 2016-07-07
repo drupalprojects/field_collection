@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Definition of \Drupal\field_collection\Entity\FieldCollectionItem.
- */
-
 namespace Drupal\field_collection\Entity;
 
 use Drupal\Core\Database\Database;

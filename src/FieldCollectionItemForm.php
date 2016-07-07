@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\field_collection\FieldCollectionItemFormController.
- */
-
 namespace Drupal\field_collection;
 
 use Drupal\Core\Entity\ContentEntityForm;

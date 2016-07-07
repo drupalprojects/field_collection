@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\field_collection\Plugin\Field\FieldType\FieldCollection.
- */
-
 namespace Drupal\field_collection\Plugin\Field\FieldType;
 
 use Drupal\Core\Field\FieldItemBase;

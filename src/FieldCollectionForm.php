@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\field_collection\FieldCollectionForm.
- */
-
 namespace Drupal\field_collection;
 
 use Drupal\Core\Entity\EntityForm;

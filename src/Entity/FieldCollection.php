@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\field_collection\Entity\FieldCollection.
- */
-
 namespace Drupal\field_collection\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;

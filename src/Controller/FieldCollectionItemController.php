@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\field_collection\Controller\FieldCollectionItemController.
- */
-
 namespace Drupal\field_collection\Controller;
 
 use Drupal\Core\Controller\ControllerBase;

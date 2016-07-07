@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\field_collection\Plugin\Field\FieldWidget\FieldCollectionEmbedWidget.
- */
-
 namespace Drupal\field_collection\Plugin\Field\FieldWidget;
 
 use Drupal\Component\Utility\Html;

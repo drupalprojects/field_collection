@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\field_collection\Tests\FieldCollectionBasicTestCase.
- */
-
 namespace Drupal\field_collection\Tests;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;

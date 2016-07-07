@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\field_collection\Form\FieldCollectionItemDeleteForm.
- */
-
 namespace Drupal\field_collection\Form;
 
 use Drupal\Core\Entity\ContentEntityConfirmFormBase;

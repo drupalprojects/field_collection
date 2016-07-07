@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\field_collection\Normalizer\FieldCollectionItemNormalizer.
- */
-
 namespace Drupal\field_collection\Normalizer;
 
 use Drupal\serialization\Normalizer\ComplexDataNormalizer;

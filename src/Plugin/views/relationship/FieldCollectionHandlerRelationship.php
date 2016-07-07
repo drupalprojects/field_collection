@@ -1,13 +1,5 @@
 <?php
 
-
-/**
- * @file
- * Provide relationship handler for field collection fields.
- *
- * Definition of Drupal\field_collection\Plugin\views\relationship\FieldCollectionHandlerRelationship.
- */
-
 namespace Drupal\field_collection\Plugin\views\relationship;
 
 use Drupal\Core\Form\FormStateInterface;
