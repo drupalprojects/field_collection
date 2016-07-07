@@ -90,8 +90,10 @@ function field_collection_field_storage_config_delete(EntityInterface $field) {
  */
 function field_collection_field_config_predelete(EntityInterface $field) {
   if ($field->getType() == 'field_collection') {
-    // @todo This is not how you interpolate variables into a db_query().
-    $field_collection_item_ids = \Drupal::database()->query('SELECT `entity_id` FROM {' . $field->getTargetEntityTypeId() . '__' . $field->getName() . '} WHERE `bundle` = \'' . $field->getTargetBundle() . '\' ')->fetchCol();
+    $query = \Drupal::database()->select($field->getTargetEntityTypeId() . '__' . $field->getName(), 't')->fields('t', ['entity_id']);
+    $query->condition("bundle", $field->getTargetBundle());
+    $field_collection_item_ids = $query->execute()->fetchCol();
+
     $controller = \Drupal::entityTypeManager()->getStorage('field_collection_item');
     $entities = $controller->loadMultiple($field_collection_item_ids);
     $controller->delete($entities);

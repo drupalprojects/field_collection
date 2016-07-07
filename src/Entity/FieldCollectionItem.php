@@ -293,8 +293,9 @@ class FieldCollectionItem extends ContentEntityBase implements FieldCollectionIt
       $table = $entity_info->get('base_table') . '__' . $this->bundle();
 
       if (Database::getConnection()->schema()->tableExists($table)) {
-        // @todo This is not how you interpolate variables into a db_query().
-        $host_id_results = \Drupal::database()->query('SELECT `entity_id` FROM {' . $table . '} ' . 'WHERE `' . $this->bundle() . '_value` = ' . $this->id())->fetchCol();
+        $query = \Drupal::database()->select($table, 't')->fields('t', ['entity_id']);
+        $query->condition("{$this->bundle()}_value", $this->id());
+        $host_id_results = $query->execute()->fetchCol();
         $this->host_id = reset($host_id_results);
       }
       else {
