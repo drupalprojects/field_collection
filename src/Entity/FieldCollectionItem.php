@@ -283,7 +283,7 @@ class FieldCollectionItem extends ContentEntityBase implements FieldCollectionIt
   public function getHostId() {
     if (!isset($this->host_id)) {
       $entity_info = $this->entityTypeManager()->getDefinition($this->host_type->value, TRUE);
-      $table = $entity_info->get('base_table') . '__' . $this->bundle();
+      $table = $entity_info->id() . '__' . $this->bundle();
 
       if (Database::getConnection()->schema()->tableExists($table)) {
         $query = \Drupal::database()->select($table, 't')->fields('t', ['entity_id']);
