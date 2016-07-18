@@ -198,16 +198,6 @@ class FieldCollectionItem extends ContentEntityBase implements FieldCollectionIt
   }
 
   /**
-   * Overrides \Drupal\Core\Entity\Entity::createDuplicate().
-   */
-  public function createDuplicate() {
-    $duplicate = parent::createDuplicate();
-    $duplicate->revision_id->value = NULL;
-    $duplicate->id->value = NULL;
-    return $duplicate;
-  }
-
-  /**
    * Deletes the host entity's reference of the field collection item.
    */
   protected function deleteHostEntityReference() {
