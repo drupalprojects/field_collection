@@ -3,7 +3,6 @@
 namespace Drupal\field_collection\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
-use Drupal\Core\Annotation\Translation;
 use Drupal\field_collection\FieldCollectionInterface;
 
 /**

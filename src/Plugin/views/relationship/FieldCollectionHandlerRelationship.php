@@ -5,7 +5,6 @@ namespace Drupal\field_collection\Plugin\views\relationship;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\views\Views;
 use Drupal\views\Plugin\views\relationship\RelationshipPluginBase;
 
 /**

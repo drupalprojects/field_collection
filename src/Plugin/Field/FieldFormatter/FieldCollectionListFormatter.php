@@ -3,6 +3,7 @@
 namespace Drupal\field_collection\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\Link;
 use Drupal\Core\Url;
 
 /**
@@ -38,15 +39,15 @@ class FieldCollectionListFormatter extends FieldCollectionLinksFormatter {
         $field_collection_item = $storage->loadRevision($item->revision_id);
 
         if ($field_collection_item->isDefaultRevision()) {
-          $links = \Drupal::l($this->fieldDefinition->getName() . ' ' . $delta, Url::FromRoute('entity.field_collection_item.canonical', array('field_collection_item' => $item->value)));
+          $links = Link::fromTextAndUrl($this->fieldDefinition->getName() . ' ' . $delta, Url::FromRoute('entity.field_collection_item.canonical', array('field_collection_item' => $item->value)))->toString();
 
           $links .= ' ' . $this->getEditLinks($item);
         }
         else {
-          $links = \Drupal::l($this->fieldDefinition->getName() . ' ' . $delta, Url::FromRoute('field_collection_item.revision_show', [
+          $links = Link::fromTextAndUrl($this->fieldDefinition->getName() . ' ' . $delta, Url::FromRoute('field_collection_item.revision_show', [
             'field_collection_item' => $item->value,
             'field_collection_item_revision' => $item->revision_id,
-          ]));
+          ]))->toString();
         }
 
         $element[$delta] = array('#markup' => $links);
