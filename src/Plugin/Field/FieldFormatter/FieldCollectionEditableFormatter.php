@@ -29,7 +29,9 @@ class FieldCollectionEditableFormatter extends FieldCollectionLinksFormatter {
         $to_render = \Drupal::entityTypeManager()->getViewBuilder('field_collection_item')->view($item->getFieldCollectionItem());
 
         $to_render['#suffix'] = $this->getEditLinks($item);
-        $render_items[] = $to_render;
+        $builder = $to_render['#pre_render'][0][0];
+        unset($to_render['#pre_render']);
+        $render_items[] = $builder->build($to_render);
       }
     }
 

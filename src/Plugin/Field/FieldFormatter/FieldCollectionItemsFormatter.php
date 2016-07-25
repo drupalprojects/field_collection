@@ -25,7 +25,10 @@ class FieldCollectionItemsFormatter extends FormatterBase {
     $render_items = [];
     foreach ($items as $delta => $item) {
       if ($item->value !== NULL) {
-        $render_items[] = \Drupal::entityTypeManager()->getViewBuilder('field_collection_item')->view($item->getFieldCollectionItem());
+        $render_item = \Drupal::entityTypeManager()->getViewBuilder('field_collection_item')->view($item->getFieldCollectionItem());
+        $builder = $render_item['#pre_render'][0][0];
+        unset($render_item['#pre_render']);
+        $render_items[] = $builder->build($render_item);
       }
     }
     return $render_items;
