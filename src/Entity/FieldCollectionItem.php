@@ -81,10 +81,10 @@ class FieldCollectionItem extends ContentEntityBase implements FieldCollectionIt
       return parent::label();
     }
     else {
-      return t('@label @delta of @host',
-               array('@label' => $field_label,
-                     '@delta' => $this->getDelta(),
-                     '@host' => $this->getHost()->label()));
+      return t('@label @delta of @host', [
+        '@label' => $field_label,
+        '@delta' => $this->getDelta(),
+        '@host' => $this->getHost()->label()]);
     }
   }
 
@@ -176,10 +176,10 @@ class FieldCollectionItem extends ContentEntityBase implements FieldCollectionIt
       $delta = $this->getDelta();
       $value = $host_entity->{$this->bundle()}->getValue();
       if (isset($delta)) {
-        $value[$delta] = array('field_collection_item' => $this);
+        $value[$delta] = ['field_collection_item' => $this];
       }
       else {
-        $value[] = array('field_collection_item' => $this);
+        $value[] = ['field_collection_item' => $this];
       }
       $host_entity->{$this->bundle()}->setValue($value);
 
@@ -224,13 +224,13 @@ class FieldCollectionItem extends ContentEntityBase implements FieldCollectionIt
    * Overrides \Drupal\Core\Entity\Entity::uri().
    */
   public function uri() {
-    $ret = array(
+    $ret = [
       'path' => 'field-collection-item/' . $this->id(),
-      'options' => array(
+      'options' => [
         'entity_type' => $this->entityType,
         'entity' => $this,
-      )
-    );
+      ]
+    ];
 
     return $ret;
   }
@@ -319,7 +319,7 @@ class FieldCollectionItem extends ContentEntityBase implements FieldCollectionIt
           drupal_set_message(t('Field is already full.'), 'error');
         }
         else {
-          $entity->{$this->bundle()}[] = array('field_collection_item' => $this);
+          $entity->{$this->bundle()}[] = ['field_collection_item' => $this];
           $entity->save();
         }
       }

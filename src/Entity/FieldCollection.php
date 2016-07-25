@@ -62,7 +62,7 @@ class FieldCollection extends ConfigEntityBundleBase implements FieldCollectionI
    */
   protected $entityType;
 
-  public function __construct(array $values = array(), $entity_type = 'field_collection') {
+  public function __construct(array $values = [], $entity_type = 'field_collection') {
     parent::__construct($values, $entity_type);
     $this->entityType = 'field_collection';
   }

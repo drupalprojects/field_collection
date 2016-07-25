@@ -35,7 +35,7 @@ class FieldCollectionEmbedWidget extends WidgetBase {
     // Nest the field collection item entity form in a dedicated parent space,
     // by appending [field_name, delta] to the current parent space.
     // That way the form values of the field collection item are separated.
-    $parents = array_merge($element['#field_parents'], array($field_name, $delta));
+    $parents = array_merge($element['#field_parents'], [$field_name, $delta]);
 
     $element += [
       '#element_validate' => [[static::class, 'validate']],
@@ -156,7 +156,7 @@ class FieldCollectionEmbedWidget extends WidgetBase {
     if (!empty($element['#required'])) {
       $element['#required'] = FALSE;
       $required_elements[] = &$element;
-      $element += array('#pre_render' => array());
+      $element += ['#pre_render' => []];
       array_unshift($element['#pre_render'], [static::class, 'renderRequired']);
     }
   }
@@ -199,7 +199,7 @@ class FieldCollectionEmbedWidget extends WidgetBase {
               $form_state->setError($elements, $elements['#required_error']);
             }
             else if (isset($elements['#title'])) {
-              $form_state->setError($elements, t('@name field is required.', array('@name' => $elements['#title'])));
+              $form_state->setError($elements, t('@name field is required.', ['@name' => $elements['#title']]));
             }
             else {
               $form_state->setError($elements);
@@ -249,7 +249,7 @@ class FieldCollectionEmbedWidget extends WidgetBase {
     $address_state = array_slice($button['#parents'], 0, -3);
 
     // Go one level up in the form, to the widgets container.
-    $parent_element = NestedArray::getValue($form, array_merge($address, array('widget')));
+    $parent_element = NestedArray::getValue($form, array_merge($address, ['widget']));
 
     $field_name = $parent_element['#field_name'];
     $parents = $parent_element['#field_parents'];
@@ -259,9 +259,9 @@ class FieldCollectionEmbedWidget extends WidgetBase {
     // Go ahead and renumber everything from our delta to the last
     // item down one. This will overwrite the item being removed.
     for ($i = $delta; $i <= $field_state['items_count']; $i++) {
-      $old_element_address = array_merge($address, array('widget', $i + 1));
-      $old_element_state_address = array_merge($address_state, array($i + 1));
-      $new_element_state_address = array_merge($address_state, array($i));
+      $old_element_address = array_merge($address, ['widget', $i + 1]);
+      $old_element_state_address = array_merge($address_state, [$i + 1]);
+      $new_element_state_address = array_merge($address_state, [$i]);
 
       $moving_element = NestedArray::getValue($form, $old_element_address);
 

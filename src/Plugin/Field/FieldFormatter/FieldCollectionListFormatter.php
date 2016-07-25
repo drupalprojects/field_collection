@@ -25,7 +25,7 @@ class FieldCollectionListFormatter extends FieldCollectionLinksFormatter {
    * TODO: Use $langcode.
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
-    $element = array();
+    $element = [];
     $settings = $this->getFieldSettings();
     $count = 0; // TODO: Is there a better way to get an accurate count of the
                 // items from the FieldItemList that doesn't count blank items?
@@ -39,18 +39,29 @@ class FieldCollectionListFormatter extends FieldCollectionLinksFormatter {
         $field_collection_item = $storage->loadRevision($item->revision_id);
 
         if ($field_collection_item->isDefaultRevision()) {
-          $links = Link::fromTextAndUrl($this->fieldDefinition->getName() . ' ' . $delta, Url::FromRoute('entity.field_collection_item.canonical', array('field_collection_item' => $item->value)))->toString();
+          $links = Link::fromTextAndUrl(
+            $this->fieldDefinition->getName() . ' ' . $delta,
+            Url::FromRoute(
+              'entity.field_collection_item.canonical',
+              ['field_collection_item' => $item->value]
+            ))
+            ->toString();
 
           $links .= ' ' . $this->getEditLinks($item);
         }
         else {
-          $links = Link::fromTextAndUrl($this->fieldDefinition->getName() . ' ' . $delta, Url::FromRoute('field_collection_item.revision_show', [
-            'field_collection_item' => $item->value,
-            'field_collection_item_revision' => $item->revision_id,
-          ]))->toString();
+          $links = Link::fromTextAndUrl(
+            $this->fieldDefinition->getName() . ' ' . $delta,
+            Url::FromRoute(
+              'field_collection_item.revision_show',
+              [
+                'field_collection_item' => $item->value,
+                'field_collection_item_revision' => $item->revision_id,
+              ]))
+              ->toString();
         }
 
-        $element[$delta] = array('#markup' => $links);
+        $element[$delta] = ['#markup' => $links];
       }
     }
 

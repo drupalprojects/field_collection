@@ -31,14 +31,14 @@ function field_collection_field_views_data(FieldStorageConfigInterface $field_st
     foreach ($table_data as $table_field_name => $field_data) {
       // Only operate on the _value columns.
       if (strrpos($table_field_name, '_value') === (strlen($table_field_name) - strlen('_value'))) {
-        $data[$table_name][$table_field_name]['relationship'] = array(
+        $data[$table_name][$table_field_name]['relationship'] = [
           'id' => 'field_collection_handler_relationship',
           'base' => 'field_collection_item',
           'base field' => 'item_id',
-          'label' => t('field collection item from @field_name', array('@field_name' => $field_name)),
+          'label' => t('field collection item from @field_name', ['@field_name' => $field_name]),
           'field name' => $field_name,
           'target entity type' => $entity_type_id,
-        );
+        ];
       }
     } 
   } 
@@ -49,7 +49,7 @@ function field_collection_field_views_data(FieldStorageConfigInterface $field_st
   $args['@field_name'] = $field_name;
   $pseudo_field_name = $field_name . '_' . $entity_type_id;
 
-  $data['field_collection_item'][$pseudo_field_name]['relationship'] = array(
+  $data['field_collection_item'][$pseudo_field_name]['relationship'] = [
     'title' => t('Host entity of @field (@field_name)', $args),
     'label' => t('@field_name', $args),
     'group' => $entity_type->getLabel(),
@@ -60,7 +60,7 @@ function field_collection_field_views_data(FieldStorageConfigInterface $field_st
     'field_name' => $field_name,
     'field table' => $table_mapping->getDedicatedDataTableName($field_storage),
     'field field' => $field_name . '_value',
-  );
+  ];
  
 
   return $data;

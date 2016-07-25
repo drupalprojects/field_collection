@@ -43,18 +43,18 @@ class FieldCollection extends FieldItemBase {
    * {@inheritdoc}
    */
   public static function schema(FieldStorageDefinitionInterface $field) {
-    return array(
-      'columns' => array(
-        'value' => array(
+    return [
+      'columns' => [
+        'value' => [
           'type' => 'int',
           'not null' => TRUE
-        ),
-        'revision_id' => array(
+        ],
+        'revision_id' => [
           'type' => 'int',
           'not null' => FALSE
-        ),
-      ),
-    );
+        ],
+      ],
+    ];
   }
 
   /**
@@ -140,7 +140,7 @@ class FieldCollection extends FieldItemBase {
       /*
       $field_name = $this->getFieldDefinition()->field_name;
       $host_original = $host->original;
-      $items_original = !empty($host_original->$field_name) ? $host_original->$field_name : array();
+      $items_original = !empty($host_original->$field_name) ? $host_original->$field_name : [];
       $original_by_id = array_flip(field_collection_field_item_to_ids($items_original));
       foreach ($items as &$item) {
       */
@@ -157,7 +157,7 @@ class FieldCollection extends FieldItemBase {
         // marked as archived now.
         if (!empty($host_entity->revision)) {
           db_update('field_collection_item')
-            ->fields(array('archived' => 1))
+            ->fields(['archived' => 1])
             ->condition('item_id', $ids, 'IN')
             ->execute();
         }
@@ -185,7 +185,7 @@ class FieldCollection extends FieldItemBase {
         // incorrectly return false here when creating a new published revision
         if (!isset($cleared_host_entity_cache)) {
           list($entity_id) = entity_extract_ids($host_entity_type, $host_entity);
-          entity_get_controller($host_entity_type)->resetCache(array($entity_id));
+          entity_get_controller($host_entity_type)->resetCache([$entity_id]);
           $cleared_host_entity_cache = true;
         }
         */

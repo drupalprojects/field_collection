@@ -15,7 +15,7 @@ class EntityFieldCollection extends EntityContentBase {
   /**
    * {@inheritdoc}
    */
-  public function import(Row $row, array $old_destination_id_values = array()) {
+  public function import(Row $row, array $old_destination_id_values = []) {
 
     /** @var \Drupal\field_collection\Entity\FieldCollectionItem $field_collection */
     $field_collection = $this->getEntity($row, $old_destination_id_values);

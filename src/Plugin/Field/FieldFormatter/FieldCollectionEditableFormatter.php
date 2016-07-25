@@ -22,7 +22,7 @@ class FieldCollectionEditableFormatter extends FieldCollectionLinksFormatter {
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $count = 0; // TODO: Is there a better way to get an accurate count of the
                 // items from the FileItemList that doesn't count blank items?
-    $render_items = array();
+    $render_items = [];
     foreach ($items as $delta => $item) {
       if ($item->value !== NULL) {
         $count++;

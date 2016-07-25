@@ -104,11 +104,11 @@ trait FieldCollectionTestTrait {
     $inner_field->save();
 
     entity_get_form_display('field_collection_item', $this->field_collection_name, 'default')
-      ->setComponent($this->inner_field_name, array('type' => 'number'))
+      ->setComponent($this->inner_field_name, ['type' => 'number'])
       ->save();
 
     entity_get_display('field_collection_item', $this->field_collection_name, 'default')
-      ->setComponent($this->inner_field_name, array('type' => 'number_decimal'))
+      ->setComponent($this->inner_field_name, ['type' => 'number_decimal'])
       ->save();
   }
 
@@ -133,14 +133,14 @@ trait FieldCollectionTestTrait {
     \Drupal::entityTypeManager()
       ->getStorage('entity_view_display')
       ->load("node.$content_type.default")
-      ->setComponent($this->field_collection_name, array('type' => 'field_collection_editable'))
+      ->setComponent($this->field_collection_name, ['type' => 'field_collection_editable'])
       ->save();
 
 
     \Drupal::entityTypeManager()
       ->getStorage('entity_form_display')
       ->load("node.$content_type.default")
-      ->setComponent($this->field_collection_name, array('type' => 'field_collection_embed'))
+      ->setComponent($this->field_collection_name, ['type' => 'field_collection_embed'])
       ->save();
 
     return $field_config;
@@ -150,7 +150,7 @@ trait FieldCollectionTestTrait {
    * Helper for creating a new node with a field collection item.
    */
   protected function createNodeWithFieldCollection($content_type) {
-    $node = $this->drupalCreateNode(array('type' => $content_type));
+    $node = $this->drupalCreateNode(['type' => $content_type]);
 
     // Manually create a field_collection.
     $entity = FieldCollectionItem::create(['field_name' => $this->field_collection_name]);
@@ -159,7 +159,7 @@ trait FieldCollectionTestTrait {
     $entity->setHostEntity($node);
     $entity->save();
 
-    return array($node, $entity);
+    return [$node, $entity];
   }
 
 }

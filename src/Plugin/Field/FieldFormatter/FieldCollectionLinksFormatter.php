@@ -16,9 +16,21 @@ abstract class FieldCollectionLinksFormatter extends FormatterBase {
   protected function getEditLinks(FieldItemInterface $item) {
     $links = '';
     if ($item->getEntity()->access('update', \Drupal::currentUser())) {
-      $links = '(' . Link::fromTextAndUrl(t('Edit'), Url::FromRoute('entity.field_collection_item.edit_form', array('field_collection_item' => $item->value)))->toString();
+      $links = '(' . Link::fromTextAndUrl(
+        t('Edit'),
+        Url::FromRoute(
+          'entity.field_collection_item.edit_form',
+          ['field_collection_item' => $item->value]
+        ))
+        ->toString();
 
-      $links .= '|' . Link::fromTextAndUrl(t('Delete'), Url::FromRoute('entity.field_collection_item.delete_form', array('field_collection_item' => $item->value)))->toString();
+      $links .= '|' . Link::fromTextAndUrl(
+        t('Delete'),
+        Url::FromRoute(
+          'entity.field_collection_item.delete_form',
+          ['field_collection_item' => $item->value]
+        ))
+        ->toString();
 
       $links .= ')';
     }

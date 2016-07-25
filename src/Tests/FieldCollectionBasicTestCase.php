@@ -54,7 +54,7 @@ class FieldCollectionBasicTestCase extends WebTestBase {
 
     $field_collection_item_2->{$this->inner_field_name}->setValue(2);
 
-    $node->{$this->field_collection_name}[1] = array('field_collection_item' => $field_collection_item_2);
+    $node->{$this->field_collection_name}[1] = ['field_collection_item' => $field_collection_item_2];
 
     $node->save();
     $this->nodeStorage->resetCache([$node->id()]);
@@ -82,10 +82,10 @@ class FieldCollectionBasicTestCase extends WebTestBase {
     // Make sure field_collections are removed during deletion of the host.
     $node->delete();
 
-    $this->assertIdentical(FieldCollectionItem::loadMultiple(), array(), 'field_collection_item deleted when the host is deleted.');
+    $this->assertIdentical(FieldCollectionItem::loadMultiple(), [], 'field_collection_item deleted when the host is deleted.');
 
     // Try deleting nodes with collections without any values.
-    $node = $this->drupalCreateNode(array('type' => 'article'));
+    $node = $this->drupalCreateNode(['type' => 'article']);
     $node->delete();
 
     $this->nodeStorage->resetCache([$node->id()]);
@@ -93,7 +93,7 @@ class FieldCollectionBasicTestCase extends WebTestBase {
     $this->assertFalse($node);
 
     // Test creating a field collection entity with a not-yet saved host entity.
-    $node = $this->drupalCreateNode(array('type' => 'article'));
+    $node = $this->drupalCreateNode(['type' => 'article']);
 
     $field_collection_item = FieldCollectionItem::create(['field_name' => $this->field_collection_name]);
 
@@ -109,9 +109,9 @@ class FieldCollectionBasicTestCase extends WebTestBase {
 
     // Again, test creating a field collection with a not-yet saved host entity,
     // but this time save both entities via the host.
-    $node = $this->drupalCreateNode(array('type' => 'article'));
+    $node = $this->drupalCreateNode(['type' => 'article']);
 
-    $field_collection_item = FieldCollectionItem::create(array('field_name' => $this->field_collection_name));
+    $field_collection_item = FieldCollectionItem::create(['field_name' => $this->field_collection_name]);
 
     $field_collection_item->{$this->inner_field_name}->setValue(4);
     $field_collection_item->setHostEntity($node);
@@ -128,7 +128,7 @@ class FieldCollectionBasicTestCase extends WebTestBase {
    */
   public function testFieldDeletion() {
     // Create a separate content type with the field collection field.
-    $this->drupalCreateContentType(array('type' => 'test_content_type', 'name' => 'Test content type'));
+    $this->drupalCreateContentType(['type' => 'test_content_type', 'name' => 'Test content type']);
 
     $field_collection_field_1 = $this->field_collection_field;
 
@@ -162,10 +162,10 @@ class FieldCollectionBasicTestCase extends WebTestBase {
    * Make sure the basic UI and access checks are working.
    */
   public function testBasicUI() {
-    $node = $this->drupalCreateNode(array('type' => 'article'));
+    $node = $this->drupalCreateNode(['type' => 'article']);
 
     // Login with new user that has no privileges.
-    $user = $this->drupalCreateUser(array('access content'));
+    $user = $this->drupalCreateUser(['access content']);
     $this->drupalLogin($user);
 
     // Make sure access is denied.
@@ -190,10 +190,10 @@ class FieldCollectionBasicTestCase extends WebTestBase {
 
     $this->assertText(t($this->inner_field_definition['label']), 'Add form is shown.');
 
-    $edit = array("$this->inner_field_name[0][value]" => rand());
+    $edit = ["$this->inner_field_name[0][value]" => rand()];
     $this->drupalPostForm(NULL, $edit, t('Save'));
 
-    $this->assertText(t('Successfully added a @field.', array('@field' => $this->field_collection_name)), 'Field collection saved.');
+    $this->assertText(t('Successfully added a @field.', ['@field' => $this->field_collection_name]), 'Field collection saved.');
 
     $this->assertText($edit["$this->inner_field_name[0][value]"], 'Added field value is shown.');
 
@@ -203,7 +203,7 @@ class FieldCollectionBasicTestCase extends WebTestBase {
     $edit["$this->inner_field_name[0][value]"] = rand();
     $this->drupalPostForm('field_collection_item/1/edit', $edit, t('Save'));
 
-    $this->assertText(t('Successfully edited @field.', array('@field' => $field_collection_item->label())), 'Field collection saved.');
+    $this->assertText(t('Successfully edited @field.', ['@field' => $field_collection_item->label()]), 'Field collection saved.');
 
     $this->assertText($edit["$this->inner_field_name[0][value]"], 'Field collection has been edited.');
 
@@ -235,14 +235,14 @@ class FieldCollectionBasicTestCase extends WebTestBase {
     $this->assertFieldById('edit-field-test-collection-0-field-inner-0-value');
 
     // Check that the "Add another item" button works as expected.
-    $this->drupalPostAjaxForm('node/add/article', array(), array('field_test_collection_add_more' => t('Add another item')));
+    $this->drupalPostAjaxForm('node/add/article', [], ['field_test_collection_add_more' => t('Add another item')]);
     // The AJAX request changes field identifiers, so we need to find them by name.
     $this->assertFieldByName('field_test_collection[0][field_inner][0][value]');
     $this->assertFieldByName('field_test_collection[1][field_inner][0][value]');
 
     // Check that we can see an empty field collection when editing content
     // that did not have values for it.
-    $node = $this->drupalCreateNode(array('type' => 'article'));
+    $node = $this->drupalCreateNode(['type' => 'article']);
     $this->drupalGet('node/' . $node->id() . '/edit');
     $this->assertFieldById('edit-field-test-collection-0-field-inner-0-value');
   }

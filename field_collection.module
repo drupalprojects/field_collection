@@ -42,7 +42,7 @@ function field_collection_field_storage_config_insert(FieldStorageConfigInterfac
       ->count()
       ->execute();
     if (!$field_collection_exists) {
-      $values = array('label' => $field->getName(), 'id' => $field->getName());
+      $values = ['label' => $field->getName(), 'id' => $field->getName()];
       $field_collection = \Drupal::service('entity.manager')->getStorage('field_collection')->create($values);
       $field_collection->enforceIsNew();
       $field_collection->save();
@@ -121,11 +121,14 @@ function field_collection_page_attachments(array &$attachments) {
 function field_collection_form_field_config_edit_form_alter(&$form, FormStateInterface $form_state) {
   if ($form_state->getFormObject()->getEntity()->getType() == 'field_collection') {
     unset($form['default_value']['widget']);
-    $form['default_value']['#description'] = t('To specify a default value, configure it via the regular default value setting of each field that is part of the field collection. To do so, go to the <a href=":url/fields">manage fields</a> screen of the field collection.', array(
-      ':url' => Url::fromRoute('entity.field_collection.edit_form', array(
-        'field_collection' => $form_state->getFormObject()->getEntity()->getName()
-      ))->setAbsolute()->toString(),
-    ));
+    $url = Url::fromRoute(
+      'entity.field_collection.edit_form',
+      ['field_collection' => $form_state->getFormObject()->getEntity()->getName()])
+        ->setAbsolute()
+        ->toString();
+
+    $form['default_value']['#description'] =
+      t('To specify a default value, configure it via the regular default value setting of each field that is part of the field collection. To do so, go to the <a href=":url/fields">manage fields</a> screen of the field collection.', [':url' => $url]);
   }
 }
 
@@ -163,18 +166,18 @@ function _field_collection_field_item_list_full(FieldItemListInterface $field_li
  * Implements hook_theme to define field_collection templates
  */
 function field_collection_theme() {
-  return array(
-    'field_collection_item' => array(
+  return [
+    'field_collection_item' => [
       'render element' => 'item',
-    ),
-  );
+    ],
+  ];
 }
 
 /**
  * Implements hook_theme_suggestions_HOOK().
  */
 function field_collection_theme_suggestions_field_collection_item(array $variables) {
-  $suggestions = array();
+  $suggestions = [];
   $item = $variables['item']['#field_collection_item'];
 
   $sanitized_view_mode = strtr($variables['item']['#view_mode'], '.', '_');
@@ -207,7 +210,7 @@ function template_preprocess_field_collection_item(&$variables) {
   ];
 
   // Provide field_collection_item $content variable for the template.
-  $variables += array('content' => array());
+  $variables += ['content' => []];
   foreach (Element::children($variables['item']) as $key) {
     $variables['content'][$key] = $variables['item'][$key];
   }

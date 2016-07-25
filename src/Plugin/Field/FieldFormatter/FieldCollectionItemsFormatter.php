@@ -22,7 +22,7 @@ class FieldCollectionItemsFormatter extends FormatterBase {
    * {@inheritdoc}
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
-    $render_items = array();
+    $render_items = [];
     foreach ($items as $delta => $item) {
       if ($item->value !== NULL) {
         $render_items[] = \Drupal::entityTypeManager()->getViewBuilder('field_collection_item')->view($item->getFieldCollectionItem());
