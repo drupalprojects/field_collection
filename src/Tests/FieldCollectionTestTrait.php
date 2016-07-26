@@ -136,7 +136,6 @@ trait FieldCollectionTestTrait {
       ->setComponent($this->field_collection_name, ['type' => 'field_collection_editable'])
       ->save();
 
-
     \Drupal::entityTypeManager()
       ->getStorage('entity_form_display')
       ->load("node.$content_type.default")

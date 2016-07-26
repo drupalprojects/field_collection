@@ -191,7 +191,7 @@ class FieldCollectionItem extends ContentEntityBase implements FieldCollectionIt
    * {@inheritdoc}
    */
   public function delete() {
-    if ($this->getHost()) {
+    if (empty($this->field_collection_deleting) && $this->getHost()) {
       $this->deleteHostEntityReference();
     }
     parent::delete();
@@ -207,7 +207,7 @@ class FieldCollectionItem extends ContentEntityBase implements FieldCollectionIt
       unset($host->{$this->bundle()}[$delta]);
       // Do not save when the host entity is being deleted. See
       // \Drupal\field_collection\Plugin\Field\FieldType\FieldCollection::delete().
-      if (empty($host->field_collection_deleting)) {
+      if (empty($this->field_collection_deleting)) {
         $host->save();
       }
     }
@@ -273,17 +273,10 @@ class FieldCollectionItem extends ContentEntityBase implements FieldCollectionIt
   public function getHostId() {
     if (!isset($this->host_id)) {
       $entity_info = $this->entityTypeManager()->getDefinition($this->host_type->value, TRUE);
-      $table = $entity_info->id() . '__' . $this->bundle();
-
-      if (Database::getConnection()->schema()->tableExists($table)) {
-        $query = \Drupal::database()->select($table, 't')->fields('t', ['entity_id']);
-        $query->condition("{$this->bundle()}_value", $this->id());
-        $host_id_results = $query->execute()->fetchCol();
-        $this->host_id = reset($host_id_results);
-      }
-      else {
-        $this->host_id = NULL;
-      }
+      $host_id_results = \Drupal::entityQuery($entity_info->id())
+        ->condition($this->bundle(), $this->id())
+        ->execute();
+      $this->host_id = reset($host_id_results);
     }
 
     return $this->host_id;

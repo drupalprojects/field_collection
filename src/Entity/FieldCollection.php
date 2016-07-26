@@ -44,7 +44,7 @@ class FieldCollection extends ConfigEntityBundleBase implements FieldCollectionI
   protected $id;
 
   /**
-   * The UUID of the node type.
+   * The UUID of the field collection type.
    *
    * @var string
    */

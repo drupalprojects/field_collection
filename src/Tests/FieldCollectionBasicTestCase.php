@@ -144,6 +144,7 @@ class FieldCollectionBasicTestCase extends WebTestBase {
     $field_collection_item_id_2 = $field_collection_item_2->id();
 
     $field_collection_field_1->delete();
+    field_purge_batch(100);
 
     $this->assertNull(FieldCollectionItem::load($field_collection_item_id_1), 'field_collection_item deleted with the field_collection field.');
 
@@ -152,6 +153,7 @@ class FieldCollectionBasicTestCase extends WebTestBase {
     $this->assertNotNull(FieldCollection::load($this->field_collection_name), 'field_collection config entity still exists.');
 
     $field_collection_field_2->delete();
+    field_purge_batch(100);
 
     $this->assertNull(FieldCollectionItem::load($field_collection_item_id_2), 'Other field_collection_item deleted with it\'s field.');
 

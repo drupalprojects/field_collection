@@ -102,9 +102,10 @@ class FieldCollection extends FieldItemBase {
 
   public function delete() {
     $field_collection_item = $this->getFieldCollectionItem();
-    // Set a flag to remember that the host entity is being deleted. See
-    // \Drupal\field_collection\Entity\FieldCollectionItem::deleteHostEntityReference().
     if ($field_collection_item !== NULL) {
+      // Set a flag so the field collection item entity knows that the field in
+      // its host is already being taken care of.
+      // See \Drupal\field_collection\Entity\FieldCollectionItem::delete().
       $field_collection_item->field_collection_deleting = TRUE;
       $field_collection_item->delete();
     }

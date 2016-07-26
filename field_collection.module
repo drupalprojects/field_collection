@@ -73,30 +73,20 @@ function field_collection_field_storage_config_insert(FieldStorageConfigInterfac
  */
 function field_collection_field_storage_config_delete(EntityInterface $field) {
   if ($field->getType() == 'field_collection') {
+    // If this was called through field API bulk data deletion there may still
+    // be a few field collection items from field data that hasn't been purged
+    // yet.  Delete them here because Entity::delete() won't work after the
+    // bundle is deleted.
+    $field_collection_item_ids = \Drupal::entityQuery('field_collection_item')
+      ->condition('field_name', $field->getName())
+      ->execute();
+    $controller = \Drupal::entityTypeManager()->getStorage('field_collection_item');
+    $field_collection_items = $controller->loadMultiple($field_collection_item_ids);
+    $controller->delete($field_collection_items);
+
+    // Do the bundle delete.
     $field_collection_bundle = FieldCollection::load($field->getName());
     $field_collection_bundle->delete();
-  }
-}
-
-/**
- * Implements hook_ENTITY_TYPE_predelete() for field_config.
- *
- * Delete field collection item entities when their corrosponding field
- * collection field is deleted.
- *
- * TODO: Perform the operation in batches because it will fail when there is
- * too much data.  See @link field_purge Field API bulk data deletion @endlink
- * for inspiration.
- */
-function field_collection_field_config_predelete(EntityInterface $field) {
-  if ($field->getType() == 'field_collection') {
-    $query = \Drupal::database()->select($field->getTargetEntityTypeId() . '__' . $field->getName(), 't')->fields('t', ['entity_id']);
-    $query->condition("bundle", $field->getTargetBundle());
-    $field_collection_item_ids = $query->execute()->fetchCol();
-
-    $controller = \Drupal::entityTypeManager()->getStorage('field_collection_item');
-    $entities = $controller->loadMultiple($field_collection_item_ids);
-    $controller->delete($entities);
   }
 }
 
