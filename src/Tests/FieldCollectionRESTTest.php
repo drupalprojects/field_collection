@@ -4,6 +4,7 @@ namespace Drupal\field_collection\Tests;
 
 use Drupal\rest\Tests\RESTTestBase;
 use Drupal\Component\Serialization\Json;
+use Drupal\Tests\field_collection\Functional\FieldCollectionTestTrait;
 
 /**
  * Test REST features.
