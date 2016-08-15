@@ -1,9 +1,0 @@
-langcode: en
-status: true
-dependencies:
-  module:
-    - field_collection
-id: field_collection_item.table
-label: Table
-targetEntityType: field_collection_item
-cache: true
