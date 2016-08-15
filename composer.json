@@ -16,7 +16,7 @@
     }
   ],
   "support": {
-    "issues": "https://drupal.org/project/issues/field_collection",
+    "issues": "https://drupal.org/project/issues/field_collection"
   },
   "minimum-stability": "dev"
 }
