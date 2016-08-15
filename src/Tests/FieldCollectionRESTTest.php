@@ -42,7 +42,6 @@ class FieldCollectionRESTTest extends RESTTestBase {
     // Create a user account that has the required permissions to read
     // resources via the REST API.
     $permissions = $this->entityPermissions('node', 'view');
-    $permissions[] = 'restful get entity:node';
     $account = $this->drupalCreateUser($permissions);
     $this->drupalLogin($account);
 
