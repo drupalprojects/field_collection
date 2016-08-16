@@ -9,7 +9,7 @@ use Drupal\field_collection\Plugin\Field\FieldType\FieldCollection;
  * Adds field collection items to field collections.
  */
 class FieldCollectionItemNormalizer extends ComplexDataNormalizer {
-//
+
   /**
    * The interface or class that this Normalizer supports.
    *

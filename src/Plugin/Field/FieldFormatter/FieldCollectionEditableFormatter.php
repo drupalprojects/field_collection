@@ -24,7 +24,7 @@ class FieldCollectionEditableFormatter extends FieldCollectionLinksFormatter {
                 // items from the FileItemList that doesn't count blank items?
     $render_items = [];
     foreach ($items as $delta => $item) {
-      if ($item->value !== NULL) {
+      if ($item->target_id !== NULL) {
         $count++;
         $to_render = \Drupal::entityTypeManager()->getViewBuilder('field_collection_item')->view($item->getFieldCollectionItem());
 

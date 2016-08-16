@@ -176,10 +176,10 @@ class FieldCollectionItem extends ContentEntityBase implements FieldCollectionIt
       $delta = $this->getDelta();
       $value = $host_entity->{$this->bundle()}->getValue();
       if (isset($delta)) {
-        $value[$delta] = ['field_collection_item' => $this];
+        $value[$delta] = ['entity' => $this];
       }
       else {
-        $value[] = ['field_collection_item' => $this];
+        $value[] = ['entity' => $this];
       }
       $host_entity->{$this->bundle()}->setValue($value);
 
@@ -241,10 +241,10 @@ class FieldCollectionItem extends ContentEntityBase implements FieldCollectionIt
   public function getDelta() {
     if (($host = $this->getHost()) && isset($host->{$this->bundle()})) {
       foreach ($host->{$this->bundle()} as $delta => $item) {
-        if (isset($item->value) && $item->value == $this->id()) {
+        if (isset($item->target_id) && $item->target_id == $this->id()) {
           return $delta;
         }
-        elseif (isset($item->field_collection_item) && $item->field_collection_item === $this) {
+        elseif (isset($item->entity) && $item->entity === $this) {
           return $delta;
         }
       }
@@ -312,7 +312,8 @@ class FieldCollectionItem extends ContentEntityBase implements FieldCollectionIt
           drupal_set_message(t('Field is already full.'), 'error');
         }
         else {
-          $entity->{$this->bundle()}[] = ['field_collection_item' => $this];
+          $bundle = $this->bundle();
+          $entity->$bundle->appendItem(['entity' => $this]);
           $entity->save();
         }
       }

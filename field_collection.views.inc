@@ -19,7 +19,7 @@ use Drupal\views;
 function field_collection_field_views_data(FieldStorageConfigInterface $field_storage) {
   $data = views_field_default_views_data($field_storage);
   $storage = _views_field_get_entity_type_storage($field_storage);
-  /** @var \Drupal\Core\Entity\Sql\DefaultTableMapping $table_mapping */ 
+  /** @var \Drupal\Core\Entity\Sql\DefaultTableMapping $table_mapping */
   $table_mapping = $storage->getTableMapping();
 
   $entity_type_id = $field_storage->getTargetEntityTypeId();
@@ -40,8 +40,8 @@ function field_collection_field_views_data(FieldStorageConfigInterface $field_st
           'target entity type' => $entity_type_id,
         ];
       }
-    } 
-  } 
+    }
+  }
 
   $args['@entity'] = $entity_type->getLabel()->render();
   $args['@entity'] = ($args['@entity'] == t('Content')) ? t('Node') : $args['@entity'];
@@ -61,7 +61,6 @@ function field_collection_field_views_data(FieldStorageConfigInterface $field_st
     'field table' => $table_mapping->getDedicatedDataTableName($field_storage),
     'field field' => $field_name . '_value',
   ];
- 
 
   return $data;
 }

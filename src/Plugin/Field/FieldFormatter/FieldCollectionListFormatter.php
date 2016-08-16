@@ -33,7 +33,7 @@ class FieldCollectionListFormatter extends FieldCollectionLinksFormatter {
 
     $storage = \Drupal::entityTypeManager()->getStorage('field_collection_item');
     foreach ($items as $delta => $item) {
-      if ($item->value !== NULL) {
+      if ($item->target_id !== NULL) {
         $count++;
 
         $field_collection_item = $storage->loadRevision($item->revision_id);
@@ -43,7 +43,7 @@ class FieldCollectionListFormatter extends FieldCollectionLinksFormatter {
             $this->fieldDefinition->getName() . ' ' . $delta,
             Url::FromRoute(
               'entity.field_collection_item.canonical',
-              ['field_collection_item' => $item->value]
+              ['field_collection_item' => $item->target_id]
             ))
             ->toString();
 
@@ -55,10 +55,10 @@ class FieldCollectionListFormatter extends FieldCollectionLinksFormatter {
             Url::FromRoute(
               'field_collection_item.revision_show',
               [
-                'field_collection_item' => $item->value,
+                'field_collection_item' => $item->target_id,
                 'field_collection_item_revision' => $item->revision_id,
-              ]))
-              ->toString();
+          ]))
+          ->toString();
         }
 
         $element[$delta] = ['#markup' => $links];

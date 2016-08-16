@@ -49,13 +49,13 @@ class FieldCollectionEmbedWidget extends WidgetBase {
 
     $field_state = static::getWidgetState($element['#field_parents'], $field_name, $form_state);
 
-    if (isset($field_state['field_collection_item'][$delta])) {
-      $field_collection_item = $field_state['field_collection_item'][$delta];
+    if (isset($field_state['entity'][$delta])) {
+      $field_collection_item = $field_state['entity'][$delta];
     }
     else {
       $field_collection_item = $items[$delta]->getFieldCollectionItem(TRUE);
       // Put our entity in the form state, so FAPI callbacks can access it.
-      $field_state['field_collection_item'][$delta] = $field_collection_item;
+      $field_state['entity'][$delta] = $field_collection_item;
     }
 
     static::setWidgetState($element['#field_parents'], $field_name, $form_state, $field_state);
@@ -178,7 +178,7 @@ class FieldCollectionEmbedWidget extends WidgetBase {
 
     $field_state = static::getWidgetState($field_parents, $field_name, $form_state);
 
-    $field_collection_item = $field_state['field_collection_item'][$element['#delta']];
+    $field_collection_item = $field_state['entity'][$element['#delta']];
 
     $display = entity_get_form_display('field_collection_item', $field_name, 'default');
     $display->extractFormValues($field_collection_item, $element, $form_state);
@@ -222,10 +222,10 @@ class FieldCollectionEmbedWidget extends WidgetBase {
         $field['_weight'] = $element['_weight']['#value'];
       }
 
-      // Put the field collection field in $field['field_collection_item'], so
+      // Put the field collection field in $field['entity'], so
       // it is saved with the host entity via FieldCollection->preSave() / field
       // API if it is not empty.
-      $field['field_collection_item'] = $field_collection_item;
+      $field['entity'] = $field_collection_item;
       $form_state->setValue($element['#parents'], $field);
     }
   }
@@ -279,11 +279,11 @@ class FieldCollectionEmbedWidget extends WidgetBase {
       $form_state->setUserInput($user_input);
 
       // Move the entity in our saved state.
-      if (isset($field_state['field_collection_item'][$i + 1])) {
-        $field_state['field_collection_item'][$i] = $field_state['field_collection_item'][$i + 1];
+      if (isset($field_state['entity'][$i + 1])) {
+        $field_state['entity'][$i] = $field_state['entity'][$i + 1];
       }
       else {
-        unset($field_state['field_collection_item'][$i]);
+        unset($field_state['entity'][$i]);
       }
     }
 
@@ -295,7 +295,7 @@ class FieldCollectionEmbedWidget extends WidgetBase {
       // Create a new field collection item after deleting the last one so the
       // form will show a blank field collection item instead of resurrecting
       // the first one if there was already data.
-      $field_state['field_collection_item'][0] = FieldCollectionItem::create(['field_name' => $field_name]);
+      $field_state['entity'][0] = FieldCollectionItem::create(['field_name' => $field_name]);
     }
 
     // Fix the weights. Field UI lets the weights be in a range of
@@ -364,7 +364,7 @@ class FieldCollectionEmbedWidget extends WidgetBase {
     // Make a new field collection item. This helps to ensure that
     // trying to add a field collection item won't ressurect a deleted one from
     // the trash bin.
-    $field_state['field_collection_item'][$field_state['items_count']] = FieldCollectionItem::create(['field_name' => $field_name]);
+    $field_state['entity'][$field_state['items_count']] = FieldCollectionItem::create(['field_name' => $field_name]);
 
     static::setWidgetState($parents, $field_name, $form_state, $field_state);
 

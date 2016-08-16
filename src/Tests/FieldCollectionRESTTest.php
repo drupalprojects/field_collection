@@ -12,6 +12,7 @@ use Drupal\Tests\field_collection\Functional\FieldCollectionTestTrait;
  * @group field_collection
  */
 class FieldCollectionRESTTest extends RESTTestBase {
+
   use FieldCollectionTestTrait;
 
   /**

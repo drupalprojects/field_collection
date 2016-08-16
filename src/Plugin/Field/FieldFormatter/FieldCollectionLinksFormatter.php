@@ -20,7 +20,7 @@ abstract class FieldCollectionLinksFormatter extends FormatterBase {
         t('Edit'),
         Url::FromRoute(
           'entity.field_collection_item.edit_form',
-          ['field_collection_item' => $item->value]
+          ['field_collection_item' => $item->target_id]
         ))
         ->toString();
 
@@ -28,7 +28,7 @@ abstract class FieldCollectionLinksFormatter extends FormatterBase {
         t('Delete'),
         Url::FromRoute(
           'entity.field_collection_item.delete_form',
-          ['field_collection_item' => $item->value]
+          ['field_collection_item' => $item->target_id]
         ))
         ->toString();
 

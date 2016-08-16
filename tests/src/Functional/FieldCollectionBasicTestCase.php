@@ -43,7 +43,7 @@ class FieldCollectionBasicTestCase extends BrowserTestBase {
     /** @var \Drupal\field_collection\FieldCollectionItemInterface $field_collection_item */
     list ($node, $field_collection_item) = $this->createNodeWithFieldCollection('article');
 
-    $this->assertEqual($field_collection_item->id(), $node->{$this->field_collection_name}->value, 'A field_collection_item has been successfully created and referenced.');
+    $this->assertEqual($field_collection_item->id(), $node->{$this->field_collection_name}->target_id, 'A field_collection_item has been successfully created and referenced.');
 
     $this->assertEqual($field_collection_item->revision_id->value, $node->{$this->field_collection_name}->revision_id, 'The new field_collection_item has the correct revision.');
 
@@ -52,21 +52,23 @@ class FieldCollectionBasicTestCase extends BrowserTestBase {
 
     $field_collection_item_2->{$this->inner_field_name}->setValue(2);
 
-    $node->{$this->field_collection_name}[1] = ['field_collection_item' => $field_collection_item_2];
+    $node->{$this->field_collection_name}[1] = ['entity' => $field_collection_item_2];
 
     $node->save();
     $this->nodeStorage->resetCache([$node->id()]);
     $node = Node::load($node->id());
 
-    $this->assertTrue(!empty($field_collection_item_2->id()) && !empty($field_collection_item_2->getRevisionId()), 'Another field_collection_item has been saved.');
+    $this->assertTrue(!empty($field_collection_item_2->id()), 'Second field_collection_item saved.');
+
+    $this->assertTrue(!empty($field_collection_item_2->getRevisionId()), 'Second field_collection_item has a revision.');
 
     $this->assertEqual(count(FieldCollectionItem::loadMultiple()), 2, 'Field_collection_items have been stored.');
 
-    $this->assertEqual($field_collection_item->id(), $node->{$this->field_collection_name}->value, 'Existing reference has been kept during update.');
+    $this->assertEqual($field_collection_item->id(), $node->{$this->field_collection_name}->target_id, 'Existing reference has been kept during update.');
 
     $this->assertEqual($field_collection_item->getRevisionId(), $node->{$this->field_collection_name}[0]->revision_id, 'Revision: Existing reference has been kept during update.');
 
-    $this->assertEqual($field_collection_item_2->id(), $node->{$this->field_collection_name}[1]->value, 'New field_collection_item has been properly referenced.');
+    $this->assertEqual($field_collection_item_2->id(), $node->{$this->field_collection_name}[1]->target_id, 'New field_collection_item has been properly referenced.');
 
     $this->assertEqual($field_collection_item_2->getRevisionId(), $node->{$this->field_collection_name}[1]->revision_id, 'Revision: New field_collection_item has been properly referenced.');
 
@@ -103,7 +105,7 @@ class FieldCollectionBasicTestCase extends BrowserTestBase {
     // should have been established.
     $this->assertTrue(!empty($node->id()), 'Node has been saved with the collection.');
 
-    $this->assertTrue(count($node->{$this->field_collection_name}) == 1 && !empty($node->{$this->field_collection_name}[0]->value) && !empty($node->{$this->field_collection_name}[0]->revision_id), 'Link has been established.');
+    $this->assertTrue(count($node->{$this->field_collection_name}) == 1 && !empty($node->{$this->field_collection_name}[0]->target_id) && !empty($node->{$this->field_collection_name}[0]->revision_id), 'Link has been established.');
 
     // Again, test creating a field collection with a not-yet saved host entity,
     // but this time save both entities via the host.
@@ -117,7 +119,7 @@ class FieldCollectionBasicTestCase extends BrowserTestBase {
 
     $this->assertTrue(!empty($field_collection_item->id()) && !empty($field_collection_item->getRevisionId()), 'Removed field collection item still exists.');
 
-    $this->assertTrue(count($node->{$this->field_collection_name}) == 1 && !empty($node->{$this->field_collection_name}[0]->value) && !empty($node->{$this->field_collection_name}[0]->revision_id), 'Removed field collection item is archived.');
+    $this->assertTrue(count($node->{$this->field_collection_name}) == 1 && !empty($node->{$this->field_collection_name}[0]->target_id) && !empty($node->{$this->field_collection_name}[0]->revision_id), 'Removed field collection item is archived.');
 
   }
 
