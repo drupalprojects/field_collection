@@ -3,12 +3,13 @@
 namespace Drupal\field_collection\Plugin\Field\FieldType;
 
 use Drupal\Core\Field\FieldItemBase;
-use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\field_collection\Entity\FieldCollectionItem;
 use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\TypedData\DataReferenceDefinition;
+use Drupal\Core\TypedData\DataReferenceTargetDefinition;
+use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\Entity\TypedData\EntityDataDefinition;
 
 /**
@@ -80,7 +81,7 @@ class FieldCollection extends EntityReferenceItem {
    * {@inheritdoc}
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
-    $properties['target_id'] = DataDefinition::create('integer')
+    $properties['target_id'] = DataReferenceTargetDefinition::create('integer')
       ->setLabel(t('The ID of the field collection item.'))
       ->setSetting('unsigned', TRUE)
       ->setRequired(TRUE)
