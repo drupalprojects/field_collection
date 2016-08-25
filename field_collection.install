@@ -94,3 +94,39 @@ function field_collection_update_8001() {
     }
   }
 }
+
+/**
+ * Update database to support entity references for pre-existing content types.
+ */
+function field_collection_update_8002() {
+  /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager */
+  $entity_field_manager = \Drupal::service('entity_field.manager');
+  $entity_type_manager = \Drupal::entityTypeManager();
+
+  foreach ($entity_field_manager->getFieldMapByFieldType('field_collection') as $entity_type_id => $map) {
+    $entity_storage = $entity_type_manager->getStorage($entity_type_id);
+
+    // Only SQL storage based entities are supported.
+    if (FALSE === ($entity_storage instanceof SqlEntityStorageInterface)) {
+      continue;
+    }
+
+    foreach ($map as $field_name => $field_settings) {
+      foreach ($field_settings['bundles'] as $bundle) {
+        $config = \Drupal::service('config.factory')->getEditable("field.field.$entity_type_id.$bundle.$field_name");
+        $settings = $config->get('settings');
+        if (empty($settings['handler'])) {
+          $settings['handler'] = 'default:field_collection_item';
+          $settings['handler_settings'] = [
+            'target_bundles' => [$field_name => $field_name],
+            'sort' => ['field' => '_none'],
+            'auto_create' => FALSE,
+            'auto_create_bundle' => '',
+          ];
+          $config->set('settings', $settings);
+          $config->save(TRUE);
+        }
+      }
+    }
+  }
+}
