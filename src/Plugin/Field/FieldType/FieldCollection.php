@@ -134,8 +134,8 @@ class FieldCollection extends EntityReferenceItem {
   /**
    * @TODO
    */
-  public function getFieldCollectionItem($create = FALSE) {
-    if (isset($this->entity)) {
+  public function getFieldCollectionItem($create = FALSE, $use_reference = TRUE) {
+    if ($use_reference && isset($this->entity)) {
       return $this->entity;
     }
     elseif (isset($this->target_id)) {

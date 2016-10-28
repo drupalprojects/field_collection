@@ -25,7 +25,7 @@ class FieldCollectionBasicTestCase extends BrowserTestBase {
    *
    * @var array
    */
-  protected static $modules = ['field_collection', 'node', 'field', 'field_ui'];
+  public static $modules = ['field_collection', 'node', 'field', 'field_ui'];
 
   /**
    * Sets up the data structures for the tests.
@@ -121,6 +121,54 @@ class FieldCollectionBasicTestCase extends BrowserTestBase {
 
     $this->assertTrue(count($node->{$this->field_collection_name}) == 1 && !empty($node->{$this->field_collection_name}[0]->target_id) && !empty($node->{$this->field_collection_name}[0]->revision_id), 'Removed field collection item is archived.');
 
+    // Test with multiple revisions of the host entity.
+    list ($node, $field_collection_item) = $this->createNodeWithFieldCollection('article');
+    $node->save();
+    $this->nodeStorage->resetCache([$node->id()]);
+
+    // Load revision 1.
+    $node = Node::load($node->id());
+    $field_collection_item = $node->get($this->field_collection_name)[0]->getFieldCollectionItem();
+
+    // Remember revision id and inner field value.
+    $revision_1_id = $node->getRevisionId();
+    $revision_1_value = $field_collection_item->{$this->inner_field_name}->value;
+
+    // Update the inner field.
+    $revision_2_value = $revision_1_value + 1;
+    $field_collection_item->{$this->inner_field_name}->setValue($revision_2_value);
+
+    // Save new revision of the host.
+    $node->setNewRevision();
+    $node->save();
+    $revision_2_id = $node->getRevisionId();
+
+    // Make sure we really did get a new revision.
+    $this->assertTrue($revision_2_id > $revision_1_value, 'New revision of node created');
+
+    $this->nodeStorage->resetCache([$node->id()]);
+
+    // Retrieve revision 1 again.
+    $node = \Drupal::entityTypeManager()
+      ->getStorage('node')
+      ->loadRevision($revision_1_id);
+
+    $field_collection_item = $node->get($this->field_collection_name)[0]->getFieldCollectionItem(FALSE, FALSE);
+
+    // Did we get the correct inner field value?
+    $this->assertTrue($field_collection_item->{$this->inner_field_name}->value == $revision_1_value, 'Correct value returned from revision 1.');
+
+    $this->nodeStorage->resetCache([$node->id()]);
+
+    // Retrieve revision 2 again.
+    $node = \Drupal::entityTypeManager()
+      ->getStorage('node')
+      ->loadRevision($revision_2_id);
+
+    $field_collection_item = $node->get($this->field_collection_name)[0]->getFieldCollectionItem(FALSE, FALSE);
+
+    // Did we get the correct inner field value?
+    $this->assertTrue($field_collection_item->{$this->inner_field_name}->value == $revision_2_value, 'Correct value returned from revision 2.');
   }
 
   /**
