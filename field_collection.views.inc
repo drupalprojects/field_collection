@@ -29,8 +29,8 @@ function field_collection_field_views_data(FieldStorageConfigInterface $field_st
 
   foreach ($data as $table_name => $table_data) {
     foreach ($table_data as $table_field_name => $field_data) {
-      // Only operate on the _value columns.
-      if (strrpos($table_field_name, '_value') === (strlen($table_field_name) - strlen('_value'))) {
+      // Only operate on the _target_id columns.
+      if (strrpos($table_field_name, '_target_id') === (strlen($table_field_name) - strlen('_target_id'))) {
         $data[$table_name][$table_field_name]['relationship'] = [
           'id' => 'field_collection_handler_relationship',
           'base' => 'field_collection_item',
@@ -59,7 +59,7 @@ function field_collection_field_views_data(FieldStorageConfigInterface $field_st
     'base field' => $entity_type->getKey('id'),
     'field_name' => $field_name,
     'field table' => $table_mapping->getDedicatedDataTableName($field_storage),
-    'field field' => $field_name . '_value',
+    'field field' => $field_name . '_target_id',
   ];
 
   return $data;
