@@ -53,43 +53,45 @@ function field_collection_update_8001() {
       ];
 
       foreach ($tables as $table_name) {
-        $schema->changeField(
-          $table_name,
-          $old_column_name,
-          $column_name,
-          $column_schema);
+        if ($schema->tableExists($table_name) && $schema->fieldExists($table_name, $old_column_name)) {
+          $schema->changeField(
+            $table_name,
+            $old_column_name,
+            $column_name,
+            $column_schema);
 
-        // Update the installed storage schema for this field as well.
-        $key = $entity_type_id . '.field_schema_data.' . $field_name;
-        if ($field_schema_data = $installed_storage_schema->get($key)) {
-          $field_schema_data[$table_name]['fields'][$column_name] = $column_schema;
-          $field_schema_data[$table_name]['indexes'][$column_name] = [$column_name];
-          unset($field_schema_data[$table_name]['fields']["{$field_name}_value"]);
-          $installed_storage_schema->set($key, $field_schema_data);
+          // Update the installed storage schema for this field as well.
+          $key = $entity_type_id . '.field_schema_data.' . $field_name;
+          if ($field_schema_data = $installed_storage_schema->get($key)) {
+            $field_schema_data[$table_name]['fields'][$column_name] = $column_schema;
+            $field_schema_data[$table_name]['indexes'][$column_name] = [$column_name];
+            unset($field_schema_data[$table_name]['fields']["{$field_name}_value"]);
+            $installed_storage_schema->set($key, $field_schema_data);
+          }
+
+          // Modified from Drupal\field_collection\Plugin\Field\FieldType\FieldCollection::schema()
+          // at time of writing.
+          $spec = [
+            'fields' => [
+              $column_name => [
+                'type' => 'int',
+                'unsigned' => TRUE,
+                'description' => 'The ID of the field collection item.',
+                'not null' => TRUE,
+              ],
+              $revision_column_name => [
+                'type' => 'int',
+                'description' => 'The revision ID of the field collection item.',
+                'not null' => FALSE,
+              ],
+            ],
+            'indexes' => [
+              $column_name => [$column_name],
+            ],
+          ];
+
+          $schema->addIndex($table_name, $column_name, [$column_name], $spec);
         }
-
-        // Modified from Drupal\field_collection\Plugin\Field\FieldType\FieldCollection::schema()
-        // at time of writing.
-        $spec = [
-          'fields' => [
-            $column_name => [
-              'type' => 'int',
-              'unsigned' => TRUE,
-              'description' => 'The ID of the field collection item.',
-              'not null' => TRUE,
-            ],
-            $revision_column_name => [
-              'type' => 'int',
-              'description' => 'The revision ID of the field collection item.',
-              'not null' => FALSE,
-            ],
-          ],
-          'indexes' => [
-            $column_name => [$column_name],
-          ],
-        ];
-
-        $schema->addIndex($table_name, $column_name, [$column_name], $spec);
       }
     }
   }
