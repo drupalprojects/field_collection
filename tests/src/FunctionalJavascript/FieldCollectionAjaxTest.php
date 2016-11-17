@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\field_collection\FunctionalJavascriptTests;
+namespace Drupal\Tests\field_collection\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\JavascriptTestBase;
 use Drupal\Tests\field_collection\Functional\FieldCollectionTestTrait;
@@ -12,7 +12,7 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
  *
  * @group Ajax
  */
-class FieldCollectionAJAXTest extends JavascriptTestBase {
+class FieldCollectionAjaxTest extends JavascriptTestBase {
   use FieldCollectionTestTrait;
 
   /**
@@ -20,7 +20,7 @@ class FieldCollectionAJAXTest extends JavascriptTestBase {
    *
    * @var array
    */
-  protected static $modules = ['field_collection', 'node', 'field', 'field_ui'];
+  public static $modules = ['field_collection', 'node', 'field', 'field_ui'];
 
   /**
    * Sets up the data structures for the tests.
