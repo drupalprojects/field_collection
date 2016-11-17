@@ -41,6 +41,15 @@ interface FieldCollectionItemInterface extends ContentEntityInterface {
   public function getHostId();
 
   /**
+   * Returns the revision_id of the host entity for this field collection item.
+   *
+   * To provide correct record id, we need to use revision ids instead of id.
+   *
+   * @return int
+   */
+  public function getHostRevisionId();
+
+  /**
    * Sets the host entity. Only possible during creation of a item.
    *
    * @param \Drupal\Core\Entity\ContentEntityInterface $entity

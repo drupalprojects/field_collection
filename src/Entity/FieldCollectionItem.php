@@ -4,8 +4,10 @@ namespace Drupal\field_collection\Entity;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\ContentEntityBase;
+use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field_collection\FieldCollectionItemInterface;
 
 /**
@@ -61,6 +63,13 @@ class FieldCollectionItem extends ContentEntityBase implements FieldCollectionIt
    * TODO: Possibly convert it to a FieldInterface.
    */
   protected $host_id;
+
+  /**
+   * The revision id of the host entity.
+   *
+   * @var int
+   */
+  protected $host_revision_id;
 
   /**
    * Implements Drupal\Core\Entity\EntityInterface::id().
@@ -255,12 +264,21 @@ class FieldCollectionItem extends ContentEntityBase implements FieldCollectionIt
    * {@inheritdoc}
    */
   public function getHost($reset = FALSE) {
+    $host_type = $this->host_type->value;
+    $entity_info = $this->entityTypeManager()->getDefinition($host_type, TRUE);
+
     if ($id = $this->getHostId()) {
-      $storage = $this->entityTypeManager()->getStorage($this->host_type->value);
+      $storage = $this->entityTypeManager()->getStorage($host_type);
       if ($reset) {
         $storage->resetCache([$id]);
       }
-      return $storage->load($id);
+
+      $host_entity = $storage->load($id);
+      if($entity_info->isRevisionable() && ($rev_id = $this->getHostRevisionId()) && $rev_id != $host_entity->getRevisionId()) {
+          $host_entity = $storage->loadRevision($rev_id);
+      }
+
+      return $host_entity;
     }
     else {
       return NULL;
@@ -280,6 +298,40 @@ class FieldCollectionItem extends ContentEntityBase implements FieldCollectionIt
     }
 
     return $this->host_id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getHostRevisionId() {
+    $host_type = $this->host_type->value;
+    $entity_info = $this->entityTypeManager()->getDefinition($host_type, TRUE);
+
+    if (!isset($this->host_revision_id) && $entity_info->isRevisionable()) {
+
+      /** @var SqlContentEntityStorage $storage */
+      $storage = $this->entityTypeManager()->getStorage($host_type);
+
+      // generate revision table name of the current field
+      $field_storage = FieldStorageConfig::loadByName($host_type, $this->bundle());
+      $table = $storage->getTableMapping()->getDedicatedRevisionTableName($field_storage);
+
+      // fetch entity + revision id of the related host
+      $query = \Drupal::database()->select($table, 'base');
+      $query->addExpression('base.entity_id', 'entity_id');
+      $query->addExpression('base.revision_id', 'revision_id');
+      $query->condition('base.'.$this->bundle().'_target_id', $this->id());
+      $query->condition('base.'.$this->bundle().'_revision_id', $this->getRevisionId());
+      $query->range(0, 1);
+      $result = $query->execute()->fetch();
+
+      $this->host_revision_id = $result->revision_id;
+      if ($this->host_revision_id) {
+        $this->host_id = $result->entity_id;
+      }
+    }
+
+    return $this->host_revision_id;
   }
 
   /**
