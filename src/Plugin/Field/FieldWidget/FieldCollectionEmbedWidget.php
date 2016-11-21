@@ -236,9 +236,9 @@ class FieldCollectionEmbedWidget extends WidgetBase {
    * When a remove button is submitted, we need to find the item that it
    * referenced and delete it. Since field UI has the deltas as a straight
    * unbroken array key, we have to renumber everything down. Since we do this
-   * we *also* need to move all the deltas around in the $form_state->values
-   * and $form_state input so that user changed values follow. This is a bit
-   * of a complicated process.
+   * we *also* need to move all the deltas around in the $form_state values,
+   * $form_state input, and $form_state field_storage so that user changed
+   * values follow. This is a bit of a complicated process.
    */
   public static function removeSubmit($form, FormStateInterface $form_state) {
     $button = $form_state->getTriggeringElement();
@@ -266,8 +266,8 @@ class FieldCollectionEmbedWidget extends WidgetBase {
       $moving_element = NestedArray::getValue($form, $old_element_address);
 
       $moving_element_value = NestedArray::getValue($form_state->getValues(), $old_element_state_address);
-
       $moving_element_input = NestedArray::getValue($form_state->getUserInput(), $old_element_state_address);
+      $moving_element_field = NestedArray::getValue($form_state->get('field_storage'), array_merge(['#parents'], $address));
 
       // Tell the element where it's being moved to.
       $moving_element['#parents'] = $new_element_state_address;
@@ -277,6 +277,7 @@ class FieldCollectionEmbedWidget extends WidgetBase {
       $user_input = $form_state->getUserInput();
       NestedArray::setValue($user_input, $moving_element['#parents'], $moving_element_input);
       $form_state->setUserInput($user_input);
+      NestedArray::setValue($form_state->get('field_storage'), array_merge(['#parents'], $moving_element['#parents']), $moving_element_field);
 
       // Move the entity in our saved state.
       if (isset($field_state['entity'][$i + 1])) {
