@@ -183,19 +183,15 @@ class FieldCollection extends EntityReferenceItem {
   public function preSave() {
 
     if ($field_collection_item = $this->getFieldCollectionItem()) {
-      // TODO: Handle node cloning
-      /*
-      if (!empty($host_entity->is_new) && empty($entity->is_new)) {
+      $host = $this->getEntity();
+
+      // Handle node cloning
+      if($host->isNew() && !$field_collection_item->isNew()) {
         // If the host entity is new but we have a field_collection that is not
         // new, it means that its host is being cloned. Thus we need to clone
         // the field collection entity as well.
-        $new_entity = clone $entity;
-        $new_entity->target_id = NULL;
-        $new_entity->revision_id = NULL;
-        $new_entity->is_new = TRUE;
-        $entity = $new_entity;
+        $field_collection_item = $field_collection_item->createDuplicate();
       }
-      */
 
       // TODO: Handle deleted items
       /*
@@ -231,11 +227,10 @@ class FieldCollection extends EntityReferenceItem {
       }
       */
 
-      $this->newHostRevision = $this->getEntity()->isNewRevision();
+      $this->newHostRevision = $host->isNewRevision();
 
       // If the host entity is saved as new revision, do the same for the item.
       if ($this->newHostRevision) {
-        $host = $this->getEntity();
 
         $field_collection_item->setNewRevision();
 
